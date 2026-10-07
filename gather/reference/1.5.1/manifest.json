@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Gather \u2014 Account IDs",
+  "version": "1.5.1",
+  "description": "Find and check social account IDs. Keep display names, links and notes together, with saved recent batches.",
+  "minimum_chrome_version": "114",
+  "permissions": [
+    "scripting",
+    "storage",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "https://*.instagram.com/*",
+    "https://*.facebook.com/*",
+    "https://*.tiktok.com/*",
+    "https://*.youtube.com/*",
+    "https://*.threads.com/*",
+    "https://*.threads.net/*"
+  ],
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "action": {
+    "default_title": "Get UserIDs with Gather",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "48": "icons/48.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'"
+  }
+}

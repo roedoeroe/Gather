@@ -1,0 +1,6 @@
+{
+  "name": "gather-account-ids",
+  "version": "1.5.1",
+  "private": true,
+  "type": "module"
+}

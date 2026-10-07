@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Gather — Workspace</title><link rel="icon" href="icon.svg"><link rel="stylesheet" href="workspace.css"></head>
+<body>
+<header class="bar"><a class="brand" href="workspace.html"><img src="icon.svg" width="28" height="28" alt="">Gather<span>Workspace</span></a><nav><a href="index.html" target="_blank">Account tools ↗</a><button id="expand" class="subtle" hidden>Open full workspace ↗</button></nav></header>
+<div class="layout">
+<aside>
+  <p class="eyebrow">YOUR WORK</p>
+  <button id="inbox" class="destination">Inbox <span id="inboxCount">0</span></button>
+  <div class="section-heading"><h2>Projects</h2><button id="newProject" class="subtle">+ New</button></div>
+  <nav id="projects" aria-label="Projects and scans"></nav>
+  <div class="aside-foot"><span class="local-dot"></span>Saved in this browser<p>No automatic page capture.</p></div>
+</aside>
+<main>
+  <div class="heading"><div><p id="projectName" class="eyebrow">READY WHEN YOU ARE</p><h1 id="scanName">Inbox</h1><p id="scanHelp" class="quiet">Save something now. Organize it when you’re ready.</p></div><div><button id="renameContext" class="subtle" hidden>Rename</button><button id="newScan" hidden>+ New scan</button></div></div>
+  <div id="message" class="message" role="status" hidden></div>
+  <div class="metrics" aria-label="Continue your work"><button data-filter="attention"><strong id="reviewCount">0</strong><span>need review</span></button><button data-view="tasks"><strong id="taskCount">0</strong><span>next actions</span></button><button data-view="searches"><strong id="searchCount">0</strong><span>searches to review</span></button></div>
+  <section class="composer" aria-label="Add to current scan">
+    <div class="section-heading"><h2>Keep your research moving.</h2><span id="saveDestination" class="quiet">Saving to Inbox</span></div>
+    <form id="searchForm" class="search-form"><label class="sr-only" for="query">Search query</label><input id="query" placeholder="Search a name, handle, phrase…" maxlength="2000" required><label class="sr-only" for="provider">Search provider</label><select id="provider"><option value="google">Google</option><option value="bing">Bing</option><option value="instagram">Instagram · Google</option><option value="facebook">Facebook · Google</option><option value="tiktok">TikTok · Google</option><option value="threads">Threads · Google</option><option value="youtube">YouTube</option><option value="x">X search</option></select><button class="primary" type="submit">Search ↗</button></form>
+    <div class="add-actions"><button id="savePage">Save current page</button><button id="addSource">+ Link / excerpt</button><button id="addNote">+ Note</button><button id="addTask">+ Next action</button></div>
+    <p class="micro">Search opens the selected service. Use Gather’s toolbar or right-click a page to save it.</p>
+  </section>
+  <div class="tabs" role="navigation" aria-label="Workspace views"><button data-view="items" class="selected">Saved items</button><button data-view="tasks">Next actions</button><button data-view="searches">Search history</button><button data-view="activity">Activity</button></div>
+  <div class="list-tools"><label class="sr-only" for="localSearch">Find in current scan</label><input id="localSearch" type="search" placeholder="Find in this scan…"><label class="sr-only" for="filter">Filter saved items</label><select id="filter"><option value="all">All items</option><option value="attention">Needs review</option><option value="account">Accounts</option><option value="source">Sources</option><option value="note">Notes</option><option value="excluded">Excluded</option></select></div>
+  <section id="items" class="cards" aria-live="polite" aria-label="Saved items"></section>
+  <section id="tasks" class="cards" aria-live="polite" aria-label="Next actions" hidden></section>
+  <section id="searches" class="cards" aria-live="polite" aria-label="Search history" hidden></section>
+  <section id="activity" class="cards" aria-live="polite" aria-label="Gather activity" hidden></section>
+  <footer><div><label class="sr-only" for="reportFormat">Report format</label><select id="reportFormat"><option value="md">Readable report</option><option value="json">Structured JSON</option></select><button id="exportReport">Export report</button><button id="backup">Back up all work</button><button id="restore" class="subtle">Restore backup</button><input id="restoreFile" type="file" accept=".json,application/json" hidden></div><p id="storageUsage" class="micro"></p><p class="micro">Reports include selected items from this scan. Backups preserve all projects and legacy batches.</p></footer>
+</main>
+</div>
+<dialog id="editor"><form id="editorForm"><h2 id="editorTitle"></h2><p id="editorDestination" class="quiet"></p><div id="fields"></div><div class="dialog-actions"><button type="button" id="cancelEdit">Cancel</button><button type="submit" id="submitEdit" class="primary">Save</button></div><p id="editorError" role="alert"></p></form></dialog>
+<dialog id="historyDialog"><h2>Account observations</h2><p class="quiet">Same platform account ID in this project. These records do not establish who operates the account.</p><div id="historyContent"></div><button id="closeHistory">Close</button></dialog>
+<script type="module" src="workspace.js"></script>
+</body></html>

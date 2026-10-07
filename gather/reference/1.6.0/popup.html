@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light">
+<title>Gather — Quick lookup</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="popup.css">
+</head>
+<body class="quick-panel">
+<header class="quick-header"><div class="brand"><img src="icon.svg" width="25" height="25" alt=""><span>Gather</span></div><button id="openFull" class="text-button">Full tool ↗</button></header>
+<main>
+  <section class="workspace-quick" aria-label="Save destination"><div class="workspace-controls"><label for="gatherDestination">Save to</label><select id="gatherDestination" disabled><option>Inbox</option></select><button id="openPanel" class="text-button">Side panel</button><button id="openWorkspace" class="text-button">Workspace ↗</button></div><button id="saveCurrentSource" class="text-button">Save this page</button><p id="workspaceStatus" class="quiet" role="status"></p></section>
+  <label for="quickLinks" class="quick-label">Paste a profile link.</label>
+  <textarea id="quickLinks" spellcheck="false" maxlength="100000" placeholder="Or paste a whole list of accounts…" title="Enter to run · Shift+Enter for a new line" aria-describedby="quickCount"></textarea>
+  <div class="quick-meta"><span id="quickCount">Instagram, Facebook, Threads, TikTok, YouTube</span><button id="usePage" class="text-button" disabled title="Open a supported profile or channel to use this">Run on this page</button></div>
+  <div class="quick-actions"><button id="getIds" class="primary-button" disabled>Get UserIDs</button><label class="auto-label"><input id="quickAuto" type="checkbox" role="switch">Auto-copy</label></div>
+  <p id="quickMessage" role="status" hidden></p>
+  <section id="quickResults" aria-label="Account results" hidden>
+    <div class="quick-copy"><label for="quickMode" class="sr-only">Copy format</label><select id="quickMode"><option value="ids">IDs only</option><option value="details">Account details</option></select><label for="quickSeparator" class="sr-only">Separate IDs with</label><select id="quickSeparator"><option value="newline">New lines</option><option value="comma">Commas</option><option value="space">Spaces</option></select><label id="quickNamesOption" class="auto-label names-option" hidden title="Show and include display names when copying account details"><input id="quickNames" type="checkbox" role="switch" checked>Display names</label><button id="copyQuick" class="primary-button">Copy IDs</button></div>
+    <div class="quick-status"><p id="quickSummary" aria-live="polite"></p><button id="stopQuick" class="text-button" hidden>Stop</button><button id="retryQuick" class="text-button" hidden>Retry unfinished</button></div>
+    <ul id="quickList" class="account-list" aria-label="Accounts"></ul>
+    <p id="quickSaved" class="quiet">Saved in Recent batches · Edit notes in the full tool.</p>
+  </section>
+  <section id="manualCopy" hidden aria-label="Manual copy"><p class="quiet">Clipboard access was blocked. Press Ctrl+C or Command+C to copy the selected text.</p><label for="quickCopyText" class="sr-only">Formatted output to copy</label><textarea id="quickCopyText" readonly spellcheck="false"></textarea><button id="closeManual" class="text-button">Done</button></section>
+</main>
+<script type="module" src="popup.js"></script>
+</body></html>

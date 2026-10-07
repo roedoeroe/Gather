@@ -58,7 +58,7 @@ Reusable cloud startup instructions are saved as a configuration draft when the 
 
 ## Source persistence and artifacts
 
-At packaging time:
+Publication verified after the user explicitly approved publishing the development branch:
 
 - Working source: `/workspace/Gather/gather`.
 - Final source checkpoint: `/workspace/Gather/checkpoints/gather-1.8.0`.
@@ -66,7 +66,8 @@ At packaging time:
 - Final downloads: `/workspace/Gather/dist/Gather-1.8.0-extension.zip`, `/workspace/Gather/dist/Gather-1.8.0-development.zip`, `/workspace/Gather/dist/Gather-1.8.0-SHA256SUMS.txt`.
 - Preserved 1.7.0 extension/development ZIPs and checksums remain in `dist/`.
 - Pre-final recovery ZIP: `/workspace/Gather/dist/Gather-1.8.0-pre-final-development.zip`, SHA-256 `1a32d741c92e9c039331fd6ad21e16975522f27e0ff278ffc8178a4027873c3b`.
-- No GitHub push or Drive upload has been performed at packaging time. The last read-only remote check showed `roedoeroe/Gather` main at `e721d70807062e5e1b1df4b94b6f7059eca5e308` with the original README-only tree. A local checkout or local commit is not external synchronization. Download the development ZIP to retain source independently of this cloud workspace. Any later publication must be reported with its actual branch/commit; never assume automatic Drive sync.
+- **Published source:** [roedoeroe/Gather — develop/1.8.0-r3](https://github.com/roedoeroe/Gather/tree/develop/1.8.0-r3). The tested implementation commit is [`c0da3abe660d3c4154c3e282a3c3a73144af1040`](https://github.com/roedoeroe/Gather/commit/c0da3abe660d3c4154c3e282a3c3a73144af1040), verified with `git ls-remote` after push. Publication documentation may add a later commit on that branch; runtime source remains the tested implementation.
+- `main` remains `e721d70807062e5e1b1df4b94b6f7059eca5e308` (the original README-only tree). No merge or pull request was made. No Drive upload was performed and automatic Drive synchronization is not assumed. Download the development ZIP for a separate complete source/evidence copy.
 
 The development ZIP contains source, tests, current/historical documentation and evidence. The extension ZIP contains only the loadable `account-id-tool` directory. Packaging verifies archive CRC, manifest/package version and exact extension file hashes. `docs/SHA256.json` hashes every extension source file; the separate checksums file hashes the two ZIPs.
 

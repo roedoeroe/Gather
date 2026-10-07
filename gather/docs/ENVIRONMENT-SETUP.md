@@ -7,3 +7,5 @@ Reusable startup instructions were saved successfully through the cloud-environm
 Review and save the changes in environment settings, then **Publish** the environment. Saving a draft does not apply/publish it or prove that a fresh task can restore this source. No fresh-task restoration was performed. Do not rely on a local checkout/commit alone as proof of remote synchronization; retain the development ZIP independently.
 
 Native unpacked extension acceptance remains blocked by administrator policy. A permitted native runner or local Chrome/Edge is the supported diagnostic path. Browser security sandbox, TLS and administrator policy were not weakened.
+
+The user subsequently approved source publication. The tested implementation was pushed to `roedoeroe/Gather`, branch `develop/1.8.0-r3`, commit `c0da3abe660d3c4154c3e282a3c3a73144af1040`, and the remote ref was verified. `main` remains unchanged. Startup instructions were updated to identify this durable source; configuration publication and fresh-task restoration remain separate, unperformed steps.

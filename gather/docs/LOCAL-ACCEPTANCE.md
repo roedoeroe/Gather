@@ -1,12 +1,12 @@
-# Check Gather 1.8.4 in Chrome or Edge
+# Check Gather 1.8.5 in Chrome or Edge
 
 The cloud tests reproduced and fixed the reported worker exception. This checklist verifies the remaining native behavior on the browser where Gather is installed. Use only disposable fictional cases for the privacy checks.
 
 ## Update without losing storage
 
 1. Preserve the installed folder. Back up work if the current build opens. If 1.8.0 cannot open, keep the browser profile and stored data intact; do not uninstall or clear site data.
-2. Extract `Gather-1.8.4-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include all modules, including `backup-validation.js` and `history-ui.js`.
-3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.4**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
+2. Extract `Gather-1.8.5-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include all modules, including `backup-validation.js` and `history-ui.js`.
+3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.5**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
 
 ## Workspace acceptance
 
@@ -37,4 +37,12 @@ The cloud tests reproduced and fixed the reported worker exception. This checkli
 
 Privacy acceptance: confirm New case says **Case name** and explains local storage. With a fictional Northbridge case selected, check the red **Delete case…** button in Settings → Data & Privacy. Cancel first; then test the typed-name guard and each backup choice on disposable cases. A denied backup must retain the complete case. Delete without backup must create no new download. Confirm Southridge and its images remain. With popup and full tool open, clear recent lookup history and confirm old results/drafts disappear, saved cases/images remain, and fresh lookup works. Reload Gather and confirm cleared data stays cleared. Browser history, clipboard and old downloaded files intentionally remain outside these controls.
 
-If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.4; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
+If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.5; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
+
+## New capture acceptance
+
+- Choose Select area & copy from the toolbar on a controlled page. Drag/release on the page, paste the image into an image-capable local application, and verify its exact bounds with no overlay. Check high-DPI screens and native browser zoom. Keyboard: Tab to Precise selection, Enter, enter coordinates, then Capture selection.
+- Cancel with Escape, close the controller, resize/navigate/switch the source tab, and verify selector/page scroll/styles restore. No other tab image may be saved. Reopen Gather after worker suspension and repeat.
+- Save PNG and JPEG through the real save dialog; cancel/deny and retry. Verify no overwrite, the local capture remains, and folder-export state is separate. Print / Save PDF must use only the selected derivative and keep source captions outside pixels; verify actual page boundaries on long images.
+- Open History: saved screenshots appear grouped by case/scan; Filters reveals attempts, status and case/scan choices. Browsing all cases must leave the current save destination unchanged. Export must identify its scan.
+- On disposable captures, test Delete selected Cancel, confirmed scoped deletion, a concurrent edit during confirmation, and individual deletion. Other cases/images remain. Close/reopen, then restore a matching private backup in a clean profile and verify image hashes/relationships.

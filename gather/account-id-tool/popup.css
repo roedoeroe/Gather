@@ -24,3 +24,5 @@ html{width:420px}
 .quick-panel{--blue:#17684b}.quick-panel main{display:block;overflow-y:auto}
 .quick-panel #quickResults{min-height:auto;flex-shrink:0}.quick-panel #quickList{min-height:120px;max-height:225px;flex-shrink:0}
 .quick-panel .account-tools-link{display:block;margin-top:14px}
+
+.selection-copy{width:100%;margin-bottom:8px}.direct-captures #captureFullPage{background:white;color:var(--blue);border:1px solid var(--line)}

@@ -23,6 +23,7 @@ async function execute({command, payload}) {
   if(command==='releaseLookup'){testReleaseLookup();return true;}
   if(command==='local')return chrome.storage.local.get(null);
   if(command==='writeLocal'){await chrome.storage.local.set(payload);return true;}
+  if(command==='closeCaptureWindow'){const before=(await chrome.storage.session.get('gather.captureLock'))['gather.captureLock'];chrome.windows.onRemoved.emit(payload);if(before?.windowId===payload){for(let i=0;i<100;i++){const session=await chrome.storage.session.get(null);if(!session['gather.captureLock'])return session;await new Promise(resolve=>setTimeout(resolve,20));}throw new Error('Window-close cleanup did not finish.');}return chrome.storage.session.get(null);}
   if (command === 'tabs') return chrome.tabs.query({});
   if (command === 'session') return chrome.storage.session.get(null);
   if (command === 'caseInput') return {name:'Northbridge',scanName:'October review',mode:'ephemeral',fields:parseIntake('SOC: Alex Example\nSchool: Northbridge School')};

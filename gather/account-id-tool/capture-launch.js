@@ -1,6 +1,8 @@
 import {readWorkspace} from './workspace-store.js';
 import {resolveTabContext} from './tab-context.js';
-import {resolveCaptureDestination} from './capture-store.js';
+import {resolveCaptureDestination,failCapture} from './capture-store.js';
+import {pageSelectionOperation} from './capture-selection.js';
+import {pageCaptureOperation} from './capture-engine.js';
 import {context as validateScope} from './workspace-model.js';
 
 const LOCK='gather.captureLock';
@@ -10,6 +12,8 @@ export function launchCapture(message){
 }
 async function launch(message){
   if(!['visible','selection','full-page'].includes(message.mode))throw new Error('Choose a capture mode.');
+  if(message.afterCapture!==undefined&&!['copy','none'].includes(message.afterCapture))throw new Error('Choose a supported capture action.');
+  if(message.selectionMethod!==undefined&&!['page','screenshot'].includes(message.selectionMethod))throw new Error('Choose a supported selection method.');
   const existing=(await chrome.storage.session.get(LOCK))[LOCK];
   if(existing){
     let live=false;try{await chrome.windows.get(existing.windowId);live=true;}catch{}
@@ -39,11 +43,25 @@ async function launch(message){
     const item=state.items.find(x=>x.id===message[field]&&x.kind===kind&&x.projectId===context.projectId);
     if(!item)throw new Error('Choose a saved observation from this project.');refs[field]=item.id;
   }
-  await chrome.storage.session.set({[key]:{launchId,context,source,mode:message.mode,refs,startedAt:Date.now()}});
+  await chrome.storage.session.set({[key]:{launchId,context,source,mode:message.mode,selectionMethod:message.selectionMethod||'page',afterCapture:message.afterCapture||'none',refs,startedAt:Date.now()}});
   try{
     const window=await chrome.windows.create({url:chrome.runtime.getURL('capture.html?launch='+launchId),type:'popup',focused:false,width:960,height:760});
-    await chrome.storage.session.set({[LOCK]:{launchId,windowId:window.id}});
+    await chrome.storage.session.set({[LOCK]:{launchId,windowId:window.id,source}});
     return {launchId,windowId:window.id,context};
   }catch(error){await chrome.storage.session.remove(key);throw error;}
 }
 export async function finishCapture(launchId){const lock=(await chrome.storage.session.get(LOCK))[LOCK];if(lock?.launchId===launchId)await chrome.storage.session.remove(LOCK);return {ok:true};}
+export function captureWindowRemoved(windowId){
+  const work=queue.catch(()=>{}).then(async()=>{
+    const lock=(await chrome.storage.session.get(LOCK))[LOCK];if(lock?.windowId!==windowId)return;
+    if(lock.source){
+      let tab;try{tab=await chrome.tabs.get(lock.source.tabId);}catch{}
+      if(tab?.url===lock.source.url){
+        await chrome.scripting.executeScript({target:{tabId:tab.id},func:pageSelectionOperation,args:['cancel',lock.launchId,{message:'Capture window closed.'}]}).catch(()=>{});
+        await chrome.scripting.executeScript({target:{tabId:tab.id},func:pageCaptureOperation,args:['restore',lock.launchId,{}]}).catch(()=>{});
+      }
+    }
+    await failCapture(lock.launchId,{status:'cancelled',error:'Capture window closed before its image was saved.'}).catch(()=>{});
+    await finishCapture(lock.launchId);await chrome.storage.session.remove('gather.captureLaunch.'+lock.launchId);
+  });queue=work;return work;
+}

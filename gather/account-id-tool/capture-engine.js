@@ -66,7 +66,7 @@ export function pageCaptureOperation(operation,token,args={}){
 }
 
 export function browserCaptureAdapter(source,browser=globalThis.chrome){
-  let interruption=null,documentId=null;
+  let interruption=null,documentId=source.documentId||null;
   const interrupt=message=>{interruption=new CaptureStopped(message);};
   const activated=info=>{if(info.windowId===source.windowId&&info.tabId!==source.tabId)interrupt('The source tab changed. No image of the other tab was retained.');};
   const removed=tabId=>{if(tabId===source.tabId)interrupt('The source tab was closed.');};
@@ -113,8 +113,8 @@ export async function composeTiles(tiles,{width,height,scale}){
   return canvasBlob(canvas);
 }
 
-export async function acquireCapture({source,mode='visible',signal,onProgress=()=>{},adapter,limits={}}){
-  const api=adapter||browserCaptureAdapter(source),bounds={...CAPTURE_LIMITS,...limits},token=globalThis.crypto.randomUUID();
+export async function acquireCapture({source,mode='visible',signal,onProgress=()=>{},adapter,limits={},token=globalThis.crypto.randomUUID()}){
+  const api=adapter||browserCaptureAdapter(source),bounds={...CAPTURE_LIMITS,...limits};
   const started=api.now(),tiles=[],limitations=[];let initialized=false,metrics,plan,lastShot=-Infinity,lastMetrics;
   const guard=async()=>{checkSignal(signal);if(api.now()-started>bounds.maxDurationMs)throw new Error('The capture reached its time limit.');await api.assertSource();};
   const shot=async()=>{await guard();const remaining=bounds.intervalMs-(api.now()-lastShot);if(remaining>0)await api.sleep(remaining,signal);await guard();const before=await api.page(mode==='full-page'?'state':'measure',token);const blob=await api.screenshot();lastShot=api.now();await guard();const after=await api.page(mode==='full-page'?'state':'measure',token);if(before.width!==after.width||before.height!==after.height||before.devicePixelRatio!==after.devicePixelRatio||before.visualScale!==after.visualScale||Math.abs(before.scrollY-after.scrollY)>1||Math.abs(before.scrollX-after.scrollX)>1)throw new CaptureStopped('The page moved, resized, or changed zoom during capture.');lastMetrics=after;return {blob,metrics:after,dimensions:await api.dimensions(blob)};};
@@ -123,7 +123,7 @@ export async function acquireCapture({source,mode='visible',signal,onProgress=()
     if(mode!=='full-page'){
       onProgress('Capturing the visible page…');const image=await shot();
       const scale=image.dimensions.width/image.metrics.width;
-      return {assets:[{blob:image.blob,role:'original',dimensions:image.dimensions}],status:'complete',dimensions:image.dimensions,scale,coordinates:{scrollX:image.metrics.scrollX,scrollY:image.metrics.scrollY,viewportWidth:image.metrics.width,viewportHeight:image.metrics.height,visualScale:image.metrics.visualScale},limitations:['A screenshot records rendered pixels at this moment; it is not a complete page archive.']};
+      return {assets:[{blob:image.blob,role:'original',dimensions:image.dimensions}],status:'complete',dimensions:image.dimensions,scale,coordinates:{scrollX:image.metrics.scrollX,scrollY:image.metrics.scrollY,viewportWidth:image.metrics.width,viewportHeight:image.metrics.height,visualScale:image.metrics.visualScale,devicePixelRatio:image.metrics.devicePixelRatio},limitations:['A screenshot records rendered pixels at this moment; it is not a complete page archive.']};
     }
     metrics=await api.page('init',token);initialized=true;
     if(metrics.visualScale!==1)throw new Error('Full-page capture does not support pinch zoom. Reset pinch zoom, then capture again.');

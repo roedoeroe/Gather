@@ -73,6 +73,10 @@ try {
   await send({type:'capture.finished',launchId:launch.launchId},'capture.html');
   assert.ok(!(await call('session'))['gather.captureLock']);
   passed.push('Tab context preserves Northbridge/role after Southridge switch; metadata save, capture launch/finish, negative coverage and explicit rejection work in the real worker.');
+  const pending=await send({type:'capture.start',mode:'selection',afterCapture:'copy',tabId:10},'popup.html');
+  const lock=(await call('session'))['gather.captureLock'];assert.equal(lock.source.tabId,10);assert.equal(lock.launchId,pending.launchId);
+  await call('closeCaptureWindow',99);assert.ok((await call('session'))['gather.captureLock']);await call('closeCaptureWindow',2);assert.ok(!(await call('session'))['gather.captureLock']);assert.ok(!(await call('session'))['gather.captureLaunch.'+pending.launchId]);
+  passed.push('Worker-owned controller-close cleanup uses the frozen source/token, ignores unrelated windows and removes the session lock/seed; scripting remains an API double.');
   const capture=await call('image',{scanId:sid,subjectId:role.id});
   assert.equal(capture.savedState,'saved');
   const stageId=await call('stageBackup');await send({type:'workspace.importImages',stageId});

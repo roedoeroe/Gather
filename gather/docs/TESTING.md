@@ -1,30 +1,28 @@
-# Gather 1.8.4 validation
+# Gather 1.8.5 validation
 
-Fictional fixtures only. The preserved 1.8.3 baseline passed all 118 Node tests before edits. Current release evidence is in `evidence/1.8.4/`; prior evidence/packages remain unchanged.
+Only deterministic fictional data. The preserved 1.8.4 baseline passed all 123 Node checks before edits. Current evidence is in `evidence/1.8.5`; older packages/evidence remain preserved.
 
-| Layer | Result | Scope |
+| Layer | Result | Practical scope |
 | --- | --- | --- |
-| Node | 123 passed; 0 failed/skipped | Five adapters, exact IDs, models, filing/navigation guards, current-page failures, privacy/races, syntax and static worker imports. |
+| Node | 129 passed, zero failed/skipped | Models/adapters, exact IDs, filing/privacy/authorization, geometry/scale, history scope/grouping, deletion guards, syntax/static imports. |
 | Rendered capture/UX | 21 groups passed | Real DOM/canvas/IndexedDB; controlled Chrome API doubles. |
-| Rendered toolbar/lookup | 11 groups passed | Actual popup buttons, controller, pointer selection, image viewer, deep link, clipboard and retry; controlled Chrome APIs. |
-| Rendered case/privacy | 18 groups passed | Actual intake/coverage/association, backup, deletion/history controls; Chrome API doubles. |
-| Actual Chromium service worker | 9 groups passed | Real ServiceWorkerGlobalScope, IndexedDB, Web Locks and stop/restart; Chrome API doubles. |
-| Native installed Chrome/Edge | Not accepted | Recorded runner policy: “Loading of unpacked extensions is disabled by the administrator.” No repeated bypass attempt. |
-| Live platforms | Not run | No current live profile success rate claimed. |
+| Rendered toolbar/capture/lookup | 22 groups passed | Actual toolbar/controller/history, pointer/keyboard selection, real image/text clipboard, output formats, recovery and deletion. Chrome APIs are doubles. |
+| Rendered case/privacy | 18 groups passed | Actual intake, associations, privacy controls, delayed writes and backup flows; Chrome APIs are doubles. |
+| Actual Chromium worker | 10 groups passed | Real ServiceWorkerGlobalScope, IndexedDB/Web Locks and stop/restart, including window-removed event routing. Chrome APIs are doubles. |
+| Native installed Chrome/Edge | Unaccepted | Recorded administrator denial; current policy still blocks extensions. No bypass or repeated identical attempt. |
+| Live platforms / native FireShot | Not run | No current profile success rate or native FireShot comparison claimed. |
 
-## New evidence
+The new capture journey uses Northbridge / SEO 6 / Alex Example and Southridge / SD 73. On-page drag/release saves immediately; native canvas verifies cropped dimensions/pixels and absence of the selector overlay. A default switch during selection preserves Northbridge/Alex. Real PNG image clipboard readback verifies the crop and subsequent flattened redaction; original SHA-256 stays unchanged. Clipboard denial retains the image and explicit Retry succeeds. PNG/JPEG output bytes/dimensions are decoded, with saveAs/uniquify/safe basename assertions; native save-dialog behavior is not established by these doubles.
 
-The toolbar journey opens Northbridge / SEO 6 with Alex Example, switches the default to Southridge / SD 73, then clicks Full page through the actual popup. The saved image/tiles remain in SEO 6/Alex. It opens that exact scan/capture through View in scan while another scan was previously active, verifies Fit width/ Fit image, explicitly reassigns/detaches the source tab, saves metadata to SD 73, and uses Visible area and pointer-drag Select area without opening the side panel. Denied scripting creates no image/controller; restricted URLs disable screenshot actions while pasted lookup remains usable.
+The actual print document renders the selected redacted pixels and optional caption outside the image. Native print/PDF dialog and printer pagination remain unaccepted. Escape, controller close and browser-provided source activation changes remove the selector. Keyboard-only coordinates and Enter save the expected rectangle. A worker-owned window-close event ignores unrelated windows and clears lock/seed from frozen source context. Full-page restoration, sticky-header overlap, partial/missing assets, hash checks and original tile retention remain covered by existing journeys.
 
-Run on this page reads fictional profile markup and Copy IDs uses the actual clipboard API to preserve `9007199254740993123`. Live network is disabled in that journey. Missing hydration/captcha-library text stays technical; an actual Retry retains the batch, row, submitted input and originating destination after a default switch. Failed input remains editable rather than clearing. Observed sign-in text has specific guidance. A rendered height/viewport assertion prevents lookup rows being compressed out of view.
+History starts with saved images and groups exact case/scan IDs. Its filters/search/reload do not change active filing. Cancelled attempts remain accessible explicitly. Deletion Cancel preserves data; stale snapshots reject; filter changes clear selection. Confirmed selected deletion atomically removes all associated assets and preserves other cases/subjects. Late failure writes cannot recreate it. Validated binary backup retains on-page geometry and original/redacted bytes; deliberate restore verifies hashes, remaps a conflicting subject link and clears the deletion tombstone. Existing full backup journeys exercise the real worker restore/journal and restoration into a separate empty browser origin.
 
-Node additions reject URL navigation before launch/write, retain explicit metadata filing despite later assignments, distinguish challenge libraries from observed access screens, and forbid silent fetched substitutes for explicit current-page reads. Worker router tests now include workspace URLs with query strings and section fragments.
+Existing checks retain same-name subjects/path collisions, rename history, denied folder export/retry, exact scan reports, local/ephemeral privacy retention, source-context provenance, current-page lookup recovery and the long fictional ID `9007199254740993123`. Four workspace views, 400 px layouts, focus restoration and CSS 200% reflow remain covered. CSS zoom is not native browser zoom.
 
-Existing journeys retain assertions for source restoration on cancellation, sticky-header stitching, same-name folder collisions, subject rename, export denial/retry, opaque redaction/default-original exclusion, interrupted binary writes/journals, missing selected derivatives, backup corruption/remapped relationships, scan-specific reports, keyboard views/focus, narrow layouts and privacy deletion/late writes. CSS 200% zoom is a reflow check, not native browser zoom.
+Visual inspection opened actual generated fictional screenshots of the selector, direct toolbar, saved capture, all-case history and narrow history. It led to compact image actions, saved-first history and a single optional filter panel. These are rendered product documents with API doubles, not native extension screenshots.
 
-Visual inspection opened actual generated screenshots of the direct toolbar, saved full page, linked inspector and observed-login recovery. It found and corrected popup flex compression that hid result rows. The inspected images contain fictional data only and represent rendered product documents with API doubles. Representative frames of the user's recording and supplied screenshots were reviewed locally as design references; no recording audio transcription, private fixture publication or native FireShot test is claimed.
-
-## Run
+## Reproduce
 
 From `gather`:
 
@@ -37,8 +35,6 @@ node tests/browser-worker.mjs
 python3 scripts/package.py
 ```
 
-Node 24.19.0, Python 3.12.14, supplied Playwright 1.62.1 and sandboxed Chromium 151 were used. No runtime dependency installation, bundler or server is required. Harnesses own their fixture servers/profiles and close them. `GATHER_CHROMIUM_PATH` chooses an available browser; `GATHER_BROWSER_ARTIFACTS` chooses output. Keep `chromiumSandbox:true`. See the historical setup instructions if development-only Playwright is unavailable after restoration.
+Node 24.19.0, Python 3.12.14, Playwright 1.62.1 and sandboxed Chromium 151 at `/usr/lib/chromium/chromium` were used. No runtime install, server or bundler is required. Harnesses start/close their own fixture servers and profiles. `GATHER_CHROMIUM_PATH` selects a browser; `GATHER_BROWSER_ARTIFACTS` selects output. Keep `chromiumSandbox:true`.
 
-ZIP packaging verifies source-byte hashes, CRC, manifest/package version and required entry points. Versioned checksums accompany both packages. Previous 1.8.3 ZIP checksums are verified unchanged.
-
-Chrome API doubles do not verify native activeTab grants, toolbar sizing/invocation, side-panel gesture, window focus, captureVisibleTab rate behavior, Downloads permission UI, browser-session reset or Edge integration. Complete `LOCAL-ACCEPTANCE.md` on a permitted browser. Full-page dynamic/infinite/nested scrolling, zoom and printer pagination retain their documented limitations. Reference Library is designed/backlogged, not shipped.
+Packaging verifies ZIP CRC, extension source-byte hashes, matching manifest/package versions and entry points. Versioned SHA-256 lists accompany both packages; previous 1.8.4 checksums remain unchanged. Native activeTab grants, actual screenshot API/rate, focus, save/clipboard/print permission UI, browser-session reset and Edge integration require the permitted-browser checklist in LOCAL-ACCEPTANCE. Nested scrolling and custom roots remain unshipped.

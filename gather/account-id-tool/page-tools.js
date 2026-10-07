@@ -1,7 +1,7 @@
 import {request} from './workspace-client.js';
 import {WORKSPACE_KEY,destinationLabel} from './workspace-model.js';
 import {listSubjects,selectedSubject,selectSubject,getCaptureSettings} from './capture-store.js';
-import {workspaceLink} from './workspace-links.js';
+import {workspaceLink,captureHistoryLink} from './workspace-links.js';
 
 const host=document.getElementById('pageTools');
 const $=id=>document.getElementById(id);
@@ -68,7 +68,7 @@ async function init(){
   });
   for(const b of captureButtons())b.onclick=run(async()=>{
     const chosen=frozen();status('Starting screenshot…');
-    await request('capture.start',{mode:b.dataset.captureMode,tabId:chosen.tabId,expectedUrl:chosen.url,destination:chosen.context,subjectId:chosen.subjectId});
+    await request('capture.start',{mode:b.dataset.captureMode,selectionMethod:b.dataset.selectionMethod||'page',afterCapture:b.dataset.afterCapture||'none',tabId:chosen.tabId,expectedUrl:chosen.url,destination:chosen.context,subjectId:chosen.subjectId});
     window.close();
   });
   $('savePageLink').onclick=run(async()=>{
@@ -76,7 +76,7 @@ async function init(){
     status('Page link saved to '+r.result.destinationLabel+'.');
   });
   $('useDefaultScan').onclick=run(async()=>{await request('workspace.detachTab',{tabId:frozen().tabId});await refresh({reset:true});});
-  $('viewCaptures').onclick=run(()=>chrome.tabs.create({url:workspaceLink(frozen().context.scanId)}));
+  $('viewCaptures').onclick=run(()=>chrome.tabs.create({url:captureHistoryLink()}));
   $('openDashboard').onclick=run(()=>chrome.tabs.create({url:workspaceLink(frozen().context.scanId,'research')}));
   const schedule=()=>{clearTimeout(timer);timer=setTimeout(()=>refresh().catch(e=>status(e.message,true)),50);};
   chrome.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes[WORKSPACE_KEY]||area==='session'&&Object.keys(changes).some(k=>k.startsWith('gather.case.')))schedule();});

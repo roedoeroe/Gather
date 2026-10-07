@@ -3,7 +3,7 @@ function event(){return {listeners:[],addListener(fn){this.listeners.push(fn);}}
 const local={},session={},onChanged=event();
 const area=(db,which)=>({async get(key){return key===null?structuredClone(db):{[key]:structuredClone(db[key])};},async set(values){const changes={};for(const [key,value] of Object.entries(values)){changes[key]={oldValue:db[key],newValue:value};db[key]=structuredClone(value);}for(const fn of onChanged.listeners)fn(changes,which);},async setAccessLevel(){}});
 const onMessage=event(),onInstalled=event(),onClicked=event();
-globalThis.chrome={runtime:{id:'test-extension',getURL:f=>'chrome-extension://test-extension/'+f,onMessage,onInstalled},storage:{local:area(local,'local'),session:area(session,'session'),onChanged},tabs:{onRemoved:event(),remove:async()=>{},get:async id=>({id,url:'https://example.test',title:'Example'}),create:async()=>({id:1})},contextMenus:{onClicked,update:async()=>{},removeAll:fn=>fn(),create:(_,fn)=>fn?.()},action:{setBadgeText:async()=>{}},sidePanel:{open:async()=>{}}};
+globalThis.chrome={runtime:{id:'test-extension',getURL:f=>'chrome-extension://test-extension/'+f,onMessage,onInstalled},storage:{local:area(local,'local'),session:area(session,'session'),onChanged},windows:{onRemoved:event()},tabs:{onRemoved:event(),remove:async()=>{},get:async id=>({id,url:'https://example.test',title:'Example'}),create:async()=>({id:1})},contextMenus:{onClicked,update:async()=>{},removeAll:fn=>fn(),create:(_,fn)=>fn?.()},action:{setBadgeText:async()=>{}},sidePanel:{open:async()=>{}}};
 await import('../account-id-tool/background.js');
 const listener=onMessage.listeners[0];
 const sender=page=>({id:'test-extension',url:chrome.runtime.getURL(page)});

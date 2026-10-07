@@ -4,7 +4,7 @@ import {saveBatch,saveLookupDraft} from './batches.js';
 import {handleQuick} from './quick-worker.js';
 import {patchPreferences} from './preferences.js';
 import {TAB_CONTEXT_KEY, inheritTabContext, removeTabContext, replaceTabContext, pruneTabContexts, resetTabContexts, resolveTabContext} from './tab-context.js';
-import {launchCapture,finishCapture} from './capture-launch.js';
+import {launchCapture,finishCapture,captureWindowRemoved} from './capture-launch.js';
 
 async function openFull(batchId) {
   const base = chrome.runtime.getURL('index.html');
@@ -48,6 +48,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   action(message.tabId,sender.tab.id).then(()=>reply({ok:true}),()=>reply({ok:false}));return true;
 });
 chrome.tabs.onRemoved.addListener(id=>{tabRemoved(id).catch(()=>{});removeTabContext(id).catch(()=>{});});
+chrome.windows.onRemoved?.addListener(id=>{captureWindowRemoved(id).catch(()=>{});});
 chrome.tabs.onCreated?.addListener(tab=>{inheritTabContext(tab).catch(()=>{});});
 chrome.tabs.onReplaced?.addListener((added,removed)=>{replaceTabContext(added,removed).catch(()=>{});});
 chrome.tabs.onActivated?.addListener(()=>{updateSaveMenu().catch(()=>{});});

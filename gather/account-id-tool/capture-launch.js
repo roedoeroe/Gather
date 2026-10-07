@@ -19,6 +19,7 @@ async function launch(message){
   const state=await readWorkspace();
   const tab=Number.isInteger(message.tabId)?await chrome.tabs.get(message.tabId):(await chrome.tabs.query({active:true,lastFocusedWindow:true}))[0];
   if(!tab?.active||!/^https?:\/\//.test(tab.url||''))throw new Error('Invoke Gather’s toolbar button on the web page you want to capture.');
+  if(message.expectedUrl&&tab.url!==message.expectedUrl)throw new Error('The page changed. Reopen Gather on the page you want to capture.');
   let assignment;
   if(message.destination){
     const chosen=validateScope(state,message.destination.scanId);

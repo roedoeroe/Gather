@@ -18,7 +18,7 @@ async function openFull(batchId) {
 }
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== chrome.runtime.id) return;
-  const page = sender.url?.split('?')[0];
+  const page = sender.url?.split(/[?#]/)[0];
   const full = page === chrome.runtime.getURL('index.html');
   const workspace = page === chrome.runtime.getURL('workspace.html');
   if(page===chrome.runtime.getURL('evidence.html')&&message?.type==='workspace.state'){handleWorkspace(message).then(reply,error=>reply({error:error.message}));return true;}

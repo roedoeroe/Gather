@@ -10,3 +10,17 @@ html{width:420px}
 
 .page-context{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin-top:8px}.page-context>button{font-size:12px;padding:4px 0;text-align:left;white-space:normal}.page-context details{font-size:11px}.page-context summary{cursor:pointer;color:var(--accent,#17684b)}.page-context details[open]{flex-basis:100%}.page-context details p{margin:8px 0}.workspace-quick #pageDestination{font-size:10px;line-height:1.45;margin:6px 0 0;overflow-wrap:anywhere}.workspace-quick #workspaceStatus{font-size:11px;margin:6px 0 0}
 .quick-panel{overflow-x:hidden}.quick-panel main{overflow-y:auto;overflow-x:hidden}.popup-capture{margin-bottom:14px}.popup-capture>summary{cursor:pointer;font-size:12px;color:#17684b;padding:3px 0}
+
+/* Direct page actions: one filing destination, three screenshot choices. */
+.quick-panel{background:#f7f8fa}.quick-header{background:#fff}.page-tools{padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.capture-filing{display:flex;gap:10px;align-items:center;margin-bottom:8px}.capture-filing label{flex:0 0 48px;color:#626e80;font-size:12px}.quick-panel .capture-filing select{max-width:none;width:100%;min-width:0;font-size:12px;border:1px solid #d7dfdc;border-radius:7px;background:#fff}
+.capture-heading{display:flex;align-items:center;justify-content:space-between;margin:17px 0 9px}.capture-heading h2{font-size:15px;letter-spacing:-.2px;margin:0;font-weight:600}.capture-heading button{font-size:12px}
+.direct-captures{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}.quick-panel .direct-captures button{font-size:12px;padding:10px 6px;min-width:0;min-height:38px}.quick-panel .direct-captures .primary-button{background:#17684b}.page-tools .text-button{color:#17684b}
+#toolbarContext{font-size:11px;line-height:1.5;margin:9px 0 0;overflow-wrap:anywhere}#pageToolsStatus:empty{display:none}#pageToolsStatus{font-size:12px;margin-top:10px;line-height:1.5}#pageToolsStatus.error{color:#a32c20;background:#fff0eb;border-radius:6px;padding:8px}
+#pageOptions{margin-top:7px;font-size:11px;color:#69766e}#pageOptions summary{cursor:pointer;padding:3px 0}#pageOptions>div{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0}#pageOptions button{font-size:11px;white-space:normal;text-align:left}#pageOptions p{font-size:11px}#pageOptions summary:focus-visible{outline:2px solid #17684b;outline-offset:3px}
+.quick-panel .account-tools-link{font-size:12px;align-self:flex-start;margin-top:15px}.quick-panel .quick-label{font-size:15px}.quick-panel #quickLinks{height:72px}.quick-panel .quick-meta{font-size:11px}
+
+/* Let the popup scroll as a document. Flex compression must never hide IDs. */
+.quick-panel{--blue:#17684b}.quick-panel main{display:block;overflow-y:auto}
+.quick-panel #quickResults{min-height:auto;flex-shrink:0}.quick-panel #quickList{min-height:120px;max-height:225px;flex-shrink:0}
+.quick-panel .account-tools-link{display:block;margin-top:14px}

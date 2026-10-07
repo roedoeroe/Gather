@@ -1,3 +1,4 @@
+import {pageToolsContext} from './page-tools.js';
 import {captureContext,cleanLookupContext,saveDestination} from './lookup-context.js';
 import {request,act} from './workspace-client.js';
 import {destinationLabel,WORKSPACE_KEY} from './workspace-model.js';
@@ -9,6 +10,7 @@ const pageSave=document.getElementById('saveCurrentSource');
 const status=text=>{const el=document.getElementById('workspaceStatus');if(el)el.textContent=text;};
 export async function captureLookupContext(){
   if(!globalThis.chrome?.runtime?.id)return undefined;
+  if(document.getElementById('pageTools'))return pageToolsContext();
   await initialState;
   if(pageSave){const result=await refreshPageContext();if(result?.context)return {...result.context,startedAt:Date.now()};}
   return captureContext(state);

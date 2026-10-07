@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gather — Capture</title><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="capture.css"></head>
-<body><main class="capture-main"><header class="section-heading"><h1>Gather Capture</h1><button id="cancel">Cancel capture</button></header>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gather — Capture</title><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="capture.css"><link rel="stylesheet" href="capture-viewer.css"></head>
+<body><main class="capture-main"><header class="section-heading"><h1>Screenshot</h1><button id="cancel">Cancel capture</button></header>
 <p id="destination" class="context-label"></p><p id="status" role="status" aria-live="polite">Preparing capture…</p>
-<p id="source" class="quiet"></p><p id="limitations" class="micro"></p>
-<section id="selection" hidden><h2>Select a rectangle</h2><p class="quiet">Drag on the image, or enter pixel coordinates below. Only the selected rectangle is exported by default. The original viewport stays in your private Gather backup.</p>
+<details id="captureDetails"><summary>Source & capture details</summary><p id="source" class="quiet"></p><p id="limitations" class="micro"></p></details>
+<section id="selection" hidden><h2>Select an area</h2><p class="quiet">Drag across the screenshot, then save. The original image stays in your private backup.</p>
 <div id="imageArea"><img id="preview" alt="Captured page for rectangle selection" draggable="false"><div id="outline"></div></div>
-<form id="cropForm"><div class="crop-fields"><label>Left <input id="cropX" type="number" min="0" value="0" required></label><label>Top <input id="cropY" type="number" min="0" value="0" required></label><label>Width <input id="cropWidth" type="number" min="1" required></label><label>Height <input id="cropHeight" type="number" min="1" required></label></div><button id="saveSelection" class="primary">Save selected rectangle</button></form></section>
-<div id="completed" hidden><p id="savedState"></p><p id="exportState"></p><div class="add-actions"><button id="export">Export to Downloads folder</button><button id="workspace">Open workspace</button><button id="close">Close</button></div><img id="resultImage" alt="Saved capture preview"></div>
+<form id="cropForm"><details id="selectionCoordinates"><summary>Adjust selection with coordinates</summary><div class="crop-fields"><label>Left <input id="cropX" type="number" min="0" value="0" required></label><label>Top <input id="cropY" type="number" min="0" value="0" required></label><label>Width <input id="cropWidth" type="number" min="1" required></label><label>Height <input id="cropHeight" type="number" min="1" required></label></div></details><button id="saveSelection" class="primary">Save selection</button></form></section>
+<div id="completed" hidden><p id="savedState"></p><p id="exportState"></p><div class="add-actions"><button id="workspace" class="primary">View in scan</button><button id="edit">Edit image</button><button id="export">Export image</button><button id="close">Done</button></div><div id="savedPreview"></div></div>
 </main><script type="module" src="capture.js"></script></body></html>

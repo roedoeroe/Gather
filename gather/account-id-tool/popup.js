@@ -73,7 +73,7 @@ function render() {
     }
     if(entry.status==='resolved'&&entry.directId===entry.id&&!entry.verifiedAt)row.append(line('note-context','ID from link · page not verified'));
     if(annotation.hint)row.append(line('note-context',annotation.hint));
-    if(['error','stopped'].includes(entry.status))row.append(line('row-issue',entry.message||'Open the profile, sign in if needed, then retry.'));
+    if(['error','stopped'].includes(entry.status))row.append(line('row-issue',entry.message||'Open the profile and retry.'));
     if(gone&&!state.busy&&entry.handle)row.append(formerAliasButton(entry,state.batch?.lookupContext,notice));
     if(!state.busy)row.append(saveAccountButton(entry,(message,success)=>notice(message,success),state.batch?.lookupContext));
     list.append(row);
@@ -106,11 +106,12 @@ async function refresh(restore=false) {
     const next=await send({type:'quick.state'});
     if(number<appliedNumber)return;appliedNumber=number;
     const finished=lastRun===next.batch?.id&&!next.busy&&state.busy;
-    const clearCompleted=state.busy&&!next.busy&&next.input===''&&$('quickLinks').value===next.submittedInput;
+    const clearCompleted=state.busy&&!next.busy&&state.batch?.id===next.batch?.id&&next.input===''&&$('quickLinks').value===next.submittedInput;
     state=next;
     if((restore&&!inputDirty)||clearCompleted){$('quickLinks').value=next.input;inputDirty=false;}
     if(next.busy)lastRun=next.batch?.id;
     initialized=true;render();
+    if(finished)$('quickResults').scrollIntoView({block:'start'});
     if(clearCompleted&&$('manualCopy').hidden)$('quickLinks').focus();
     if(!copying&&$('quickAuto').checked&&(next.copyPending||finished)&&!next.interrupted&&!next.stopping&&entries().every(e=>e.status!=='stopped')){
       copying=true;try{await copyAll(true);}finally{copying=false;}
@@ -133,7 +134,7 @@ async function act(message, copyAfter=false) {
     if(state.busy)lastRun=state.batch?.id;render();if(copyAfter&&$('quickAuto').checked)await copyAll(true);
   }
   catch(error){notice(error.message);}
-  finally{submitting=false;render();await refresh();}
+  finally{submitting=false;render();await refresh();if(['quick.start','quick.retry'].includes(message.type)&&!state.busy&&state.batch)$('quickResults').scrollIntoView({block:'start'});}
 }
 function saveDraft() {
   inputDirty=true;renderInput();send({type:'quick.draft',historyEpoch:state.historyEpoch,input:$('quickLinks').value}).catch(error=>notice('Draft could not be saved. '+error.message));
@@ -193,7 +194,13 @@ $('quickLinks').addEventListener('keydown',event=>{
 });
 $('getIds').addEventListener('click',()=>act({type:'quick.start',input:$('quickLinks').value}));
 $('stopQuick').addEventListener('click',()=>act({type:'quick.stop'}));
-$('retryQuick').addEventListener('click',()=>act({type:'quick.retry',batchId:state.batch?.id}));
+$('retryQuick').addEventListener('click',async()=>{
+  if(submitting||state.busy)return;
+  const batch=state.batch;if(!batch)return;
+  const page=await updateCurrentPage();let currentTabId;
+  if(page?.url&&batch.entries.length===1&&normalizeProfile(page.url).key===batch.entries[0].key)currentTabId=page.tabId;
+  await act({type:'quick.retry',batchId:batch.id,...(Number.isInteger(currentTabId)?{currentTabId}:{})});
+});
 $('copyQuick').addEventListener('click',()=>copyAll());
 $('quickMode').addEventListener('change',()=>{render();savePrefs({copyMode:$('quickMode').value});});
 $('quickSeparator').addEventListener('change',()=>savePrefs({separator:$('quickSeparator').value}));

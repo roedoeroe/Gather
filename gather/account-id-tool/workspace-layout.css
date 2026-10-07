@@ -37,3 +37,5 @@ body:not(.panel) #captureLibrary{margin:0;padding:0;border:0}.capture-library-he
 .finding-details{font-size:12px;color:var(--muted);margin:8px 0}.finding-details p{overflow-wrap:anywhere}
 
 .workspace-nav button{transition:none}
+
+.capture-inspector .capture-viewer .inspector-image{height:auto;width:auto;max-width:100%;margin:0 auto;border-radius:0}.capture-inspector .capture-viewer[data-fit=image] .inspector-image{max-height:58vh}.capture-inspector .image-viewport{max-height:58vh}

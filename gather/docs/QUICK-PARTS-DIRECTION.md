@@ -1,6 +1,6 @@
 # Quick Parts / Reference Library — proposed first implementation
 
-Status: design/backlog only, after the completed 1.8.2 privacy build. No runtime feature or organization content ships in this change. Native 1.8.2 acceptance remains the immediate stabilization priority. This proposal is grounded in the current extension architecture; the actual SST Document Glossary, communication library and Word Quick Parts were not supplied or inspected. Source taxonomy, approval meaning and conversion fidelity remain to be verified from authorized local exports.
+Status: design/backlog after the 1.8.4 direct-capture stabilization release. The supplied Optimized Design Engineering Steer R3 was read as product guidance; it does not turn every phase into this release's scope. The first implementation remains generic and local, with fictional language. Real reference exports are not present; their availability does not block engine/interaction work. Verify source labels and conversion fidelity before calling imported material approved.
 
 ## Outcome and scope
 
@@ -96,7 +96,7 @@ Favorites may ship first as stable pack/entry IDs. Recents are optional after re
 2. **One usable vertical slice:** generic schema/validator + atomic local import/replace/remove + both collection views + focused weighted search + labelled preview + explicit part copy. No case required. Include pack isolation and backup/package exclusion tests from the beginning.
 3. **Complete the proposed minimum workflow:** block assembly/reorder/edit, explicit placeholder offers, final review/copy and case-deletion draft clearing; add the three supported coverage/account suggestion signals and visible reasons. Ship only when the combined journey is reliable. Ongoing-scan suggestions, recents, typo tolerance and richer authoring can follow.
 
-This is the next bounded product feature after 1.8.2 native acceptance and any discovered regressions, not a reason to delay the privacy release or launch a broad organization-pack framework. Use a future feature version (tentatively 1.9.0 after scope validation); do not rebuild or relabel the released 1.8.2 ZIPs for this design-only change.
+This is the next bounded product feature after the current release checkpoint and any discovered regressions, not a reason to delay the privacy release or launch a broad organization-pack framework. Use a future feature version (tentatively 1.9.0 after scope validation); do not rebuild or relabel the released ZIPs for this design-only change.
 
 ## Acceptance before shipping
 
@@ -109,3 +109,16 @@ Use invented language/data for all public automated tests. Private corpus testin
 - Switching to Southridge during a Northbridge draft never changes its scope or values. Delete Northbridge clears the relevant open draft; delayed fill/copy preparation cannot resurrect it. Closing discards draft memory; restoring a case backup does not import it.
 - Invalid/update-interrupted/quota-failed packs leave the installed version intact. Renames keep IDs/favorites; removed entries don't leave stale results. Mid-draft updates don't replace selected text.
 - Case backups contain zero library bodies/preferences/drafts; pack exports contain zero case data; public development ZIPs contain no proprietary source content. No network request occurs during import/search/ranking/composition. Explicit source-link opening remains user initiated.
+
+
+## R3 engineering and release gate (2026-10-07)
+
+Finish and checkpoint the current capture release first. Before adding Reference Library, verify the toolbar popup, Run on this page, five adapters using controlled fixtures, exact-string copy, search-origin filing, capture cancellation/export retry, deletion/history races and binary backup/restore. Native and live-profile checks remain separate evidence; a blocked native runner must not be reported as a pass. The 1.8.4 current-page fixes address false blanket sign-in advice, substituted reads and input clearing on technical failures.
+
+Treat imported packs as untrusted plain-text data. Reject prototype-related keys, duplicate IDs across relevant namespaces, invalid collection references, unsupported signal mappings and pathological sizes before any write. Count UTF-8 bytes, validate bounded arrays/string lengths and normalize a complete immutable candidate. Render with textContent, never template HTML or evaluated expressions. Source links allow explicitly activated HTTP(S) only, with their actual host visible. Unknown metadata cannot acquire code/rule behavior. All import/update/remove operations use atomic IndexedDB transactions and a stable installation generation so overlapping pages cannot restore an obsolete index. Interrupted updates retain the last valid pack.
+
+A saved pack's names/publisher/approval labels are declarations, not verified authority. Preserve original wording, original labels, source reference and version. Stable pack/entry IDs distinguish renames from replacement. Proposals, examples and guidance remain unmistakable in results, preview and any deliberate reuse; unknown labels default to unverified. Organization pack data stays outside workspace JSON, capture assets, case backups and lookup archives. Test backup isolation and packaging exclusion from the first slice; Git ignore alone cannot protect development ZIPs.
+
+Keep the first view calm: one focused search box, two collection choices, a flat list and readable preview; lightweight filters are secondary. Suggested appears only when deterministic recorded signals have a meaningful scoped explanation. All query tokens may match across title/alias/tags/body rather than requiring one exact OneNote heading. Exact matches must not disappear below suggestion boosts. Support stable keyboard selection, Escape/focus restoration, announced counts, narrow widths, long bodies and offline use. Use measured warm/open latency against a named fixture and machine, not a claim of instant performance without evidence.
+
+The first feature checkpoint is import → search → preview → deliberate part copy in both collections, with replacement/removal, provenance and empty/error states complete. Do not ship a broad framework of placeholders that do not work. Then finish add/reorder/edit → explicit fills → review → final copy, including unresolved-field guards, original block snapshots and no regeneration over user edits. Drafts live in document memory. Freeze their context, invalidate pending operations when a case is deleted, keep pack updates from silently rewriting draft text and require deliberate discard. Favorites/recents and suggestion expansion follow demonstrated retrieval quality. No AI, sending, remote index or OneNote runtime dependency is required.

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Gather",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "description": "Local research with exact account IDs, reviewed Case Start, roles, scan continuity, capture and evidence export.",
   "minimum_chrome_version": "116",
   "permissions": [
@@ -27,7 +27,7 @@
     "128": "icons/128.png"
   },
   "action": {
-    "default_title": "Get UserIDs with Gather",
+    "default_title": "Gather \u2014 capture and account lookup",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/16.png",
@@ -41,7 +41,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'"
   },
-  "version_name": "1.8.2 local privacy development",
+  "version_name": "1.8.4 direct capture development",
   "side_panel": {
     "default_path": "workspace.html?panel=1"
   }

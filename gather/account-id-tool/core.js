@@ -246,10 +246,23 @@ function walk(roots, visit) {
 }
 const asId = value => typeof value === 'string' ? value : Number.isSafeInteger(value) ? String(value) : '';
 
+// Challenge libraries and login links occur on ordinary profile pages too.
+// Only rendered text, explicit structured errors or a known redirect screen
+// justify asking the analyst to sign in or complete a security check.
+export function pageAccessIssue(html, pageUrl, roots = []) {
+  let path='';try{path=new URL(pageUrl).pathname;}catch{}
+  if(/^\/(?:accounts\/login|login|login\.php)(?:\/|$)/i.test(path))return 'The page opened a sign-in screen. Sign in on the site, then reopen the profile and retry.';
+  if(/^\/(?:challenge|checkpoint)(?:\/|$)/i.test(path))return 'The page opened a security check. Complete it on the site, then reopen the profile and retry.';
+  const text=html.replace(/<!--[^]*?-->/g,' ').replace(/<(script|style)\b[^>]*>[^]*?<\/\1\s*>/gi,' ').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ');
+  let login=/\blogin_required\b|\blog in to (?:instagram|facebook)\b|\bsign in to confirm\b/i.test(text),challenge=/\b(?:challenge_required|checkpoint_required)\b|\bverify (?:that )?you are human\b|\bcomplete (?:the )?(?:security check|captcha)\b/i.test(text);
+  walk(roots,obj=>{for(const key of ['error','message','error_type']){if(obj[key]==='login_required')login=true;if(['challenge_required','checkpoint_required'].includes(obj[key]))challenge=true;}});
+  return challenge?'The page reports a security check. Complete it on the site, then retry.':login?'The page asks you to sign in. Sign in on the site, then reopen the profile and retry.':null;
+}
+
 export function extractId(html, profile, pageUrl = profile.url) {
   if (typeof html !== 'string' || html.length > 15000000) return {error: 'Page source is empty or too large'};
   let current;
-  try { current = normalizeProfile(pageUrl); } catch { return {error: 'Page requires sign-in, a security check, or a profile URL'}; }
+  try { current = normalizeProfile(pageUrl); } catch { return {error: pageAccessIssue(html,pageUrl)||'The page did not return a supported profile URL. Open the intended profile and retry.'}; }
   if (current.platform !== profile.platform) return {error: 'The page redirected to a different platform'};
   if (current.key !== profile.key && !(profile.platform === 'youtube' && current.directId) && !profile.directId) return {error: 'The page redirected to a different profile. Use its current profile link.'};
   const candidates = new Map();
@@ -316,7 +329,7 @@ export function extractId(html, profile, pageUrl = profile.url) {
     return {id, method, displayName: names.get(id) || nameFromTitle(title, profile), verifiedAt: Date.now(), profileStatus: detectProfileStatus(roots, profile, id)};
   }
   if (candidates.size > 1) return {error: 'Multiple account IDs found. Open the profile and check its source.'};
-  if (/captcha|challenge_required|checkpoint|login_required|log in to (?:instagram|facebook)|sign in to confirm/i.test(html)) return {error: 'Sign in or complete the security check, then retry'};
+  const accessIssue=pageAccessIssue(html,pageUrl,roots);if(accessIssue)return {error:accessIssue};
   const gone=confirmedGone(roots,profile,current);if(gone)return gone;
   return {error: 'No matching account ID found. Try the page-source fallback.'};
 }

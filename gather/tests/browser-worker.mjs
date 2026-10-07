@@ -44,7 +44,7 @@ try {
   const call=(command,payload)=>page.evaluate(({command,payload})=>workerCall(command,payload),{command,payload});
   const send=async(message,from='workspace.html')=>{const r=await call('runtime',{message,page:from});assert.ok(r,'Message not handled');assert.ok(!r.error,r.error);return r;};
   const environment=await call('environment');assert.equal(environment.scope,'ServiceWorkerGlobalScope');assert.equal(environment.hasDocument,false);assert.equal(environment.hasIndexedDB,true);
-  for(const from of ['popup.html','workspace.html?panel=1','index.html','evidence.html'])assert.equal((await send({type:'workspace.state'},from)).state.schemaVersion,1);
+  for(const from of ['popup.html','workspace.html?panel=1','workspace.html#captures','workspace.html?scan=fictional#settings','index.html','evidence.html'])assert.equal((await send({type:'workspace.state'},from)).state.schemaVersion,1);
   passed.push('Actual background message router opens workspace state from popup, panel, full tool and evidence in ServiceWorkerGlobalScope with real IndexedDB.');
   // Source-page lookup avoids all live network; the exact large ID is a string.
   await send({type:'quick.start',input:'https://www.instagram.com/alex.example/',currentTabId:10},'popup.html');

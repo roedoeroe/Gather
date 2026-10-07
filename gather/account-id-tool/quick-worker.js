@@ -32,8 +32,8 @@ async function state() {
   const previous = quickRun && quickRun.batchId === quick.batchId ? quickRun : {};
   const batch = active ? structuredClone(active.batch) : quick.batchId ? await loadBatch(quick.batchId) : null;
   // Also clear completed input left by an earlier extension version. Keep new
-  // drafts and interrupted work; results remain in the saved batch.
-  const completed = !active && batch?.entries.every(e=>['resolved','gone','error'].includes(e.status)) && previous.status!=='interrupted';
+  // drafts, failed and interrupted work; results remain in the saved batch.
+  const completed = !active && batch?.entries.every(e=>['resolved','gone'].includes(e.status)) && previous.status!=='interrupted';
   const input = completed && quick.input===quick.submittedInput ? '' : quick.input;
   return {historyEpoch:await historyEpoch(),input: typeof input === 'string' ? input.slice(0,100000) : '',
     submittedInput: typeof quick.submittedInput === 'string' ? quick.submittedInput : null,
@@ -75,7 +75,7 @@ async function run(job, retry) {
     for (const entry of queue) {entry.status='stopped';entry.message='Lookup stopped. Retry to finish.';}
     await closeTemporary(OWNER);
     await persist(job);
-    if(!signal.aborted){
+    if(!signal.aborted&&job.batch.entries.every(e=>['resolved','gone'].includes(e.status))){
       const quick=(await storage.get('gather.quick'))['gather.quick'];
       if(quick?.batchId===job.batch.id)await saveLookupDraft('gather.quick',{...quick,input:''},job.batch.historyEpoch);
     }
@@ -98,15 +98,15 @@ async function start(message) {
     if (input.length > 100000) throw new Error('Paste a list under 100 KB.');
     const parsed = parseInput(input);
     if (!parsed.entries.length) throw new Error('Paste a supported profile or channel link.');
-    if(message.currentTabId!==undefined){
-      if(!Number.isInteger(message.currentTabId)||parsed.entries.length!==1)throw new Error('Open one supported profile to run this page.');
-      try {
-        const tab=await chrome.tabs.get(message.currentTabId);
-        if(normalizeProfile(tab.url).key!==parsed.entries[0].key)throw new Error('changed');
-        currentTabId=message.currentTabId;
-      }catch{throw new Error('The current page changed. Open the profile and run it again.');}
-    }
     batch = {historyEpoch:message.historyEpoch,lookupContext:originalContext,id:crypto.randomUUID(), title:'', createdAt:Date.now(), updatedAt:Date.now(), entries:parsed.entries, invalid:parsed.invalid, duplicates:parsed.duplicates};
+  }
+  if(message.currentTabId!==undefined){
+    if(!Number.isInteger(message.currentTabId)||batch.entries.length!==1)throw new Error('Open one supported profile to run this page.');
+    try {
+      const tab=await chrome.tabs.get(message.currentTabId);
+      if(normalizeProfile(tab.url).key!==batch.entries[0].key)throw new Error('changed');
+      currentTabId=message.currentTabId;
+    }catch{throw new Error('The current page changed. Open the profile and run it again.');}
   }
   const release = await lockBatch(batch.id);
   let prefs;

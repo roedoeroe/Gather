@@ -1,23 +1,28 @@
-# Gather 1.8.3 validation
+# Gather 1.8.4 validation
 
-All fixtures are fictional. The preserved 1.8.2 baseline passed 118 Node tests before edits. Current evidence is in `evidence/1.8.3/`; historical evidence and notes remain unchanged.
+Fictional fixtures only. The preserved 1.8.3 baseline passed all 118 Node tests before edits. Current release evidence is in `evidence/1.8.4/`; prior evidence/packages remain unchanged.
 
 | Layer | Result | Scope |
 | --- | --- | --- |
-| Node | 118 passed, 0 failed/skipped | Model, adapters, state, privacy/races, module syntax and static worker imports. |
-| Rendered capture/UX journey | 21 scenario groups passed | Real DOM, canvas, IndexedDB; Chrome APIs are controlled doubles. |
-| Rendered case/privacy journey | 18 scenario groups passed | Reviewed intake, associations, backup/restore, deletion and history clearing through real UI; Chrome API doubles. |
-| Actual Chromium service worker | 9 scenario groups passed | Real ServiceWorkerGlobalScope, IndexedDB, Web Locks and stop/restart; Chrome API doubles. |
-| Native installed Chrome/Edge | Blocked | Administrator disables unpacked extensions in this runner. |
-| Live platforms | Not run | No current platform extraction success rate claimed. |
+| Node | 123 passed; 0 failed/skipped | Five adapters, exact IDs, models, filing/navigation guards, current-page failures, privacy/races, syntax and static worker imports. |
+| Rendered capture/UX | 21 groups passed | Real DOM/canvas/IndexedDB; controlled Chrome API doubles. |
+| Rendered toolbar/lookup | 11 groups passed | Actual popup buttons, controller, pointer selection, image viewer, deep link, clipboard and retry; controlled Chrome APIs. |
+| Rendered case/privacy | 18 groups passed | Actual intake/coverage/association, backup, deletion/history controls; Chrome API doubles. |
+| Actual Chromium service worker | 9 groups passed | Real ServiceWorkerGlobalScope, IndexedDB, Web Locks and stop/restart; Chrome API doubles. |
+| Native installed Chrome/Edge | Not accepted | Recorded runner policy: “Loading of unpacked extensions is disabled by the administrator.” No repeated bypass attempt. |
+| Live platforms | Not run | No current live profile success rate claimed. |
 
-## New UI evidence
+## New evidence
 
-The capture journey tests empty Inbox at 1280×800 and 1440×900, findings above the fold, four stable keyboard tabs, a single visible panel, view restoration on reload, preserved query/filter text and cancelled case creation without writes. It creates a blank case and subject through the UI. It checks inspector open/close focus and unchanged review/inclusion, denied export with visible error, Retry retaining bytes, Settings access, Add → Note and review focus after a storage refresh. Capture scope changes keep the Captures view. Library collapses at 400px. CSS 200% zoom has no horizontal overflow; this is not native browser-zoom acceptance.
+The toolbar journey opens Northbridge / SEO 6 with Alex Example, switches the default to Southridge / SD 73, then clicks Full page through the actual popup. The saved image/tiles remain in SEO 6/Alex. It opens that exact scan/capture through View in scan while another scan was previously active, verifies Fit width/ Fit image, explicitly reassigns/detaches the source tab, saves metadata to SD 73, and uses Visible area and pointer-drag Select area without opening the side panel. Denied scripting creates no image/controller; restricted URLs disable screenshot actions while pasted lookup remains usable.
 
-Fictional portrait, landscape, tall partial and missing-selected-derivative records exercise the gallery. Missing selected bytes produce an error and no substituted original. Intake edits invalidate reviewed fields and disable creation until re-reviewed. Existing coverage/association/exact string IDs, cancellation restoring page scroll/styles, binary backup/restore, collision-safe folders, history-clear races and deletion guards remain asserted.
+Run on this page reads fictional profile markup and Copy IDs uses the actual clipboard API to preserve `9007199254740993123`. Live network is disabled in that journey. Missing hydration/captcha-library text stays technical; an actual Retry retains the batch, row, submitted input and originating destination after a default switch. Failed input remains editable rather than clearing. Observed sign-in text has specific guidance. A rendered height/viewport assertion prevents lookup rows being compressed out of view.
 
-Visual review opened actual generated images for empty Inbox, populated Research, gallery, inspector, Case, Settings, narrow workspace, panel and popup. Screenshots show rendered product documents with API doubles, not a natively installed extension. During validation, visual inspection found a panel refresh exception; the new panel assertion covers it. Add → Note uncovered a pre-existing textarea.type exception; it is fixed and covered by the actual creation flow.
+Node additions reject URL navigation before launch/write, retain explicit metadata filing despite later assignments, distinguish challenge libraries from observed access screens, and forbid silent fetched substitutes for explicit current-page reads. Worker router tests now include workspace URLs with query strings and section fragments.
+
+Existing journeys retain assertions for source restoration on cancellation, sticky-header stitching, same-name folder collisions, subject rename, export denial/retry, opaque redaction/default-original exclusion, interrupted binary writes/journals, missing selected derivatives, backup corruption/remapped relationships, scan-specific reports, keyboard views/focus, narrow layouts and privacy deletion/late writes. CSS 200% zoom is a reflow check, not native browser zoom.
+
+Visual inspection opened actual generated screenshots of the direct toolbar, saved full page, linked inspector and observed-login recovery. It found and corrected popup flex compression that hid result rows. The inspected images contain fictional data only and represent rendered product documents with API doubles. Representative frames of the user's recording and supplied screenshots were reviewed locally as design references; no recording audio transcription, private fixture publication or native FireShot test is claimed.
 
 ## Run
 
@@ -26,11 +31,14 @@ From `gather`:
 ```sh
 node --test tests/*.test.mjs
 node tests/browser-capture.mjs
+node tests/browser-toolbar.mjs
 node tests/browser-case.mjs
 node tests/browser-worker.mjs
 python3 scripts/package.py
 ```
 
-Node 24, Python 3, Playwright 1.62.1 and sandboxed Chromium 151 were used. There is no runtime install, bundler or server. Playwright is supplied by the runner; otherwise install it into a development-only `.tools` prefix as described in `history/1.8.2-TESTING.md`. Use `GATHER_CHROMIUM_PATH` for an available browser and `GATHER_BROWSER_ARTIFACTS` for output. Keep `chromiumSandbox:true`; do not weaken browser security to evade the administrator blocker.
+Node 24.19.0, Python 3.12.14, supplied Playwright 1.62.1 and sandboxed Chromium 151 were used. No runtime dependency installation, bundler or server is required. Harnesses own their fixture servers/profiles and close them. `GATHER_CHROMIUM_PATH` chooses an available browser; `GATHER_BROWSER_ARTIFACTS` chooses output. Keep `chromiumSandbox:true`. See the historical setup instructions if development-only Playwright is unavailable after restoration.
 
-The harnesses create and close their own HTTP fixture servers and temporary profiles. Chrome API doubles do not validate activeTab permissions, native popup sizing, native side-panel invocation/window focus, downloads permission UI or live site markup. Complete `LOCAL-ACCEPTANCE.md` on an allowed Chrome/Edge installation. Full-page dynamic/infinite/nested scrolling and printer pagination retain documented limits.
+ZIP packaging verifies source-byte hashes, CRC, manifest/package version and required entry points. Versioned checksums accompany both packages. Previous 1.8.3 ZIP checksums are verified unchanged.
+
+Chrome API doubles do not verify native activeTab grants, toolbar sizing/invocation, side-panel gesture, window focus, captureVisibleTab rate behavior, Downloads permission UI, browser-session reset or Edge integration. Complete `LOCAL-ACCEPTANCE.md` on a permitted browser. Full-page dynamic/infinite/nested scrolling, zoom and printer pagination retain their documented limitations. Reference Library is designed/backlogged, not shipped.

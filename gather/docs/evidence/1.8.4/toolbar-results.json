@@ -1,0 +1,18 @@
+{
+  "kind": "rendered-browser-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [
+    "Three direct screenshot actions and one Save to selector are visible; focused lookup and optional subject retained; a default switch leaves the displayed SEO 6 destination unchanged.",
+    "Full page launches directly from the popup into the real controller, stitches real fixture screenshots and saves SEO 6/Alex despite SD 73 being active; width/whole-image viewing works.",
+    "View in scan selects the captured scan and opens that exact image, even when another case was active during workspace initialization.",
+    "Changing Save to assigns this tab without moving the workspace default; Save page link files only metadata to SD 73; explicit default action detaches the assignment.",
+    "Visible area is a single toolbar action; the saved original has the actual viewport dimensions.",
+    "Select area supports an actual pointer drag without coordinate dialogs and retains the original plus cropped derivative.",
+    "Denied scripting access produces actionable toolbar guidance and creates no image or controller.",
+    "Restricted pages disable screenshots while project-free pasted lookup remains available.",
+    "Actual Run on this page and Copy IDs preserve the exact long fictional ID, with no fetched substitute or live network.",
+    "Missing hydrated data stays technical; Retry recovers the same row/batch and scan after a default switch, without false sign-in advice or network.",
+    "Observed sign-in text produces specific advice; missing markup never claims Gone or identity."
+  ],
+  "errors": []
+}

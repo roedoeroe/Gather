@@ -1,4 +1,4 @@
-import {extractId, normalizeProfile} from './core.js';
+import {extractId, normalizeProfile, pageAccessIssue} from './core.js';
 
 export const isExtension = Boolean(globalThis.chrome?.runtime?.id && globalThis.chrome?.scripting);
 const ownedTabs = new Set();
@@ -25,7 +25,7 @@ async function fetchSource(profile, signal) {
     check(signal);
     // Only normalized, allowlisted profile URLs ever reach this function.
     const response = await fetch(profile.url, {credentials: 'include', signal: controller.signal, redirect: 'follow', cache: 'no-store'});
-    if (!response.ok) return {error: `Site returned HTTP ${response.status}. Try signing in and retrying.`};
+    if (!response.ok) return {error: `The site returned HTTP ${response.status}. Open the profile to check its response, then retry.`};
     if (!response.body) return {error: 'The site returned no page source'};
     const reader = response.body.getReader(), decoder = new TextDecoder(); let html = '';
     try {
@@ -60,7 +60,7 @@ async function readBrowserPage(profile, signal, onStage, tabOwner) {
       const state = await chrome.tabs.get(tab.id);
       if (state.status !== 'complete') continue;
       let actual;
-      try { actual = normalizeProfile(state.url); } catch { return {error: 'Open the profile, sign in or complete its security check, then retry'}; }
+      try { actual = normalizeProfile(state.url); } catch { return {error: pageAccessIssue('',state.url)||'The browser page did not return a supported profile URL. Open the intended profile and retry.'}; }
       if (actual.platform !== profile.platform) return {error: 'The profile redirected outside its platform'};
       const results = await chrome.scripting.executeScript({
         target: {tabId: tab.id},
@@ -69,7 +69,7 @@ async function readBrowserPage(profile, signal, onStage, tabOwner) {
       check(signal);
       const snapshot = results[0]?.result;
       if (snapshot) last = extractId(snapshot.html, profile, snapshot.url);
-      if (last.id || last.accountState==='GONE' || /security check|Multiple account IDs|different profile/.test(last.error || '')) return last;
+      if (last.id || last.accountState==='GONE' || /security check|sign in|Multiple account IDs|different profile/.test(last.error || '')) return last;
       // Allow hydrated profile data to arrive, but never solve login or CAPTCHA screens.
       if (Date.now() > deadline - 17000) return last;
     }
@@ -102,11 +102,12 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
       if(snapshot){
         const result=extractId(snapshot.html,profile,snapshot.url);
         if(result.id||result.accountState==='GONE')return {...result,method:'Current page · '+result.method};
-        if(/different profile|different platform|different channel/.test(result.error||''))return result;
+        return result;
       }
-    }catch{check(signal);}
-    // A closed or unreadable tab can still be resolved from its requested link.
-    // This existing user tab is never tracked as temporary or closed by Gather.
+      return {error:'The current page returned no readable source. Reload the profile, then retry.'};
+    }catch{check(signal);return {error:'Gather could not read this tab. Reopen Gather using its toolbar button on the profile, then retry.'};}
+    // This explicit current-page operation never substitutes a fetched or new tab.
+    // The existing user tab is never tracked as temporary or closed by Gather.
   }
   onStage?.('Fetching profile…');
   const direct = await fetchSource(profile, signal);

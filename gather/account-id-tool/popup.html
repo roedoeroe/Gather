@@ -5,12 +5,19 @@
 <title>Gather — Quick lookup</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="popup.css">
 <link rel="stylesheet" href="capture-ui.css"></head>
 <body class="quick-panel">
-<header class="quick-header"><div class="brand"><img src="icon.svg" width="25" height="25" alt=""><span>Gather</span></div><button id="openFull" class="text-button">Full tool ↗</button></header>
+<header class="quick-header"><div class="brand"><img src="icon.svg" width="25" height="25" alt=""><span>Gather</span></div><button id="openDashboard" class="text-button" disabled>Workspace</button></header>
 <main>
-  <section class="workspace-quick" aria-label="Save destination"><div class="workspace-controls"><label for="gatherDestination">Default scan</label><select id="gatherDestination" disabled><option>Inbox</option></select><button id="openPanel" class="text-button">Side panel</button><button id="openWorkspace" class="text-button">Workspace ↗</button></div><div class="page-context"><button id="saveCurrentSource" class="text-button" disabled>Save this page</button><details><summary>Change destination</summary><p id="pageContextHelp" class="quiet"></p><div class="workspace-controls"><label class="sr-only" for="pageScan">Assign this tab to</label><select id="pageScan"></select><button id="assignPage" class="text-button">Assign tab</button><button id="detachPage" class="text-button">Detach</button></div></details></div><p id="pageDestination" class="quiet">Reading page destination…</p><p id="workspaceStatus" class="quiet" role="status"></p></section>
-  <details class="popup-capture"><summary>Capture this page</summary><section id="captureTools" aria-label="Capture destination and subject"></section></details>
-  <label for="quickLinks" class="quick-label">Paste a profile link.</label>
-  <textarea id="quickLinks" spellcheck="false" maxlength="100000" placeholder="Or paste a whole list of accounts…" title="Enter to run · Shift+Enter for a new line" aria-describedby="quickCount"></textarea>
+  <section id="pageTools" class="page-tools" aria-label="Screenshot and destination">
+    <div class="capture-filing"><label for="captureScan">Save to</label><select id="captureScan" disabled><option>Loading scans…</option></select></div>
+    <div id="captureSubjectRow" class="capture-filing" hidden><label id="captureSubjectLabel" for="toolbarSubject">Subject</label><select id="toolbarSubject" disabled><option value="">Unassigned</option></select></div>
+    <div class="capture-heading"><h2>Screenshot</h2><button id="viewCaptures" class="text-button" disabled>View captures</button></div>
+    <div class="direct-captures"><button id="captureFullPage" data-capture-mode="full-page" class="primary-button" disabled>Full page</button><button id="captureVisible" data-capture-mode="visible" class="secondary-button" disabled>Visible area</button><button id="captureSelection" data-capture-mode="selection" class="secondary-button" disabled>Select area</button></div>
+    <p id="toolbarContext" class="quiet"></p>
+    <details id="pageOptions"><summary>Page options</summary><div><button id="savePageLink" class="text-button" disabled>Save page link</button><button id="useDefaultScan" class="text-button" disabled>Use workspace default</button><button id="openPanel" class="text-button">Open side panel</button></div><p class="quiet">Save page link keeps its URL and title without an image. A scan assignment is research context, not proof of discovery.</p></details>
+    <p id="pageToolsStatus" class="quiet" role="status"></p>
+  </section>
+  <label for="quickLinks" class="quick-label">Find account IDs</label>
+  <textarea id="quickLinks" spellcheck="false" maxlength="100000" placeholder="Paste a profile link or a list of accounts…" title="Enter to run · Shift+Enter for a new line" aria-describedby="quickCount"></textarea>
   <div class="quick-meta"><span id="quickCount">Instagram, Facebook, Threads, TikTok, YouTube</span><button id="usePage" class="text-button" disabled title="Open a supported profile or channel to use this">Run on this page</button></div>
   <div class="quick-actions"><button id="getIds" class="primary-button" disabled>Get UserIDs</button><label class="auto-label"><input id="quickAuto" type="checkbox" role="switch">Auto-copy</label></div>
   <p id="quickMessage" role="status" hidden></p>
@@ -21,7 +28,8 @@
     <p id="quickSaved" class="quiet">Saved in Recent batches · Edit notes in the full tool.</p>
   </section>
   <section id="manualCopy" hidden aria-label="Manual copy"><p class="quiet">Clipboard access was blocked. Press Ctrl+C or Command+C to copy the selected text.</p><label for="quickCopyText" class="sr-only">Formatted output to copy</label><textarea id="quickCopyText" readonly spellcheck="false"></textarea><button id="closeManual" class="text-button">Done</button></section>
+  <button id="openFull" class="text-button account-tools-link">Open account tools</button>
 </main>
 <script type="module" src="popup.js"></script>
-<script type="module" src="capture-lazy.js"></script>
+
 </body></html>

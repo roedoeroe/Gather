@@ -1,3 +1,4 @@
+import {getCapture} from './capture-store.js';
 import {retainFocus} from './workspace-focus.js';
 import {initNavigation,selectSection,setCaseAvailable} from './workspace-navigation.js';
 import {accountState} from './account-state.js';
@@ -158,7 +159,18 @@ async function init(){
   const currentTab=await chrome.tabs.getCurrent();if(currentTab)$('savePage').hidden=true;
   if(isPanel){await refreshTabContext();chrome.tabs.onActivated.addListener(info=>{if(info.windowId===windowId)safely(refreshTabContext);});chrome.tabs.onUpdated.addListener(id=>{if(id===tabId)safely(refreshTabContext);});}
   chrome.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes[WORKSPACE_KEY]?.newValue){update(changes[WORKSPACE_KEY].newValue);if(isPanel)safely(refreshTabContext);}if(area==='session'&&changes['gather.tabContexts.v1']&&isPanel)safely(refreshTabContext);if(area==='session'&&changes.gatherCaptureError?.newValue)message(changes.gatherCaptureError.newValue,true);});
-  const r=await request('workspace.state');update(r.state);selectSection(initialSection||'research');document.querySelector('.layout').inert=false;
+  let r=await request('workspace.state');
+  const link=new URLSearchParams(location.search);
+  if(!isPanel&&link.has('scan')){
+    const scanId=link.get('scan')==='inbox'?null:link.get('scan');
+    const requested=scanId===null||r.state.scans.some(s=>s.id===scanId);
+    let captureMatches=true;
+    if(link.has('capture')){const capture=await getCapture(link.get('capture'));captureMatches=!!capture&&capture.scanId===scanId;}
+    if(requested&&captureMatches)r=await act({type:'context.select',scanId});
+    else message('The linked scan or capture is no longer available. Choose a scan from the library.',true);
+  }
+  update(r.state);selectSection(initialSection||'research');document.querySelector('.layout').inert=false;
+  document.dispatchEvent(new Event('gather:workspace-ready'));
   const {gatherCaptureError}=await chrome.storage.session.get('gatherCaptureError');if(gatherCaptureError){message(gatherCaptureError,true);await chrome.storage.session.remove('gatherCaptureError');}chrome.action.setBadgeText({text:''}).catch(()=>{});
 }
 safely(init);

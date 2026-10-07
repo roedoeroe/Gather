@@ -68,9 +68,15 @@ async function launchSearchTab(search){
 }
 export async function capturePage(scanId,tabId,options={}){
   // Snapshot the destination and tab supplied at invocation; never query a later active tab here.
-  const destination=await resolveTabContext(await readWorkspace(),tabId,scanId);
+  const current=await readWorkspace();let destination;
+  if(options.destination){
+    const chosen=context(current,options.destination.scanId),searchId=options.destination.originatingSearchId||null;
+    if(chosen.projectId!==options.destination.projectId||searchId&&!current.searches.some(s=>s.id===searchId&&s.scanId===chosen.scanId&&s.projectId===chosen.projectId))throw new Error('The displayed destination is unavailable. Choose a scan again.');
+    destination={context:{...chosen,originatingSearchId:searchId},label:destinationLabel(current,chosen.scanId)};
+  }else destination=await resolveTabContext(current,tabId,scanId);
   let filing={};if(globalThis.indexedDB&&destination.context.projectId){const subjectId=options.subjectId===undefined?await selectedSubject(destination.context.scanId):options.subjectId,subject=(await listSubjects(destination.context.projectId)).find(s=>s.id===subjectId);if(subjectId&&!subject)throw new Error('Choose a subject in this project.');if(subject)filing={filingSubjectId:subject.id,filingRoleId:subject.roleId};}
   const tab=await chrome.tabs.get(tabId);
+  if(options.expectedUrl&&tab.url!==options.expectedUrl)throw new Error('The page changed. Reopen Gather before saving it.');
   if(!tab.url)throw new Error('Use the Gather toolbar button on the page, or right-click to save it.');
   webUrl(tab.url);
   const response=await dispatch({type:'item.save',kind:'source',scanId:destination.context.scanId,originatingSearchId:destination.context.originatingSearchId,url:tab.url,title:(tab.title||tab.url).slice(0,500),excerpt:'',metadataOnly:true,...filing});
@@ -173,7 +179,7 @@ export async function handleWorkspace(message){
     case 'workspace.action': return dispatch(message.action);
     case 'workspace.search': return openSearch(message.action);
     case 'workspace.reopenSearch': return reopenSearch(message.id);
-    case 'workspace.capture': return capturePage(message.scanId,message.tabId,{subjectId:message.subjectId});
+    case 'workspace.capture': return capturePage(message.scanId,message.tabId,{subjectId:message.subjectId,destination:message.destination,expectedUrl:message.expectedUrl});
     case 'workspace.tabContext': return resolveTabContext(await readWorkspace(),message.tabId);
     case 'workspace.assignTab': {
       const state=await readWorkspace();await chrome.tabs.get(message.tabId);

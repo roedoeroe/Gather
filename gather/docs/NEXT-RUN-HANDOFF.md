@@ -1,3 +1,5 @@
+> **Latest user direction:** implement the 1.8.3 workspace UX redesign described in [NEXT-SESSION-UX-PROMPT.md](NEXT-SESSION-UX-PROMPT.md). The user paused to prepare that brief, then explicitly resumed. Active runtime was verified byte-identical to 1.8.2 before resuming; the unfinished navigation sketch is checkpointed separately and is not shipped. This direction supersedes the next-feature ordering below.
+
 # Gather 1.8.2 — next run handoff
 
 ## Resume the actual source

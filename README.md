@@ -6,13 +6,15 @@ A local browser extension for fast account lookup, deliberate research and scree
 
 ## Get the current build
 
-**[Download Gather 1.8.5](https://github.com/roedoeroe/Gather/raw/d29ba5475e0f53795f3f4695155038de8036414f/releases/1.8.5/Gather-1.8.5-extension.zip)** · Development build for Chrome and Edge
+**[Download Gather 1.8.6](https://github.com/roedoeroe/Gather/raw/cd9b747048dbfe7e3dba7b6a29b6c263710ff4b5/releases/1.8.6/Gather-1.8.6-extension.zip)** · Development build for Chrome and Edge
 
-[Source/test package](releases/1.8.5/Gather-1.8.5-development.zip) · [SHA-256 checksums](releases/1.8.5/Gather-1.8.5-SHA256SUMS.txt) · [Delivery notes](releases/1.8.5/Gather-1.8.5-DELIVERY.md)
+[Source/test package](releases/1.8.6/Gather-1.8.6-development.zip) · [SHA-256 checksums](releases/1.8.6/Gather-1.8.6-SHA256SUMS.txt) · [Delivery notes](releases/1.8.6/Gather-1.8.6-DELIVERY.md)
 
-Choose `Gather-1.8.5-extension.zip`, extract it to a permanent folder, and load its **account-id-tool** directory from your browser's Extensions page with Developer mode enabled. For an update, replace all files at the same installed path and Reload; do not uninstall or clear storage. See the [installation and rollback guide](gather/README.md#install-or-update).
+Choose `Gather-1.8.6-extension.zip`, extract it to a permanent folder, and load its **account-id-tool** directory from your browser's Extensions page with Developer mode enabled. For an update, replace all files at the same installed path and Reload; do not uninstall or clear storage. See the [installation and rollback guide](gather/README.md#install-or-update).
 
-The development source is maintained on **develop/1.8.0-r3**; the branch name is historical, while the current extension version is **1.8.5**. Release ZIPs are pinned to their release commit. Main is unchanged.
+The development source is maintained on **develop/1.8.0-r3**; the branch name is historical, while the current extension version is **1.8.6**. Release ZIPs are pinned to their release commit. Main is unchanged.
+
+1.8.6 is a fixes-only update: capture lifecycle, stale redaction/print/clipboard guards, export ownership/retry, backup recovery and deletion state. No new features or permissions.
 
 ## Capture directly from the toolbar
 
@@ -28,7 +30,7 @@ Workspace → **Settings → Data & Privacy** offers red **Delete case…** and 
 
 ## Verification
 
-The 1.8.5 release passed **129 automated tests**, **61 rendered-browser scenario groups** and **10 real service-worker groups**. Browser journeys use controlled Chrome API doubles. Native installed-extension testing is blocked by this runner's administrator policy; live-platform reliability remains unverified. Use the [local Chrome/Edge checklist](gather/docs/LOCAL-ACCEPTANCE.md) before relying on native behavior.
+The 1.8.6 release passed **130 automated tests**, **71 rendered-browser scenario groups** and **10 real service-worker groups**. Browser journeys use controlled Chrome API doubles. Native installed-extension testing is blocked by this runner's administrator policy; live-platform reliability remains unverified. Use the [local Chrome/Edge checklist](gather/docs/LOCAL-ACCEPTANCE.md) before relying on native behavior.
 
 ## Continue development
 
@@ -36,6 +38,6 @@ The 1.8.5 release passed **129 automated tests**, **61 rendered-browser scenario
 - [Test evidence and commands](gather/docs/TESTING.md)
 - [Next-run handoff](gather/docs/NEXT-RUN-HANDOFF.md)
 - [Product direction](gather/docs/PRODUCT-DIRECTION.md)
-- [Proposed Quick Parts / Reference Library](gather/docs/QUICK-PARTS-DIRECTION.md) — local search and reviewed composition; **not included in 1.8.5**
+- [Proposed Quick Parts / Reference Library](gather/docs/QUICK-PARTS-DIRECTION.md) — local search and reviewed composition; **not included in 1.8.6**
 
 The extension has no runtime dependencies, bundler or server. From `gather`, run `node --test tests/*.test.mjs` and `python3 scripts/package.py`. Browser validation setup is documented in the testing guide. Public fixtures contain invented data only.

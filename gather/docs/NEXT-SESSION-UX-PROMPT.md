@@ -1,3 +1,5 @@
+> **Implemented in 1.8.3.** Retained as the original researched brief. Read NEXT-RUN-HANDOFF.md for current state and remaining native acceptance; do not restart this implementation.
+
 # Gather — next session: finish the workspace UX redesign
 
 Continue implementing Gather in the real extension. This is an implementation and validation task, not another roadmap. The previous session deliberately paused at my request to save remaining usage and prepare this brief. Read this document completely, then the linked design research and current handoff. Make routine decisions autonomously; ask only if an answer materially changes the product or authorization.

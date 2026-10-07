@@ -1,3 +1,5 @@
+import {retainFocus} from './workspace-focus.js';
+import {initNavigation,selectSection,setCaseAvailable} from './workspace-navigation.js';
 import {accountState} from './account-state.js';
 import {scanCaptureReport,captureReportMarkdown} from './capture-report.js';
 import {createFullBackup,readFullBackup,stageFullRestore,MAX_BACKUP_BYTES} from './capture-backup.js';
@@ -9,6 +11,7 @@ const isPanel=new URLSearchParams(location.search).has('panel');
 let tabContext=null,tabId=null,tabRefresh=0;
 const currentScan=()=>isPanel&&tabContext?tabContext.context.scanId:state.activeScanId;
 document.body.classList.toggle('panel',isPanel);
+const initialSection=location.hash.slice(1);initNavigation();
 let state=null,view='items',draftQueue=Promise.resolve(),editorSave=null,lastScan,windowId=null,undoId=null;
 const formatTime=t=>new Date(t).toLocaleString();
 const label=id=>destinationLabel(state,id);
@@ -21,28 +24,36 @@ async function action(payload){const response=await act(payload);update(response
 function button(title,fn,cls=''){const b=make('button',cls,title);b.type='button';b.addEventListener('click',()=>safely(fn));return b;}
 function empty(target,title,description){const el=make('div','empty');el.append(make('strong','',title),make('span','',description));target.append(el);}
 function matches(row){const q=$('localSearch').value.trim().toLowerCase();return !q||JSON.stringify(row).toLowerCase().includes(q);}
-function setView(next){view=isPanel?'tasks':next;renderViews();}
+function setView(next){view=isPanel?'tasks':next==='searches'?$('historyKind').value:next;renderViews();}
 function render(){
+  const restoreFocus=retainFocus(document.querySelector('main'));const restoreLibraryFocus=retainFocus($('projects'));
   const scan=state.scans.find(x=>x.id===currentScan()),project=state.projects.find(x=>x.id===scan?.projectId);
-  $('projectName').textContent=project?.name||'READY WHEN YOU ARE';$('scanName').textContent=scan?.name||'Inbox';
-  $('scanHelp').textContent=scan?'Your sources, observations and next steps, together.':'Save something now. Organize it when you’re ready.';
-  $('saveDestination').textContent='Save to '+label(currentScan());$('savePage').textContent='Save page to '+label(currentScan());if(isPanel)renderTabContext();$('newScan').hidden=!scan;$('renameContext').hidden=!scan;
-  $('inboxCount').textContent=state.items.filter(x=>x.scanId===null).length;$('inbox').classList.toggle('selected',state.activeScanId===null);
+  $('projectName').textContent=project?.name||'YOUR LIBRARY';$('scanName').textContent=scan?.name||'Inbox';
+  $('scanHelp').textContent=scan?'Research saved to this scan.':'Save findings here. A case is optional.';
+  $('saveDestination').textContent='In '+label(currentScan());$('savePage').textContent='Save page to '+label(currentScan());if(isPanel)renderTabContext();$('newScan').hidden=!scan;$('renameContext').hidden=!scan;
+  setCaseAvailable(Boolean(project));
+  $('libraryToggle').textContent='Library · '+(project?.name||'Inbox')+' ▾';
+  $('inboxCount').textContent=state.items.filter(x=>x.scanId===null).length;$('inboxCount').hidden=Number($('inboxCount').textContent)===0;$('inbox').classList.toggle('selected',state.activeScanId===null);
   $('projects').replaceChildren();
-  for(const p of state.projects){$('projects').append(make('div','project-label',p.name));for(const s of state.scans.filter(s=>s.projectId===p.id))$('projects').append(button(s.name,()=>selectScan(s.id),'scan'+(state.activeScanId===s.id?' selected':'')));}
-  if(!state.projects.length)$('projects').append(make('p','quiet','Create a project when you need one.'));
+  for(const p of state.projects){$('projects').append(make('div','project-label',p.name));for(const s of state.scans.filter(s=>s.projectId===p.id))$('projects').append(Object.assign(button(s.name,()=>selectScan(s.id),'scan'+(state.activeScanId===s.id?' selected':'')),{id:'scan-'+s.id}));}
+  if(!state.projects.length)$('projects').append(make('p','quiet','No cases yet. Use New case when you need one.'));
   $('reviewCount').textContent=rows('items').filter(x=>['unreviewed','follow-up'].includes(x.review)).length;
   $('taskCount').textContent=rows('tasks').filter(x=>x.status==='open').length;
   $('searchCount').textContent=rows('searches').filter(x=>x.status!=='reviewed').length;
+  $('reviewShortcut').hidden=Number($('reviewCount').textContent)===0;
+  for(const id of ['taskCount','searchCount'])$(id).hidden=Number($(id).textContent)===0;
   const used=new TextEncoder().encode(JSON.stringify(state)).length;
   $('storageUsage').textContent='Workspace: '+(used/1024).toFixed(0)+' KB / '+(MAX_BYTES/1024/1024)+' MB'+(used>MAX_BYTES*.8?' · Approaching capacity. Back up your work.':'');
-  renderViews();
+  renderViews();restoreFocus();restoreLibraryFocus();
 }
 function renderViews(){
   if(isPanel)view='tasks';
   for(const name of ['items','tasks','searches','activity'])$(name).hidden=name!==view;
-  for(const tab of document.querySelectorAll('.tabs [data-view]')){tab.classList.toggle('selected',tab.dataset.view===view);tab.setAttribute('aria-current',tab.dataset.view===view?'page':'false');}
-  $('filter').hidden=view!=='items';
+  for(const tab of document.querySelectorAll('.tabs [data-view]')){tab.classList.toggle('selected',(tab.dataset.view===view||(tab.dataset.view==='searches'&&view==='activity')));tab.setAttribute('aria-current',(tab.dataset.view===view||(tab.dataset.view==='searches'&&view==='activity'))?'page':'false');}
+  $('historyKindLabel').hidden=!['searches','activity'].includes(view);
+  if(['searches','activity'].includes(view))$('historyKind').value=view;
+  $('filter').hidden=view!=='items';$('reviewShortcut').hidden=view!=='items'||Number($('reviewCount').textContent)===0;
+  $('localSearch').placeholder={items:'Find saved items…',tasks:'Find tasks…',searches:'Find searches…',activity:'Find activity…'}[view];
   ({items:renderItems,tasks:renderTasks,searches:renderSearches,activity:renderActivity}[view])();
 }
 function cardMeta(card,kind,date){const meta=make('div','meta');meta.append(make('span','badge',kind),make('span','',formatTime(date)));card.append(meta);}
@@ -50,9 +61,9 @@ function addLink(card,url,title=url){const a=make('a','url',title);a.href=url;a.
 function renderItems(){
   const target=$('items');target.replaceChildren();const filter=$('filter').value;
   const items=rows('items').filter(matches).filter(x=>filter==='all'||filter===x.kind||(filter==='attention'&&['unreviewed','follow-up'].includes(x.review))||(filter==='excluded'&&x.review==='excluded')).slice().reverse();
-  if(!items.length){empty(target,'A clear place for your findings.','Save a page, include an account result, or add a note. Your choices stay with this scan.');return;}
+  if(!items.length){empty(target,rows('items').length?'No matching findings':'No findings yet',rows('items').length?'Try another search or filter.':'Save a page with Gather, or add a link or note here.');return;}
   for(const item of items){
-    const card=make('article','card');card.dataset.itemId=item.id;cardMeta(card,item.kind,item.createdAt);card.append(make('h3','',item.title));if(item.evidenceId)card.append(make('p','micro',item.evidenceId));if(item.metadataOnly)card.append(make('p','micro','Metadata only · no image'));if(item.filingRoleId)card.append(make('p','micro','Filed to '+item.filingRoleId));
+    const card=make('article','card');card.dataset.itemId=item.id;card.dataset.focusKey=item.id;cardMeta(card,item.kind,item.createdAt);card.append(make('h3','',item.title));if(item.evidenceId){const details=make('details','finding-details');details.append(make('summary','','Record details'),make('p','micro',item.evidenceId));card.append(details);}if(item.metadataOnly)card.append(make('p','micro','Metadata only · no image'));if(item.filingRoleId)card.append(make('p','micro','Filed to '+item.filingRoleId));
     if(item.url)addLink(card,item.url);
     if(item.kind==='account'){
       const entry=item.entry;card.append(make('div','account-id',accountState(entry)==='GONE'?'Gone':entry.id||'ID unresolved'),make('p','quiet',item.extraction));
@@ -75,22 +86,22 @@ function renderItems(){
   }
 }
 function renderTasks(){
-  const target=$('tasks');target.replaceChildren();const tasks=rows('tasks').filter(matches).slice().sort((a,b)=>(a.status!=='open')-(b.status!=='open')||b.createdAt-a.createdAt);
-  if(!tasks.length)empty(target,'Know what comes next.','Add an unresolved question or action. Done and dismissed actions stay in the record.');
-  for(const task of tasks){const card=make('article','card');cardMeta(card,task.status,task.createdAt);card.append(make('h3','',task.title));const controls=make('div','card-controls');for(const [status,title] of (task.status==='open'?[['done','Mark done'],['dismissed','Dismiss']]:[['open','Reopen']]))controls.append(button(title,()=>action({type:'task.status',id:task.id,status})));card.append(controls);target.append(card);}
+  const target=$('tasks');target.replaceChildren();const tasks=rows('tasks').filter(t=>!isPanel||t.status==='open').filter(matches).slice().sort((a,b)=>(a.status!=='open')-(b.status!=='open')||b.createdAt-a.createdAt);
+  if(!tasks.length)empty(target,'No tasks yet','Add a task for something you want to follow up.');
+  for(const task of (isPanel?tasks.slice(0,3):tasks)){const card=make('article','card');card.dataset.focusKey=task.id;cardMeta(card,task.status,task.createdAt);card.append(make('h3','',task.title));const controls=make('div','card-controls');for(const [status,title] of (task.status==='open'?[['done','Mark done'],['dismissed','Dismiss']]:[['open','Reopen']]))controls.append(button(title,()=>action({type:'task.status',id:task.id,status})));card.append(controls);target.append(card);}
 }
 function renderSearches(){
   const target=$('searches');target.replaceChildren();const searches=rows('searches').filter(matches).slice().reverse();
-  if(!searches.length)empty(target,'Your searches, with context.','Prepared, opened and reviewed describe your actions. Search history never implies complete coverage or absence.');
-  for(const search of searches){const card=make('article','card');cardMeta(card,search.status,search.createdAt);card.append(make('h3','',search.query),make('p','quiet',PROVIDERS[search.provider]));const controls=make('div','card-controls');controls.append(button('Open search ↗',async()=>{const r=await request('workspace.reopenSearch',{id:search.id});update(r.state);}));if(search.status==='opened')controls.append(button('Mark reviewed',()=>action({type:'search.status',id:search.id,status:'reviewed'})));card.append(controls);target.append(card);}
+  if(!searches.length)empty(target,'No searches yet','Searches you launch from Gather appear here. They do not imply complete coverage.');
+  for(const search of searches){const card=make('article','card');card.dataset.focusKey=search.id;cardMeta(card,search.status,search.createdAt);card.append(make('h3','',search.query),make('p','quiet',PROVIDERS[search.provider]));const controls=make('div','card-controls');controls.append(button('Open search ↗',async()=>{const r=await request('workspace.reopenSearch',{id:search.id});update(r.state);}));if(search.status==='opened')controls.append(button('Mark reviewed',()=>action({type:'search.status',id:search.id,status:'reviewed'})));card.append(controls);target.append(card);}
 }
-function renderActivity(){const target=$('activity');target.replaceChildren();const events=rows('activity').filter(matches).slice().reverse();if(!events.length)empty(target,'Only your Gather actions.','Saving, reviewing and searches appear here. Browsing history is not collected.');for(const event of events){const card=make('article','card');cardMeta(card,event.kind.replaceAll('.',' · '),event.at);card.append(make('p','',event.label));target.append(card);}}
-async function selectScan(id){await action({type:'context.select',scanId:id});$('localSearch').value='';$('filter').value='all';setView('items');message('Active destination: '+label(id));}
+function renderActivity(){const target=$('activity');target.replaceChildren();const events=rows('activity').filter(matches).slice().reverse();if(!events.length)empty(target,'No activity yet','Your saves, reviews and searches appear here. Browsing history is not collected.');for(const event of events){const card=make('article','card');cardMeta(card,event.kind.replaceAll('.',' · '),event.at);card.append(make('p','',event.label));target.append(card);}}
+async function selectScan(id){await action({type:'context.select',scanId:id});$('localSearch').value='';$('filter').value='all';setView('items');document.body.classList.remove('library-open');$('libraryToggle').setAttribute('aria-expanded','false');}
 function openEditor(title,fields,save,destination=currentScan(),submit='Save'){
   editorSave=save;$('editorTitle').textContent=title;$('editorDestination').textContent='Destination: '+label(destination);$('submitEdit').textContent=submit;$('fields').replaceChildren();$('editorError').textContent='';
   for(const spec of fields){const label=make('label','',spec.label),input=make(spec.type==='textarea'?'textarea':spec.type==='select'?'select':'input');input.name=spec.name;
     if(spec.type==='select')for(const o of spec.options)input.append(new Option(o.label,o.value));
-    else{input.type=spec.type||'text';input.maxLength=spec.max||500;input.required=spec.required!==false;}
+    else{if(input.tagName==='INPUT')input.type=spec.type||'text';input.maxLength=spec.max||500;input.required=spec.required!==false;}
     input.value=spec.value||'';label.append(input);$('fields').append(label);
   }
   $('editor').showModal();$('fields').querySelector('input,select,textarea')?.focus();
@@ -102,20 +113,22 @@ $('undoAction').onclick=()=>safely(async()=>{const eventId=undoId;$('undoAction'
 $('closeHistory').onclick=()=>$('historyDialog').close();
 $('editorForm').addEventListener('submit',async event=>{event.preventDefault();$('submitEdit').disabled=true;try{await editorSave(Object.fromEntries(new FormData(event.target)));$('editor').close();message('Saved.');}catch(error){$('editorError').textContent=error.message;}finally{$('submitEdit').disabled=false;}});
 $('cancelEdit').onclick=()=>$('editor').close();
-$('newProject').onclick=()=>openEditor('New project',[{name:'name',label:'Project name',max:100},{name:'scanName',label:'First scan',value:'Initial review',max:100}],values=>action({type:'project.create',...values}));
-$('renameContext').onclick=()=>{const scan=state.scans.find(x=>x.id===state.activeScanId),project=state.projects.find(x=>x.id===scan.projectId);openEditor('Rename project and scan',[{name:'projectName',label:'Project name',value:project.name,max:100},{name:'scanName',label:'Scan name',value:scan.name,max:100}],v=>action({type:'context.rename',scanId:scan.id,...v}),scan.id);};
+$('renameContext').onclick=()=>{const scan=state.scans.find(x=>x.id===state.activeScanId),project=state.projects.find(x=>x.id===scan.projectId);openEditor('Rename case and scan',[{name:'projectName',label:'Case name',value:project.name,max:100},{name:'scanName',label:'Scan name',value:scan.name,max:100}],v=>action({type:'context.rename',scanId:scan.id,...v}),scan.id);};
 $('newScan').onclick=()=>{const projectId=state.scans.find(s=>s.id===state.activeScanId).projectId;openEditor('New scan',[{name:'name',label:'Scan name',max:100}],values=>action({type:'scan.create',projectId,...values}));};
 $('inbox').onclick=()=>safely(()=>selectScan(null));
 $('addSource').onclick=()=>{const scanId=currentScan();openEditor('Save a source',[{name:'url',label:'Source URL',type:'url',max:4096},{name:'title',label:'Title',required:false},{name:'excerpt',label:'Selected excerpt (optional)',type:'textarea',max:20000,required:false}],v=>action({type:'item.save',kind:'source',scanId,...v}),scanId);};
 $('addNote').onclick=()=>{const scanId=currentScan();openEditor('Add a note',[{name:'title',label:'Title',value:'Note'},{name:'body',label:'Your note',type:'textarea',max:20000}],v=>action({type:'item.save',kind:'note',scanId,...v}),scanId);};
-$('addTask').onclick=()=>{const scanId=currentScan();openEditor('Next action',[{name:'title',label:'What needs to happen?'}],v=>action({type:'task.create',scanId,...v}),scanId);};
+$('addTask').onclick=()=>{const scanId=currentScan();openEditor('New task',[{name:'title',label:'What needs to happen?'}],v=>action({type:'task.create',scanId,...v}),scanId);};
 $('savePage').onclick=()=>safely(async()=>{const scanId=currentScan(),sourceTabId=tabId;if(!sourceTabId)throw new Error('Open a web page and use the Gather toolbar button.');const response=await request('workspace.capture',{scanId,tabId:sourceTabId});update(response.state);message('Page saved to '+(response.result?.destinationLabel||label(response.result?.scanId??scanId))+'.');});
 $('searchForm').addEventListener('submit',event=>{event.preventDefault();const scanId=currentScan(),query=$('query').value,provider=$('provider').value,submit=event.submitter;submit.disabled=true;safely(async()=>{const r=await request('workspace.search',{action:{scanId,query,provider}});update(r.state);message('Search opened for '+label(scanId)+'. Mark it reviewed when you finish.');setView('searches');}).finally(()=>submit.disabled=false);});
 function draftKey(scanId){return 'gather.search-draft.'+(scanId||'inbox');}
 function draftStorage(scanId){const projectId=state.scans.find(s=>s.id===scanId)?.projectId;return state.projects.find(p=>p.id===projectId)?.mode==='ephemeral'?chrome.storage.session:chrome.storage.local;}
 function saveDraft(){const scanId=currentScan(),value={query:$('query').value,provider:$('provider').value};draftQueue=draftQueue.catch(()=>{}).then(()=>request('workspace.searchDraft',{scanId,value})).catch(error=>message('Search draft could not be saved. '+error.message,true));}
 async function restoreDraft(scanId){await draftQueue.catch(()=>{});const key=draftKey(scanId),draft=(await draftStorage(scanId).get(key))[key];if(currentScan()!==scanId)return;$('query').value=draft?.query||'';$('provider').value=draft?.provider||'google';}
+document.querySelector('.add-menu').addEventListener('click',event=>{if(event.target.closest('button'))event.currentTarget.open=false;});
 $('query').oninput=saveDraft;$('provider').onchange=saveDraft;
+$('libraryToggle').onclick=()=>{const open=document.body.classList.toggle('library-open');$('libraryToggle').setAttribute('aria-expanded',String(open));};
+$('historyKind').onchange=()=>setView($('historyKind').value);
 $('localSearch').oninput=renderViews;$('filter').onchange=renderViews;
 for(const el of document.querySelectorAll('[data-view]'))el.onclick=()=>setView(el.dataset.view);
 for(const el of document.querySelectorAll('[data-filter]'))el.onclick=()=>{$('filter').value=el.dataset.filter;setView('items');};
@@ -145,7 +158,7 @@ async function init(){
   const currentTab=await chrome.tabs.getCurrent();if(currentTab)$('savePage').hidden=true;
   if(isPanel){await refreshTabContext();chrome.tabs.onActivated.addListener(info=>{if(info.windowId===windowId)safely(refreshTabContext);});chrome.tabs.onUpdated.addListener(id=>{if(id===tabId)safely(refreshTabContext);});}
   chrome.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes[WORKSPACE_KEY]?.newValue){update(changes[WORKSPACE_KEY].newValue);if(isPanel)safely(refreshTabContext);}if(area==='session'&&changes['gather.tabContexts.v1']&&isPanel)safely(refreshTabContext);if(area==='session'&&changes.gatherCaptureError?.newValue)message(changes.gatherCaptureError.newValue,true);});
-  const r=await request('workspace.state');update(r.state);document.querySelector('.layout').inert=false;
+  const r=await request('workspace.state');update(r.state);selectSection(initialSection||'research');document.querySelector('.layout').inert=false;
   const {gatherCaptureError}=await chrome.storage.session.get('gatherCaptureError');if(gatherCaptureError){message(gatherCaptureError,true);await chrome.storage.session.remove('gatherCaptureError');}chrome.action.setBadgeText({text:''}).catch(()=>{});
 }
 safely(init);

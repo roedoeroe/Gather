@@ -1,5 +1,5 @@
 {
-  "version": "1.8.2",
+  "version": "1.8.3",
   "files": {
     "account-id-tool/README.md": "8fa8cb5ab52e44ed8482a62c32861379d0d609e11dde5b94f0210bd88232bc04",
     "account-id-tool/account-state-ui.js": "c9cfa0c802a54ca8bbc4a048b44677e0b0befb06e7c3563651fe637ef596bfce",
@@ -18,7 +18,7 @@
     "account-id-tool/capture-report.js": "2f1e82ac42ad8cc0a6ebfb396f1de3487a3d938ab4b0ad38f274641504a50f33",
     "account-id-tool/capture-store.js": "e86717776c26e7907154e17ecdaa98d6711d3a3b5ad127a3e6be1e79118f1cf4",
     "account-id-tool/capture-ui.css": "e0869fb12aa26c910753b6f2a4b3e79631907c94c1e3ce38318d716be559933c",
-    "account-id-tool/capture-ui.js": "fca883882d86fa2c2484ca54501aa88cd997e4b64e0817fe2b005599040da141",
+    "account-id-tool/capture-ui.js": "130f93d5606dd17adedafaf0c157aed769afb2c45fd8879637c6e04422749747",
     "account-id-tool/capture.css": "4600faef420584e6018018db8195dc8fc87b196a0ee8a0284dbffd9b929eed40",
     "account-id-tool/capture.html": "cdde81cb08659baf53404d65de462ec11a80c151a0c22cb8d5d513ba5f4eee6e",
     "account-id-tool/capture.js": "8b9f5e3316597496e4d18d3c84c4688e72c2eabb772545becebe2a228483ace6",
@@ -26,7 +26,7 @@
     "account-id-tool/case-model.js": "fdfe9642882a3c47ba3d0d58e3a425c9a0c79ce87e862e85c8fac875c3aa440a",
     "account-id-tool/case-session.js": "0e8343cfcfda641bb0f2a8d14287cb225e40df1b6020a50c194686711904a41f",
     "account-id-tool/case-ui.css": "329ba53f3f4ace9ae3f45da713ba263726aeb0d593d9d8a68a495ee83c5cf286",
-    "account-id-tool/case-ui.js": "856b17ca765225e9770ee28492ae60dfc033ff92da02e3e804bfc9f2c432113c",
+    "account-id-tool/case-ui.js": "c394a7bf7e7b7a8590001cc7454ddac2ca048c63943a8a6b2d6dfe1ade55a145",
     "account-id-tool/core.js": "268699df6fbee2e73284c263730a19cccba69fb2f2f88b55b2a7c7e5e9d01dda",
     "account-id-tool/evidence.css": "ae1c3e403dce92750e5f86d96ca946ae611550b4973081ed3bff30274f3beb3a",
     "account-id-tool/evidence.html": "b4eb28b36c551a9cbb86e119fafebea2fa2c33211e44a45f11bca6df862dc8cb",
@@ -38,8 +38,8 @@
     "account-id-tool/icons/48.png": "a707c90ded8c5c32599bcd181ad82168ff25ebd45fe42834bf0b5a16efaae4bf",
     "account-id-tool/index.html": "efd479c380d98eda9acde99205977567eab3b4ed4c49441fc3a274de20b2a636",
     "account-id-tool/lookup-context.js": "712b9c54046aaf50cb8d464f7be5b4f3635ca499e166ee851d9ea3b9e371531f",
-    "account-id-tool/manifest.json": "0a269bff87bd949751eb7d6d2ecb385be5cf702415ef8e7e7eac56d2093a1ff8",
-    "account-id-tool/package.json": "1ec23c4eb6aa39d7d140c30116ced068d8149a39c2a16ee1520c27da0722a6ff",
+    "account-id-tool/manifest.json": "47dae563eead1b02f297c080e725ec3d933f0c75a14b4034791b1f46eb9767dc",
+    "account-id-tool/package.json": "604912d61c2748c61f171507d0a777c3c0c9325960fda6188dc88c65368a246b",
     "account-id-tool/paste.js": "7e32d2757a12fda42f8e83c80e38bc9c5f1a9626422708378249b5eb40d23826",
     "account-id-tool/popup.css": "143d2c63bee8dac4d5456075d0a69c142af4ad8ad3735c12f0e4ad5f867a5e5a",
     "account-id-tool/popup.html": "8a0f91ba433d1d87ba8460ae97659ba7a6a32150ce80a7fc70bd87fdac2f95cf",
@@ -52,11 +52,14 @@
     "account-id-tool/tab-context.js": "a8a5adb2ecbfba4c8f88f09d959742c8a8bc525271f3e8a3fcb008a8cfc2cdf2",
     "account-id-tool/tab-ownership.js": "bb6fe3abba828fe36f9b680321c120d9b6bedc1527c3b25c472f68fd9829bce5",
     "account-id-tool/workspace-client.js": "2fb0761603a2a4bd1e014e54720aac4dd44833a7cb34cc44e04319345d5cf250",
+    "account-id-tool/workspace-focus.js": "a5183ea04b217aced15828017a8292e95bb77cb31d7c7e65b890137ffed7ca9d",
     "account-id-tool/workspace-integration.js": "8a4d8d6d4627b50b9a38088f8d2bd2d770bb2f45aa1aae2b7f1d287c690d9ca1",
+    "account-id-tool/workspace-layout.css": "64c155fdcc1d8dd21162b685d9e53d36841c3d7038ec048d302983c73768ef2c",
     "account-id-tool/workspace-model.js": "639b1db9915d1b8b01c4291e14efbedf6a899ecc0c00bab6ecee47f1a8ed024a",
+    "account-id-tool/workspace-navigation.js": "a4e1df73fc69ffad85aa51daeee7f6fb66ffb4bc63c41097680b9046df4410a7",
     "account-id-tool/workspace-store.js": "e4dbdaa3bdb25afb346885eaaf65d5031b7132ecbed2bcf08760278b82ace32e",
     "account-id-tool/workspace.css": "7ffe863984548931435a0e609d6b29372bcef51b7774645a25259eb1e78da7cb",
-    "account-id-tool/workspace.html": "7db272872640d7d9d324c1ab40bd5bf657f8c56c85ad856e365eff6abd0205b0",
-    "account-id-tool/workspace.js": "0a8db524b26bad477bbbb9711847d200f51662e7b5c836851f4edbf4636a51fc"
+    "account-id-tool/workspace.html": "4dbe0e82171b8fbdca3a9b40b83069ab20453a1aef784a882ab4386f260fef7c",
+    "account-id-tool/workspace.js": "ecea88471fe166f67ef21257e659804a2aa3752866bdcf94c870429e6f4739da"
   }
 }

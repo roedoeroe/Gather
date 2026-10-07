@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Gather",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "Local research with exact account IDs, reviewed Case Start, roles, scan continuity, capture and evidence export.",
   "minimum_chrome_version": "116",
   "permissions": [

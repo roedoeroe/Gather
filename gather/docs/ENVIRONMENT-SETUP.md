@@ -1,8 +1,8 @@
-# Cloud environment setup — Gather 1.8.2
+# Cloud environment setup — Gather 1.8.3
 
-Use the existing `/workspace/Gather` checkout; runtime source is `gather/account-id-tool`. No runtime install, bundler, service, credential or application environment variable is needed. Node 24 and Python 3 run automated tests and packaging. Playwright 1.62.1 and sandboxed Chromium 151 run the browser journeys.
+Use the existing checkout at `/workspace/Gather`. Each task is already isolated; do not create a new worktree unless explicitly requested. Inspect Git status, instructions, manifest/package versions and the current handoff before changing files. Preserve newer work and all completed release ZIPs.
 
-From `/workspace/Gather/gather`:
+Runtime source is `gather/account-id-tool`. There are no runtime dependencies, install step, bundler, server or case-storage credentials. Node 24 and Python 3 run the existing tests and packaging. From `/workspace/Gather/gather`:
 
 ```sh
 node --test tests/*.test.mjs
@@ -12,10 +12,14 @@ node tests/browser-worker.mjs
 python3 scripts/package.py
 ```
 
-Read `TESTING.md` for exact evidence and the distinction between real ServiceWorkerGlobalScope, mocked Chrome APIs and native installed-extension acceptance. Version 1.8.2 adds guarded local privacy controls while preserving the 1.8.1 worker import and popup sizing fixes. Do not select the older 1.8.0 just because its historical tests were green.
+The prepared environment supplies Playwright 1.62.1 and Chromium 151 at `/usr/lib/chromium/chromium`. Browser scripts start/close their own fixture server and temporary profile. No process needs to survive between tasks. `GATHER_BROWSER_ARTIFACTS` chooses output and `GATHER_CHROMIUM_PATH` selects another available browser. Follow TESTING.md if these tools are absent after restoration; do not add extension runtime dependencies or weaken `chromiumSandbox:true`.
 
-Reusable startup instructions are maintained in the cloud-environment-onboarding configuration draft, ID `f48a87a3-f937-4677-9d9e-d9c40b45e675~cecfgdraft_6ac55bcaa29481909166e1267d756bd6`. Only startup instructions are updated; repository membership, network policy, secrets and unrelated settings remain unchanged. Review and save in environment settings, then **Publish**. A saved draft does not publish the environment or prove fresh-task restoration; neither action has been performed here.
+1.8.3 validation: 118 Node tests; 21 rendered capture/UX groups; 18 rendered case/privacy groups; 9 actual ServiceWorkerGlobalScope groups. Evidence is `docs/evidence/1.8.3`. Chrome APIs are doubles; native extension and live-platform acceptance are distinct. Native unpacked loading is blocked by “Loading of unpacked extensions is disabled by the administrator.” Do not repeatedly retry the same command or disable browser security. Use LOCAL-ACCEPTANCE.md on an allowed installation.
 
-The user-authorized source branch is `roedoeroe/Gather:develop/1.8.0-r3`; its manifest now advances to 1.8.2. The final delivery receipt records the verified correction commit. Main is unchanged. If a new checkout begins on the README-only main branch, fetch the development branch after checking for local changes; do not reset user work or restart from an older upload. Downloadable development ZIPs provide another independent source/evidence copy. No Drive upload occurred.
+The redesign has four views, optional-intake New case, capture inspection and Settings privacy controls. Preserve frozen filing, exact string IDs, project-free lookup, original images and binary backups. Preserve static worker imports, privacy generations/locks/queues, tombstones, archive scrubbing and late-write guards. Case data stays local; source remains public by the user's choice. Searches/lookups contact chosen sites, exports create separate files. No cloud sync, analytics, passive collection or name-based identity inference.
 
-Native unpacked-extension loading remains blocked by administrator policy. Use a permitted runner or local Chrome/Edge. Do not repeatedly retry the blocked path or weaken browser sandbox, TLS or administrator policy. Current browser runs use the unrestricted execution environment with `chromiumSandbox:true`; follow current tool permissions and never add unsupported escalation flags.
+The maintained branch is `develop/1.8.0-r3` (historical name). Main remains the original README-only branch. If restoration checks out main without `gather`, check local changes and fetch/switch to the existing development branch; do not reset user edits. Use the supplied Git proxy authentication. Development-branch publication is authorized; merging main or changing visibility is not requested. Versioned delivery assets are tracked in `releases/1.8.3/`; `/dist` also contains local copies. Earlier releases remain immutable. GitHub Release upload endpoints previously returned HTTP 400 Bad Content-Length; Git ZIP mirrors are the working delivery path.
+
+Update at the same installed directory and Reload, without uninstalling or clearing storage. Reload releases ephemeral session values. Keep the old package and matching backup; validate rollback in a separate clean profile.
+
+The `start_skill` configuration draft captures these steps. Saving a draft does not execute startup, publish a cloud snapshot or verify restoration in a fresh task. Environment publication remains a separate user action. No network, repository-selection, credential or install-script changes are needed for this release.

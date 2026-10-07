@@ -1,12 +1,20 @@
-# Check Gather 1.8.2 in Chrome or Edge
+# Check Gather 1.8.3 in Chrome or Edge
 
 The cloud tests reproduced and fixed the reported worker exception. This checklist verifies the remaining native behavior on the browser where Gather is installed. Use only disposable fictional cases for the privacy checks.
 
 ## Update without losing storage
 
 1. Preserve the installed folder. Back up work if the current build opens. If 1.8.0 cannot open, keep the browser profile and stored data intact; do not uninstall or clear site data.
-2. Extract `Gather-1.8.2-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include all modules, including `backup-validation.js` and `history-ui.js`.
-3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.2**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
+2. Extract `Gather-1.8.3-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include all modules, including `backup-validation.js` and `history-ui.js`.
+3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.3**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
+
+## Workspace acceptance
+
+- Inbox shows Research / Captures / Case / Settings; search and findings are visible without scrolling past management. Arrow keys, Home/End and Tab have visible focus.
+- New case works with just a name/scan. Optional intake requires review again after edits. Add → Note and Link or excerpt open editable dialogs.
+- Open Captures and an image; Close/Escape returns focus. Review/inclusion changes only deliberately. Missing/partial/failed states stay visible. Export identifies its scan even while browsing a subject across scans.
+- Settings shows the selected case and red deletion/history buttons. Native browser zoom at 200%, a narrow workspace and the native side panel keep actions reachable.
+- Switch sections, reload and use browser Back/Forward: section clicks replace the current URL, not add history entries. They must not change filing destinations.
 
 ## Pass criteria
 
@@ -17,6 +25,6 @@ The cloud tests reproduced and fixed the reported worker exception. This checkli
 - **Saving/export:** the image says Saved in Gather. Enable Downloads export and verify the relative folder plus companion JSON. A failed download must retain the image and offer Retry. Original screenshot data is not a shareable redacted export; explicitly choose/review a derivative.
 - **Persistence:** close/reopen Gather, select the original scan and verify its saved items/images. Create a private `.gather` backup. Test restore in a separate clean browser profile/installation, keeping the original profile intact until relationships and image bytes are verified.
 
-Privacy acceptance: confirm Case Start says **Case name** and explains local storage. With a fictional Northbridge case selected, check the red **Delete case…** button in Data & Privacy. Cancel first; then test the typed-name guard and each backup choice on disposable cases. A denied backup must retain the complete case. Delete without backup must create no new download. Confirm Southridge and its images remain. With popup and full tool open, clear recent lookup history and confirm old results/drafts disappear, saved cases/images remain, and fresh lookup works. Reload Gather and confirm cleared data stays cleared. Browser history, clipboard and old downloaded files intentionally remain outside these controls.
+Privacy acceptance: confirm New case says **Case name** and explains local storage. With a fictional Northbridge case selected, check the red **Delete case…** button in Settings → Data & Privacy. Cancel first; then test the typed-name guard and each backup choice on disposable cases. A denied backup must retain the complete case. Delete without backup must create no new download. Confirm Southridge and its images remain. With popup and full tool open, clear recent lookup history and confirm old results/drafts disappear, saved cases/images remain, and fresh lookup works. Reload Gather and confirm cleared data stays cleared. Browser history, clipboard and old downloaded files intentionally remain outside these controls.
 
-If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.2; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
+If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.3; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.

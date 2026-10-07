@@ -1,26 +1,40 @@
-# Gather 1.8.5 validation
+# Gather 1.8.6 validation
 
-Only deterministic fictional data. The preserved 1.8.4 baseline passed all 123 Node checks before edits. Current evidence is in `evidence/1.8.5`; older packages/evidence remain preserved.
+This finalizing run adds fixes and regression coverage, not product features. All fixtures are deterministic fictional data. The untouched 1.8.5 baseline passed 129 Node checks, 61 rendered-browser groups and 10 worker groups before edits; both preserved ZIPs passed CRC, source-byte and checksum verification.
 
-| Layer | Result | Practical scope |
+| Layer | Result | Scope |
 | --- | --- | --- |
-| Node | 129 passed, zero failed/skipped | Models/adapters, exact IDs, filing/privacy/authorization, geometry/scale, history scope/grouping, deletion guards, syntax/static imports. |
-| Rendered capture/UX | 21 groups passed | Real DOM/canvas/IndexedDB; controlled Chrome API doubles. |
-| Rendered toolbar/capture/lookup | 22 groups passed | Actual toolbar/controller/history, pointer/keyboard selection, real image/text clipboard, output formats, recovery and deletion. Chrome APIs are doubles. |
-| Rendered case/privacy | 18 groups passed | Actual intake, associations, privacy controls, delayed writes and backup flows; Chrome APIs are doubles. |
-| Actual Chromium worker | 10 groups passed | Real ServiceWorkerGlobalScope, IndexedDB/Web Locks and stop/restart, including window-removed event routing. Chrome APIs are doubles. |
-| Native installed Chrome/Edge | Unaccepted | Recorded administrator denial; current policy still blocks extensions. No bypass or repeated identical attempt. |
-| Live platforms / native FireShot | Not run | No current profile success rate or native FireShot comparison claimed. |
+| Node | 130 passed, zero failed/skipped | Models/adapters, exact IDs, continuity/privacy, geometry, history/deletion, startup race, syntax and static worker imports. |
+| Rendered capture/UX | 21 groups passed | Actual DOM/canvas/IndexedDB, stitching, cancellation/restoration, hashes, backup and responsive layouts. Chrome APIs are doubles. |
+| Rendered toolbar/capture/lookup | 22 groups passed | Actual controller, pointer/keyboard selection, real image/text clipboard, save formats, print pixels, history/deletion and current-page lookup. Chrome APIs are doubles. |
+| Rendered case/privacy | 18 groups passed | Actual intake, associations, retention, delayed writes, scoped deletion and restore. Chrome APIs are doubles. |
+| Rendered stabilization | 10 groups passed | Cross-window/output/interruption regressions below. Real IDB/canvas/BroadcastChannel; controlled downloads/clipboard failure gates. |
+| Actual Chromium worker | 10 groups passed | ServiceWorkerGlobalScope, IndexedDB/Web Locks and actual stop/restart. Extension APIs are doubles. |
+| Native installed Chrome/Edge | Unaccepted | Administrator policy still blocks unpacked loading. No bypass or identical launch retry. |
+| Live platforms / native FireShot | Not run | No live success rate or native FireShot acceptance claimed. |
 
-The new capture journey uses Northbridge / SEO 6 / Alex Example and Southridge / SD 73. On-page drag/release saves immediately; native canvas verifies cropped dimensions/pixels and absence of the selector overlay. A default switch during selection preserves Northbridge/Alex. Real PNG image clipboard readback verifies the crop and subsequent flattened redaction; original SHA-256 stays unchanged. Clipboard denial retains the image and explicit Retry succeeds. PNG/JPEG output bytes/dimensions are decoded, with saveAs/uniquify/safe basename assertions; native save-dialog behavior is not established by these doubles.
+Release totals: **130 Node, 71 rendered-browser groups and 10 actual worker groups**. Packaged-build verification is recorded separately in the evidence; reruns do not increase these counts.
 
-The actual print document renders the selected redacted pixels and optional caption outside the image. Native print/PDF dialog and printer pagination remain unaccepted. Escape, controller close and browser-provided source activation changes remove the selector. Keyboard-only coordinates and Enter save the expected rectangle. A worker-owned window-close event ignores unrelated windows and clears lock/seed from frozen source context. Full-page restoration, sticky-header overlap, partial/missing assets, hash checks and original tile retention remain covered by existing journeys.
+## New defect regressions
 
-History starts with saved images and groups exact case/scan IDs. Its filters/search/reload do not change active filing. Cancelled attempts remain accessible explicitly. Deletion Cancel preserves data; stale snapshots reject; filter changes clear selection. Confirmed selected deletion atomically removes all associated assets and preserves other cases/subjects. Late failure writes cannot recreate it. Validated binary backup retains on-page geometry and original/redacted bytes; deliberate restore verifies hashes, remaps a conflicting subject link and clears the deletion tombstone. Existing full backup journeys exercise the real worker restore/journal and restoration into a separate empty browser origin.
+The early-finish Node test failed against 1.8.5: finish arrived before windows.create resolved, leaving a lock for a finished controller. The corrected queued release passes and permits another capture while the first completion window remains open.
 
-Existing checks retain same-name subjects/path collisions, rename history, denied folder export/retry, exact scan reports, local/ephemeral privacy retention, source-context provenance, current-page lookup recovery and the long fictional ID `9007199254740993123`. Four workspace views, 400 px layouts, focus restoration and CSS 200% reflow remain covered. CSS zoom is not native browser zoom.
+Nine browser scenarios failed against the preserved, extracted 1.8.5 extension. The tenth reproduced restore of an in-flight export before its specific fix. Their passing counterparts verify:
 
-Visual inspection opened actual generated fictional screenshots of the selector, direct toolbar, saved capture, all-case history and narrow history. It led to compact image actions, saved-first history and a single optional filter panel. These are rendered product documents with API doubles, not native extension screenshots.
+1. An open print preview clears pixels/disables Print after redaction or deletion; reopening renders the selected image.
+2. Two documents cannot own one folder export; rejection preserves the first running/successful attempt.
+3. A healthy two-file export is not expired at 150 seconds; edits wait for it, then work and reset folder state.
+4. Case purge rejects an active export atomically, preserving records and bytes.
+5. A stale editor cannot overwrite a newer redaction; repeated current-editor saves work.
+6. Interrupted old work cannot overwrite a successful retry or dispatch its companion record afterward.
+7. A validated binary backup made during export restores hashes/relationships, makes the orphaned job retryable, and permits immediate export. Another restore remaps its exported asset reference.
+8. Clipboard PNG conversion rejects stale bytes if the selected image changes during encoding. This failure gate uses a clipboard double; ordinary toolbar clipboard readback is real.
+9. A simulated transient IndexedDB preview-read error after durable save releases the lock, retains the image and recovers on focus.
+10. Delayed clipboard denial after deletion leaves the preview empty, image actions disabled and deletion message visible.
+
+Existing Northbridge / SEO 6 / Alex Example → delayed capture → Southridge / SD 73 journeys preserve original filing. Other checks retain long exact IDs, same-name subject folders, rename history, denied export/retry, full-page cancellation/restoration, original/derivative hashes, selected-scan reports, corrupt-backup rejection and empty-origin restore. Privacy checks cover typed-name deletion, Cancel, failed-backup preservation, history clearing across windows, late writes and worker restart.
+
+Tests exercise actual product documents and browser storage/canvas/clipboard. Native activeTab grants, captureVisibleTab/rate/focus, save/print dialogs, browser zoom/reset and Edge require [LOCAL-ACCEPTANCE](LOCAL-ACCEPTANCE.md) on an allowed installation. CSS 200% reflow is not native zoom. Current managed policy has ExtensionInstallBlocklist ["*"]; security settings remain intact.
 
 ## Reproduce
 
@@ -32,9 +46,12 @@ node tests/browser-capture.mjs
 node tests/browser-toolbar.mjs
 node tests/browser-case.mjs
 node tests/browser-worker.mjs
+node tests/browser-stabilization.mjs
 python3 scripts/package.py
 ```
 
-Node 24.19.0, Python 3.12.14, Playwright 1.62.1 and sandboxed Chromium 151 at `/usr/lib/chromium/chromium` were used. No runtime install, server or bundler is required. Harnesses start/close their own fixture servers and profiles. `GATHER_CHROMIUM_PATH` selects a browser; `GATHER_BROWSER_ARTIFACTS` selects output. Keep `chromiumSandbox:true`.
+Node 24.19.0, Python 3.12.14, supplied Playwright 1.62.1 and sandboxed Chromium 151 at `/usr/lib/chromium/chromium` were used. No extension runtime install, bundler or application server is needed. Harnesses own and close temporary servers/profiles. Keep chromiumSandbox:true. GATHER_CHROMIUM_PATH selects a browser and GATHER_BROWSER_ARTIFACTS selects output. The stabilization harness accepts GATHER_EXTENSION_ROOT to serve an extracted package; its optional GATHER_STABILIZATION_FILTER cannot silently execute zero scenarios.
 
-Packaging verifies ZIP CRC, extension source-byte hashes, matching manifest/package versions and entry points. Versioned SHA-256 lists accompany both packages; previous 1.8.4 checksums remain unchanged. Native activeTab grants, actual screenshot API/rate, focus, save/clipboard/print permission UI, browser-session reset and Edge integration require the permitted-browser checklist in LOCAL-ACCEPTANCE. Nested scrolling and custom roots remain unshipped.
+A toolbar assertion once inspected history during a second asynchronous rerender. It now waits for both expected groups before asserting; fresh source and extracted-package runs pass. Browser harnesses remove any prior results.json before running, so a failed command cannot leave a stale success report. The diagnostic failure is retained separately.
+
+Current logs/results/fictional screenshots are in `evidence/1.8.6`; prior evidence is preserved. Packaging verifies CRC, every runtime byte against SHA256.json, versions, entry points and archive paths. Installation/update/rollback are in README and the separate delivery receipt. Backup/workspace schemas stay compatible. No permission, dependency, network service or passive collection was added.

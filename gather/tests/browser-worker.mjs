@@ -11,7 +11,7 @@ const {chromium}=createRequire(import.meta.url)('playwright');
 const here=path.dirname(fileURLToPath(import.meta.url));
 const root=process.env.GATHER_EXTENSION_ROOT||path.resolve(here,'../account-id-tool');
 const artifacts=process.env.GATHER_BROWSER_ARTIFACTS||path.resolve(here,'../../artifacts/browser-worker');
-await fs.mkdir(artifacts,{recursive:true});
+await fs.mkdir(artifacts,{recursive:true});await fs.rm(path.join(artifacts,'results.json'),{force:true});
 const fixtures={'/test-worker.js':'worker-entry.js','/test-worker-chrome.js':'worker-chrome.js'};
 const server=http.createServer(async(req,res)=>{
   try {

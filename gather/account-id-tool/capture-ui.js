@@ -53,7 +53,7 @@ subjectSelect.onchange=()=>selectSubject(scope.scanId,subjectSelect.value||null,
 function captureHost(record){try{return new URL(record.source.url).hostname;}catch{return record.source.url;}}
 function filing(record){return destinationLabel(state,record.scanId)+' / '+(historySubjects.get(record.subjectId)?.name||subjects.find(s=>s.id===record.subjectId)?.name||record.context.subjectName||'Unassigned');}
 function savedLabel(record){return record.savedState==='saved'?'Saved in Gather':'Image not saved';}
-function folderLabel(record){return record.export?.status==='exported'?'Exported to folder':record.export?.status==='failed'?'Folder export failed':'Not exported';}
+function folderLabel(record){return record.export?.status==='exported'?'Exported to folder':record.export?.status==='exporting'?'Exporting to folder…':record.export?.status==='failed'?'Folder export failed':'Not exported';}
 async function openCapture(id){
   const record=await getCapture(id);if(!record)throw new Error('This capture is no longer available.');
   inspector?.close();const d=el('dialog',undefined,'capture-inspector'),title=el('h2',record.source.title||captureHost(record)),heading=el('div',undefined,'inspector-heading'),close=button('Close',()=>d.close());

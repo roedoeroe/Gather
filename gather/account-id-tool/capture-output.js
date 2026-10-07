@@ -21,7 +21,11 @@ export async function imageFormat(blob,format='png'){
 export function copyCaptureImage(id){
   if(!navigator.clipboard?.write||!globalThis.ClipboardItem)return Promise.reject(new Error('Image clipboard access is unavailable. Use Save image instead.'));
   // Invoke write during the click; the promised bytes are verified asynchronously.
-  const bytes=shareImage(id).then(({asset})=>imageFormat(asset.blob,'png'));
+  const bytes=shareImage(id).then(async({asset})=>{
+    const blob=await imageFormat(asset.blob,'png'),current=await getCapture(id);
+    if(!current||preferredCaptureAsset(current)?.id!==asset.id)throw new Error('The selected image changed. Click Copy image again.');
+    return blob;
+  });
   bytes.catch(()=>{});
   return navigator.clipboard.write([new ClipboardItem({'image/png':bytes})]);
 }

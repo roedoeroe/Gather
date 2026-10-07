@@ -2,13 +2,20 @@ import {captureViewer} from './capture-viewer.js';
 import {workspaceLink} from './workspace-links.js';
 import {captureHistoryLink} from './workspace-links.js';
 import {selectPageArea,selectionPixels} from './capture-selection.js';
-import {copyCaptureImage,saveCaptureImage,printCaptureLink} from './capture-output.js';
+import {copyCaptureImage,saveCaptureImage,printCaptureLink,shareImage} from './capture-output.js';
 import {acquireCapture,cropImage,selectionBounds,CaptureStopped} from './capture-engine.js';
 import {beginCapture,completeCapture,failCapture,getAsset,getCapture} from './capture-store.js';
 import {exportCapture,preferredCaptureAsset} from './capture-files.js';
 import {request} from './workspace-client.js';
 const $=id=>document.getElementById(id),abort=new AbortController();
-let launch,record,result,objectURL,selecting=false,finished=false,saving=false,previewAssetId,previewSerial=0;
+let launch,record,result,objectURL,selecting=false,finished=false,saving=false,previewAssetId,previewSerial=0,deleted=false;
+const busyOutputs=new Set(),outputButtons=['copy','saveImage','print','edit','export','workspace'];
+function outputAvailability(){for(const id of outputButtons)$(id).disabled=deleted||busyOutputs.has(id)||(id==='export'&&record?.export?.status==='exporting');for(const button of viewer.element.querySelectorAll('button'))button.disabled=deleted||!objectURL;}
+function folderState(){
+  const folder=record.export||{};
+  $('exportState').textContent=folder.status==='exported'?'Exported to folder: '+folder.filename:folder.status==='exporting'?'Saved in Gather · Exporting to Downloads…':folder.status==='failed'?'Saved in Gather · Folder export failed: '+folder.error:'Not exported to a folder.';
+  $('export').textContent=folder.status==='exported'?'Export another copy':folder.status==='failed'?'Retry folder export':'Export to folder';
+}
 const viewer=captureViewer('Saved screenshot');viewer.image.id='resultImage';$('savedPreview').append(viewer.element);
 const status=text=>$('status').textContent=text;
 async function release(){if(launch)await request('capture.finished',{launchId:launch.launchId}).catch(()=>{});}
@@ -22,36 +29,39 @@ async function save(details){
   try{record=await completeCapture(record.id,details);finished=true;selecting=false;$('selection').hidden=true;$('completed').hidden=false;$('cancel').hidden=true;
     $('savedState').textContent='Saved in Gather · '+(record.status==='partial'?'Partial capture':({'visible':'Visible area saved','selection':'Selected area saved','full-page':'Full page saved'}[record.mode]));
     $('limitations').textContent=record.limitations.join('\n');status(record.status==='partial'?'Partial screenshot saved — some page content could not be captured.':'Screenshot saved.');$('captureDetails').open=record.status==='partial';
-    const asset=await getAsset(preferredCaptureAsset(record).id);previewAssetId=asset.id;if(objectURL)URL.revokeObjectURL(objectURL);objectURL=URL.createObjectURL(asset.blob);viewer.image.src=objectURL;
-    await release();await chrome.windows.update((await chrome.windows.getCurrent()).id,{focused:true});
+    // Acquisition is finished once the image transaction commits. A preview
+    // read or window-focus failure must not prevent the next screenshot.
+    await release();
+    const saved=await shareImage(record.id);record=saved.record;const asset=saved.asset;previewAssetId=asset.id;if(objectURL)URL.revokeObjectURL(objectURL);objectURL=URL.createObjectURL(asset.blob);viewer.image.src=objectURL;outputAvailability();
+    await chrome.windows.update((await chrome.windows.getCurrent()).id,{focused:true}).catch(()=>{});
     if(launch.afterCapture==='copy')await copySaved();
-    if(record.automaticExport)await exportSaved();else $('exportState').textContent='Not exported to a folder.';
+    if(record.automaticExport)await exportSaved();else folderState();
   }catch(error){if(!finished)await fail(error);else status(error.message);}finally{saving=false;$('saveSelection').disabled=false;}
 }
 async function refreshSavedPreview(){
   if(!finished||record?.savedState!=='saved')return;const ticket=++previewSerial;
   try{
     const current=await getCapture(record.id);if(ticket!==previewSerial)return;
-    if(!current){viewer.image.removeAttribute('src');if(objectURL)URL.revokeObjectURL(objectURL);objectURL=null;$('outputStatus').textContent='This capture was deleted from Gather.';for(const id of ['copy','saveImage','print','edit','export','workspace'])$(id).disabled=true;return;}
-    const chosen=preferredCaptureAsset(current);if(chosen.id!==previewAssetId){const asset=await getAsset(chosen.id,{verify:true});if(ticket!==previewSerial)return;if(objectURL)URL.revokeObjectURL(objectURL);objectURL=URL.createObjectURL(asset.blob);viewer.image.src=objectURL;previewAssetId=chosen.id;$('outputStatus').textContent='Updated saved image.';}record=current;
-  }catch(error){viewer.image.removeAttribute('src');$('outputStatus').textContent=error.message;}
+    if(!current){deleted=true;viewer.image.removeAttribute('src');if(objectURL)URL.revokeObjectURL(objectURL);objectURL=null;previewAssetId=null;status('Screenshot deleted.');$('savedState').textContent='Deleted from Gather.';$('outputStatus').textContent='This capture was deleted from Gather.';$('exportState').textContent='This capture was deleted from Gather.';outputAvailability();return;}
+    deleted=false;const chosen=preferredCaptureAsset(current);if(chosen.id!==previewAssetId||!objectURL){const asset=await getAsset(chosen.id,{verify:true});if(ticket!==previewSerial)return;if(objectURL)URL.revokeObjectURL(objectURL);objectURL=URL.createObjectURL(asset.blob);viewer.image.src=objectURL;previewAssetId=chosen.id;status(current.status==='partial'?'Partial screenshot saved — some page content could not be captured.':'Screenshot saved.');$('outputStatus').textContent='Updated saved image.';}record=current;folderState();outputAvailability();
+  }catch(error){if(ticket!==previewSerial)return;viewer.image.removeAttribute('src');if(objectURL)URL.revokeObjectURL(objectURL);objectURL=null;previewAssetId=null;$('outputStatus').textContent=error.message;outputAvailability();}
 }
 window.addEventListener('focus',refreshSavedPreview);
 if(globalThis.BroadcastChannel){const channel=new BroadcastChannel('gather-captures');channel.onmessage=refreshSavedPreview;window.addEventListener('pagehide',()=>channel.close());}
 async function exportSaved(){
-  $('export').disabled=true;$('exportState').textContent='Saved in Gather · Exporting to Downloads…';
+  busyOutputs.add('export');outputAvailability();$('exportState').textContent='Saved in Gather · Exporting to Downloads…';
   try{record=await exportCapture(record.id);$('exportState').textContent='Exported to folder: '+record.export.filename;$('export').textContent='Export another copy';}
   catch(error){$('exportState').textContent='Saved in Gather · Folder export failed: '+error.message;$('export').textContent='Retry folder export';}
-  finally{$('export').disabled=false;}
+  finally{busyOutputs.delete('export');await refreshSavedPreview();outputAvailability();}
 }
 async function copySaved(){
-  const work=copyCaptureImage(record.id);$('copy').disabled=true;$('outputStatus').textContent='Copying selected image…';
+  const work=copyCaptureImage(record.id);busyOutputs.add('copy');outputAvailability();$('outputStatus').textContent='Copying selected image…';
   try{await work;$('outputStatus').textContent='Image copied to clipboard.';}
   catch(error){$('outputStatus').textContent='Saved in Gather. Clipboard copy failed: '+error.message+' Click Copy image to retry.';}
-  finally{$('copy').disabled=false;}
+  finally{busyOutputs.delete('copy');await refreshSavedPreview();outputAvailability();}
 }
 $('copy').onclick=copySaved;
-$('saveImage').onclick=async()=>{const button=$('saveImage');button.disabled=true;$('outputStatus').textContent='Choose where to save the image…';try{const result=await saveCaptureImage(record.id,$('imageFormat').value);$('outputStatus').textContent='Image downloaded: '+result.basename;}catch(error){$('outputStatus').textContent='Saved in Gather. Image download failed: '+error.message;}finally{button.disabled=false;}};
+$('saveImage').onclick=async()=>{busyOutputs.add('saveImage');outputAvailability();$('outputStatus').textContent='Choose where to save the image…';try{const result=await saveCaptureImage(record.id,$('imageFormat').value);$('outputStatus').textContent='Image downloaded: '+result.basename;}catch(error){$('outputStatus').textContent='Saved in Gather. Image download failed: '+error.message;}finally{busyOutputs.delete('saveImage');await refreshSavedPreview();outputAvailability();}};
 $('print').onclick=()=>chrome.tabs.create({url:printCaptureLink(record.id)});
 $('history').onclick=()=>chrome.tabs.create({url:captureHistoryLink()});
 function crop(){return {x:Number($('cropX').value),y:Number($('cropY').value),width:Number($('cropWidth').value),height:Number($('cropHeight').value)};}

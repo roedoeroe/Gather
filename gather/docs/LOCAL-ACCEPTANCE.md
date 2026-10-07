@@ -1,12 +1,12 @@
-# Check Gather 1.8.5 in Chrome or Edge
+# Check Gather 1.8.6 in Chrome or Edge
 
 The cloud tests reproduced and fixed the reported worker exception. This checklist verifies the remaining native behavior on the browser where Gather is installed. Use only disposable fictional cases for the privacy checks.
 
 ## Update without losing storage
 
 1. Preserve the installed folder. Back up work if the current build opens. If 1.8.0 cannot open, keep the browser profile and stored data intact; do not uninstall or clear site data.
-2. Extract `Gather-1.8.5-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include all modules, including `backup-validation.js` and `history-ui.js`.
-3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.5**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
+2. Extract `Gather-1.8.6-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include all modules, including `backup-validation.js` and `history-ui.js`.
+3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.6**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
 
 ## Workspace acceptance
 
@@ -22,7 +22,7 @@ The cloud tests reproduced and fixed the reported worker exception. This checkli
 - Change the default to Southridge / SD 73 in another Gather view while the popup is open. Save to must still show SEO 6. Full page must file to SEO 6/Alex, including its original tiles.
 - View in scan must select SEO 6, activate Captures and open that exact image. Fit width allows reading/scrolling; Fit image provides an overview. Viewing does not mark it reviewed/included.
 - Return to the source page, open Gather, explicitly choose SD 73, capture Visible area and verify its filing. Page options → Use workspace default must explicitly detach the tab; no guessed discovery attribution.
-- Select area supports drag on the frozen screenshot, optional coordinates and Save selection. Check originals plus derivative in a private backup.
+- Select area supports drag/release directly on the source page and optional keyboard coordinates. Page options retains a frozen-screenshot fallback. Check originals plus derivative in a private backup.
 - Invoke without page access and on restricted pages: actions should fail/disable with useful advice, leaving lookup usable. Navigate/switch tabs during full page: no other-tab pixels may be retained; partial/cancelled state and source restoration must be honest.
 - Run on this page on a known permitted profile for each supported platform, inspect/copy the exact ID, then test delayed markup, login/challenge, denied access and Retry. Do not report a live success rate without executed evidence. Missing markup remains technical; retry keeps input/row/original destination.
 
@@ -37,7 +37,7 @@ The cloud tests reproduced and fixed the reported worker exception. This checkli
 
 Privacy acceptance: confirm New case says **Case name** and explains local storage. With a fictional Northbridge case selected, check the red **Delete case…** button in Settings → Data & Privacy. Cancel first; then test the typed-name guard and each backup choice on disposable cases. A denied backup must retain the complete case. Delete without backup must create no new download. Confirm Southridge and its images remain. With popup and full tool open, clear recent lookup history and confirm old results/drafts disappear, saved cases/images remain, and fresh lookup works. Reload Gather and confirm cleared data stays cleared. Browser history, clipboard and old downloaded files intentionally remain outside these controls.
 
-If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.5; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
+If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.6; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
 
 ## New capture acceptance
 
@@ -46,3 +46,11 @@ If opening still fails, the browser Extensions page lists errors for Gather. Rec
 - Save PNG and JPEG through the real save dialog; cancel/deny and retry. Verify no overwrite, the local capture remains, and folder-export state is separate. Print / Save PDF must use only the selected derivative and keep source captions outside pixels; verify actual page boundaries on long images.
 - Open History: saved screenshots appear grouped by case/scan; Filters reveals attempts, status and case/scan choices. Browsing all cases must leave the current save destination unchanged. Export must identify its scan.
 - On disposable captures, test Delete selected Cancel, confirmed scoped deletion, a concurrent edit during confirmation, and individual deletion. Other cases/images remain. Close/reopen, then restore a matching private backup in a clean profile and verify image hashes/relationships.
+
+## Stabilization acceptance
+
+- Keep a print preview open, redact the same capture elsewhere, and confirm the stale preview removes its image and disables Print. Reopen to see the updated pixels. Delete the disposable capture and confirm an open preview clears again.
+- Open two image editors; save a redaction in one, then try saving the older editor. Gather must request reopening; the newer redaction remains selected. Further saves in the current editor must still work.
+- Start folder export in one window, attempt another export/edit/Delete case elsewhere, and confirm active work is protected. Denial/interruption must retain the image, display the correct state and offer Retry. No completed older attempt may replace a newer retry's status.
+- Make a private binary backup during an export; restore it in a separate clean profile. Images/relationships/hashes remain, and the imported unfinished export offers immediate Retry.
+- Save two captures successively while the first completion window remains open. Test deletion from History while a clipboard/save action is pending: the deleted preview stays empty and its image actions remain disabled.

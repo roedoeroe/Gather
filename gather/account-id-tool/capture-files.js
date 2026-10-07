@@ -39,6 +39,16 @@ const running=new Map();
 export function exportCapture(id,options={}){if(running.has(id))return running.get(id);const work=doExport(id,options).finally(()=>running.delete(id));running.set(id,work);return work;}
 async function doExport(id,{includeOriginal=false}={}){
   let record=await getCapture(id);if(!record||record.savedState!=='saved')throw new Error('Save a capture in Gather before exporting it.');
-  record=await updateCaptureExport(id,{status:'exporting',error:'',startedAt:Date.now(),attempts:(record.export?.attempts||0)+1});
-  try{const chosen=preferredCaptureAsset(record,{includeOriginal});if(!chosen)throw new Error('Capture has no image. Restore it from a backup.');const asset=await getAsset(chosen.id,{verify:true}),ext={"image/png":"png","image/jpeg":"jpg","image/webp":"webp"}[asset.mime]||'png',filename=captureExportPath(record,ext);const imageDownload=await downloadVerifiedBlob(asset.blob,filename),actualFilename=filename.slice(0,filename.lastIndexOf('/')+1)+imageDownload.basename;const recordDownload=await downloadVerifiedBlob(new Blob([JSON.stringify({...captureExportRecord(record,chosen,{includeOriginal}),exportedImageFile:imageDownload.basename},null,2)],{type:'application/json'}),actualFilename.replace(/\.[^.]+$/,'.json'));return updateCaptureExport(id,{status:'exported',error:'',completedAt:Date.now(),filename:actualFilename,downloadIds:[imageDownload.id,recordDownload.id],assetId:asset.id});}catch(error){await updateCaptureExport(id,{status:'failed',error:String(error.message||error).slice(0,2000)});throw error;}
+  const attemptId=crypto.randomUUID();
+  // IndexedDB claims ownership across all Gather documents. A rejected claim
+  // must never mark somebody else's in-flight export failed.
+  record=await updateCaptureExport(id,{status:'exporting',error:'',startedAt:Date.now(),attemptId});
+  try{
+    const chosen=preferredCaptureAsset(record,{includeOriginal});if(!chosen)throw new Error('Capture has no image. Restore it from a backup.');
+    const currentAttempt=async()=>{const current=await getCapture(id);if(current?.export?.status!=='exporting'||current.export.attemptId!==attemptId||preferredCaptureAsset(current,{includeOriginal})?.id!==chosen.id)throw new Error('Folder export changed or was interrupted. Review its current status before retrying.');};
+    const asset=await getAsset(chosen.id,{verify:true}),ext={"image/png":"png","image/jpeg":"jpg","image/webp":"webp"}[asset.mime]||'png',filename=captureExportPath(record,ext);
+    await currentAttempt();const imageDownload=await downloadVerifiedBlob(asset.blob,filename),actualFilename=filename.slice(0,filename.lastIndexOf('/')+1)+imageDownload.basename;
+    await currentAttempt();const recordDownload=await downloadVerifiedBlob(new Blob([JSON.stringify({...captureExportRecord(record,chosen,{includeOriginal}),exportedImageFile:imageDownload.basename},null,2)],{type:'application/json'}),actualFilename.replace(/\.[^.]+$/,'.json'));
+    await currentAttempt();return await updateCaptureExport(id,{status:'exported',error:'',completedAt:Date.now(),filename:actualFilename,downloadIds:[imageDownload.id,recordDownload.id],assetId:asset.id},{expectedAttemptId:attemptId});
+  }catch(error){await updateCaptureExport(id,{status:'failed',error:String(error.message||error).slice(0,2000)},{expectedAttemptId:attemptId}).catch(()=>{});throw error;}
 }

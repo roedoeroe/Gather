@@ -50,7 +50,12 @@ async function launch(message){
     return {launchId,windowId:window.id,context};
   }catch(error){await chrome.storage.session.remove(key);throw error;}
 }
-export async function finishCapture(launchId){const lock=(await chrome.storage.session.get(LOCK))[LOCK];if(lock?.launchId===launchId)await chrome.storage.session.remove(LOCK);return {ok:true};}
+async function finishSession(launchId){const lock=(await chrome.storage.session.get(LOCK))[LOCK];if(lock?.launchId===launchId)await chrome.storage.session.remove(LOCK);return {ok:true};}
+export function finishCapture(launchId){
+  // A controller can finish while windows.create is still resolving. Release
+  // after the queued launch writes its lock, never before that write.
+  const work=queue.catch(()=>{}).then(()=>finishSession(launchId));queue=work;return work;
+}
 export function captureWindowRemoved(windowId){
   const work=queue.catch(()=>{}).then(async()=>{
     const lock=(await chrome.storage.session.get(LOCK))[LOCK];if(lock?.windowId!==windowId)return;
@@ -62,6 +67,6 @@ export function captureWindowRemoved(windowId){
       }
     }
     await failCapture(lock.launchId,{status:'cancelled',error:'Capture window closed before its image was saved.'}).catch(()=>{});
-    await finishCapture(lock.launchId);await chrome.storage.session.remove('gather.captureLaunch.'+lock.launchId);
+    await finishSession(lock.launchId);await chrome.storage.session.remove('gather.captureLaunch.'+lock.launchId);
   });queue=work;return work;
 }

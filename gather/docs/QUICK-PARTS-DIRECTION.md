@@ -1,6 +1,6 @@
 # Quick Parts / Reference Library — proposed first implementation
 
-Status: design/backlog after the 1.8.4 direct-capture stabilization release. The supplied Optimized Design Engineering Steer R3 was read as product guidance; it does not turn every phase into this release's scope. The first implementation remains generic and local, with fictional language. Real reference exports are not present; their availability does not block engine/interaction work. Verify source labels and conversion fidelity before calling imported material approved.
+Status: design/backlog after the 1.8.6 capture stabilization checkpoint; **no Reference Library engine or composer is shipped yet**. The supplied Optimized Design Engineering Steer R3 was read as product guidance; it does not turn every phase into this release's scope. The [goals audit](GOALS-AUDIT.md) preserves the later refinements and earlier product goals. The first implementation remains generic and local, with fictional language. Real reference exports are not present; their availability does not block engine/interaction work. Verify source labels and conversion fidelity before calling imported material approved.
 
 ## Outcome and scope
 
@@ -37,21 +37,24 @@ Provisional envelope:
 ```text
 format: gather-reference-pack
 schemaVersion: 1
-packId, name, publisher, version, updatedAt
+packId, name, publisher, version, createdAt, updatedAt, lastReviewedAt
 collections[]: { id, title }
 entries[]:
   id, collectionId, title, aliases[]
   category, tags[], platforms[], workflowStages[], outcomes[]
-  type: template | example | guidance
+  type: template | example | guidance | warning | definition | quick_part
   approvalStatus: approved | proposed | unverified
+  lifecycle: active | deprecated | superseded | draft
   sourceLabel, body, placeholders[], usageNotes
   sourceReference: { document, section, revision, optionalUrl }
-  version
+  version, lastReviewedAt, relatedIds[], supersedes?, supersededBy?
 ```
 
 IDs are stable within a namespaced pack and survive renames. Pack version and schema version are separate. `publisher`/`approvalStatus` are declarations from the imported pack, not authentication or approval by Gather. Preserve the exact original labels alongside normalized fields: **TEMPLATE** does not automatically mean approved; **POSS TEMPLATE** stays proposed; **EXAMPLE NOT TEMPLATE** stays example. Unknown labels default unverified. Usage warnings stay visible in preview and when a block is added.
 
-Placeholder definitions include token, label, required flag and optional offer source. Use exact bracket tokens such as `[DATE]`, `[FREQUENCY]`, `[ROLE]`, `[CLIENT NAME]`, `[MISSING INFORMATION]`; no scripts or expressions. Preserve unfamiliar fields as unresolved instead of deleting them.
+Normalize possible templates as `type: template` plus `approvalStatus: proposed`, while retaining the original label. Keep lifecycle separate from approval: an approved but superseded entry is not current. Ordinary results prioritize active entries; retired/draft entries require an explicit filter and clear status. Definition/report-part actions remain appropriate to their type, rather than forcing all text into an email draft. Guidance/warnings can accompany related entries through validated stable IDs and never enter body text by default. Freshness notices use supplied review dates and organization policy; invent no expiration or verified-publisher claim. Pack signing/authenticated distribution is a later deployment decision.
+
+Placeholder definitions include token, label, required flag and optional offer source. Support exact bracket tokens such as `[DATE]`, `[FREQUENCY]`, `[ROLE]`, `[CLIENT NAME]`, `[MISSING INFORMATION]`. The later steer also proposes `{{date}}`/`{{frequency}}`: support a pack's explicitly declared simple tokens without silently rewriting its original text. No scripts, expressions or conditional template language. Preserve unfamiliar fields as unresolved instead of deleting them.
 
 Use a separate `gather-reference-v1` IndexedDB database for installed packs, entries and non-case library preferences. Initial proposed bounds: 10 MiB per pack, 5,000 entries per pack, 64 KiB per body, 25 MiB total installed content. Measure against the real corpus before freezing limits. Reject oversized, duplicate-ID, invalid-reference and unsupported-schema packs before mutation.
 
@@ -63,7 +66,7 @@ Provide separate **Export organization pack**, **Remove pack…** and **Clear li
 
 Focus search immediately on opening. Offer shallow collection/category/platform filters and searchable tags; avoid nested folders. Category/tag examples from the request are a starting vocabulary only. Inspect real materials to derive a small taxonomy and alias list, preserving original source paths as references rather than folders. Snapchat and Discord can be library tags without adding account extractors.
 
-Build an in-memory index once per installed version. Normalize case, whitespace and punctuation; tokenize and rank exact/prefix title and alias matches first, then tags/platform/category/stage/outcome, then body matches. Use explicit aliases for abbreviations and synonyms, e.g. `snap` → `Snapchat`; no embedding service. Deterministic ties use stable title/ID order. Match all query tokens across fields when possible; expose partial matches honestly. Examples/guidance remain searchable with prominent badges, not disguised as templates. Consider typo tolerance only if real corpus testing demonstrates a need.
+Build an in-memory index once per installed version. Search title, aliases, category, tags, collection/type, platform, stage/outcome, placeholder names, usage notes and body. Normalize case, whitespace and punctuation; tokenize and rank exact/prefix title and alias matches first, then structured fields, then body matches. Use explicit aliases for abbreviations and synonyms, e.g. `snap` → `Snapchat`; no embedding service. Deterministic ties use stable title/ID order. Match all query tokens across fields when possible; expose partial matches honestly. Examples/guidance remain searchable with prominent badges, not disguised as templates. Include a small bounded fuzzy fallback when exact/token retrieval is insufficient; it must never outrank strong intent. Measure with fictional imperfect queries before adding a heavier search library.
 
 A small Suggested section (up to three approved templates with supported mappings) uses only the displayed current scan and, where selected, explicitly associated subject context. Show a reason and scope next to each suggestion. Suggestions may boost relevant results but cannot hide exact search matches. With no recorded signal, show no case-based suggestion. Library search must still work without a case.
 
@@ -82,6 +85,8 @@ Preview first: title, approval/type badge, source/version, complete body and usa
 
 Add blocks, remove or move them with keyboard-accessible Up/Down controls, and edit each block's text. Fill shared placeholders with explicit confirmation of which occurrences change. Then **Review draft** assembles an editable final text preview. Returning to blocks after editing the final text must warn before regenerating/discarding final edits; never silently overwrite them. Preserve original pack text and version metadata separately from user edits.
 
+Retain inserted entry/version/time and edited/freeform state in draft memory. Provide View original, deliberate Reset and undo for draft edits, with keyboard alternatives to drag reordering. Before final Copy, detect duplicate blocks/greetings/closings, empty blocks, unresolved tokens, and guidance/warnings/example text inserted without the required deliberate action. These checks do not rewrite analyst language or make analytical judgments. Plain text preserves paragraph spacing and line breaks; verify paste into the normal email workflow. Formatted HTML is later.
+
 Offer known values with provenance, never silently insert them. Date must distinguish today's date from a capture/incident date. Role label may be offered from the selected role; client name/frequency/missing information require entry unless an exact confirmed field exists. Do not substitute a project name for a client name. Highlight unresolved tokens and block **Copy final draft** until required fields are filled or their text deliberately removed. Copy requires explicit review after any text change. No auto-copy on selecting a part and no “sent” status.
 
 Draft text and filled values live only in the extension document's memory, not browser local/session storage, case backups, usage logs or the public repository. Show a clear discard-on-close message and confirm closing an edited draft. No crash recovery in this first slice. Freeze displayed case/scan context when composition begins; changing the workspace selection does not retarget it or refill values. Deleting that case clears its open drafts and rejects any late pending fill operation. Starting without a case remains supported.
@@ -94,7 +99,7 @@ Favorites may ship first as stable pack/entry IDs. Recents are optional after re
 
 1. **Fictional contract, source audit in parallel:** establish the generic schema and retrieval examples with entirely invented wording. Availability of SST exports does not block engine/UX development. When local exports become available, identify headings/aliases/usage labels and verify reuse/approval distinctions before producing the real private pack. No SST text enters fixtures, screenshots, commits or source ZIPs.
 2. **One usable vertical slice:** generic schema/validator + atomic local import/replace/remove + both collection views + focused weighted search + labelled preview + explicit part copy. No case required. Include pack isolation and backup/package exclusion tests from the beginning.
-3. **Complete the proposed minimum workflow:** block assembly/reorder/edit, explicit placeholder offers, final review/copy and case-deletion draft clearing; add the three supported coverage/account suggestion signals and visible reasons. Ship only when the combined journey is reliable. Ongoing-scan suggestions, recents, typo tolerance and richer authoring can follow.
+3. **Complete the proposed minimum workflow:** block assembly/reorder/edit/reset/undo, explicit placeholder offers, deterministic draft checks, final review/copy and case-deletion draft clearing; then add the three supported coverage/account suggestion signals and visible reasons. Ship only when the combined journey is reliable. Ongoing-scan suggestions, recents and richer authoring can follow.
 
 This is the next bounded product feature after the current release checkpoint and any discovered regressions, not a reason to delay the privacy release or launch a broad organization-pack framework. Use a future feature version (tentatively 1.9.0 after scope validation); do not rebuild or relabel the released ZIPs for this design-only change.
 
@@ -104,6 +109,7 @@ Use invented language/data for all public automated tests. Private corpus testin
 
 - `no accounts` and `snap username` retrieve the curated relevant entries without requiring exact page titles. Title/alias/body/platform/stage/outcome matches, filters and deterministic ties are tested.
 - With 5,000 fictional entries, warm query-to-render p95 target is under 100 ms on a documented reference machine; first searchable open target under 500 ms after loading local content. These are targets, not measured claims. Search continues offline after import.
+- Measure search computation separately (R3 target below 50 ms), plus index/import/composer costs. Aliases/usage notes/placeholder names, bounded fuzzy fallback, retired-entry filtering and related-reference actions have deterministic fixtures. Do not let recency/context overcome exact intent.
 - Coverage/account fixtures yield scoped “may be useful” reasons; unknown states, no case, another scan's state and threat-related text do not invent suggestions or populate a conclusion. Ongoing work has no trigger until recorded explicitly.
 - Templates/proposals/examples/guidance remain visibly distinct through preview and composition. Keyboard-only add/reorder/edit/fill/review/copy works. Unresolved required tokens block final copy; source text is unchanged.
 - Switching to Southridge during a Northbridge draft never changes its scope or values. Delete Northbridge clears the relevant open draft; delayed fill/copy preparation cannot resurrect it. Closing discards draft memory; restoring a case backup does not import it.

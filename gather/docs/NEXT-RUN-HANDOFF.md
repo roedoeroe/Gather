@@ -4,7 +4,7 @@
 
 Runnable source: `gather/account-id-tool`. Manifest/package/version_name: **1.8.6**. Maintained branch: **develop/1.8.0-r3** (historical name). Inspect actual HEAD/status, instructions and this handoff before editing; preserve newer user changes. Exact source/package commit, downloads and hashes are in the later, separate `releases/1.8.6/Gather-1.8.6-DELIVERY.md` receipt. Prior ZIPs remain immutable.
 
-The user's latest instruction is a finalizing/testing run: no new features unless required for a concrete fix. This release implements that scope. Development-branch publication is authorized, source stays public, case data local, and main stays unchanged. Uploaded private reference documents/recordings remain outside public source/packages. Use fictional fixtures only. No subagent delegation is required.
+The user's last runtime instruction was a finalizing/testing run: no new features unless required for a concrete fix. This release implements that scope. The subsequent request audits goals across the conversation; see [GOALS-AUDIT](GOALS-AUDIT.md) for implemented, partial, retained and superseded work. The audit changes documentation only and does not repack 1.8.6. Development-branch publication is authorized, source stays public, case data local, and main stays unchanged. Uploaded private reference documents/recordings remain outside public source/packages. Use fictional fixtures only. No subagent delegation is required.
 
 ## Existing product, retained
 
@@ -42,6 +42,13 @@ Native extension acceptance remains blocked: prior administrator denial and curr
 1. Execute LOCAL-ACCEPTANCE on permitted Chrome/Edge using this exact package, including simultaneous editors/export windows, stale print preview, selection/copy, delayed deletion, high-DPI/zoom, source switches, cancellation/restoration and private backup restore.
 2. Fix only reproducible acceptance failures. Preserve this working checkpoint and record automated/mock/native/live evidence separately; do not call it universally perfect.
 3. Feature direction remains separate under PRODUCT-DIRECTION / QUICK-PARTS-DIRECTION: generic local Reference Library first, then richer capture editing/nested scrollers/custom roots based on evidence. Do not expand the stabilization run or import proprietary reference content into public fixtures.
+4. Preserve the older worthwhile goals restored in GOALS-AUDIT: selected batch saving, confirmed-identifier scan carry-forward, field-level provenance/diagnostics and reusable query recipes. Current per-row saving/manual new scans/method metadata do not complete them. Previewable documentation blocks, sanitized archive and baseline comparison are later bounded work. Do not silently drop these again or treat conditional blueprint ideas as release blockers.
+
+## Latest intent reconciliation
+
+The audit read the unique supplied handoff/continuation/design guidance and R3 blueprint text, compared current models/UI/export code and saved evidence, and verified package integrity without changing runtime bytes. Quick Parts remains design-only; native/live acceptance remains unverified. Role-ID export folders supersede the earlier friendly-name default. Source-public/case-local, explicit association, no passive collection and no automated threat/identity conclusions remain unchanged. The unrelated creative-video request was withdrawn and is excluded.
+
+Current docs include the new audit and refinements to the Quick Parts contract; the already published development ZIP is the immutable release snapshot and does not contain these later documentation updates. Fetch the development branch for the latest docs. No new version, runtime test run or GitHub Release object is implied by this documentation pass.
 
 ## Environment and delivery
 

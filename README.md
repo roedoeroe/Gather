@@ -37,6 +37,7 @@ The 1.8.6 release passed **130 automated tests**, **71 rendered-browser scenario
 - [Product guide and limitations](gather/README.md)
 - [Test evidence and commands](gather/docs/TESTING.md)
 - [Next-run handoff](gather/docs/NEXT-RUN-HANDOFF.md)
+- [Goals audit: original workflow, later requests and remaining work](gather/docs/GOALS-AUDIT.md)
 - [Product direction](gather/docs/PRODUCT-DIRECTION.md)
 - [Proposed Quick Parts / Reference Library](gather/docs/QUICK-PARTS-DIRECTION.md) — local search and reviewed composition; **not included in 1.8.6**
 

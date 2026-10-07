@@ -26,3 +26,9 @@ Extract the extension ZIP to a permanent folder and load its account-id-tool dir
 Preserved [1.8.5 extension](https://github.com/roedoeroe/Gather/raw/d29ba5475e0f53795f3f4695155038de8036414f/releases/1.8.5/Gather-1.8.5-extension.zip) and matching [delivery notes](../1.8.5/Gather-1.8.5-DELIVERY.md) remain. Verify rollback with that package and its pre-update backup in a separate clean browser profile, retaining the current profile until recovery is confirmed. [Handoff/backlog](../../gather/docs/NEXT-RUN-HANDOFF.md) prioritizes native acceptance and concrete fixes.
 
 ZIPs are versioned Git mirrors, not GitHub Release uploads. No main merge is implied. Cloud startup instructions are a separately saved reviewable draft; saving it does not publish a cloud snapshot.
+
+## Publication verification
+
+The development branch push succeeded; main was verified unchanged at e721d70807062e5e1b1df4b94b6f7059eca5e308. Both pinned public raw downloads returned HTTP 200, matched the exact SHA-256 values above and passed ZIP CRC/version checks. [Machine-readable verification](Gather-1.8.6-DOWNLOAD-VERIFICATION.json) records byte counts/hashes. The working tree was clean after delivery.
+
+The cloud startup draft was saved with 1.8.6 commands, evidence and stabilization scope. Install script, selected repositories, network and credentials were preserved. It requires review/save in Environment settings followed by environment publication; no cloud snapshot or new-task restoration is claimed.

@@ -1,80 +1,69 @@
-# Gather 1.8.0 validation
+# Gather 1.8.1 validation
 
-Final evidence was generated on 2026-10-07 UTC (2026-10-06 Pacific) using deterministic fictional Northbridge / October review, Southridge / Intake, TEST-28175 and Alex Example material. No real case or live account data was used.
+This is the corrective release for the user's installed-browser screenshot: a collapsed popup and `import() is disallowed on ServiceWorkerGlobalScope`. All test data is fictional. The supplied screenshot was inspected for UI/error diagnosis; the depicted account was not queried or added to test fixtures.
 
-| Layer | Result | Meaning |
+| Layer | Result | What was exercised |
 | --- | --- | --- |
-| Supplied 1.6.1 baseline | 66 passed | Rerun before implementation. Original evidence remains in `evidence/baseline-66.txt`. |
-| Preserved 1.6.2 checkpoint | 76 passed | Integrated tab context and originating references; not the earlier unsaved prototype. |
-| Preserved 1.7.0 checkpoint | 94 automated + 18 rendered scenario groups passed | Historical evidence and source remain unchanged. |
-| **Final 1.8.0 Node suite** | **109 passed, 0 failed, 0 skipped** | Deterministic model, adapter fixtures, state/store/worker doubles, source structure and all shipped JavaScript syntax. |
-| **Final rendered Chromium capture journey** | **18 scenario groups passed** | Real product DOM/canvas/IndexedDB with controlled extension API doubles. |
-| **Final rendered Chromium R3 case journey** | **16 scenario groups passed** | Real case, role, queue, evidence and closure UI/storage with controlled extension API doubles. |
-| Native Chrome extension integration | **Blocked** | Administrator disables unpacked extension loading. |
-| Native Edge / live platforms | **Not run** | No native Edge or live extractor acceptance claim. |
+| Node automated | **110 passed, 0 failed, 0 skipped** | Original model/adapter/state tests, every shipped JS module's syntax and a new transitive service-worker import guard. |
+| Rendered capture journey | **19 scenario groups passed** | Actual DOM, canvas and IndexedDB, with Chrome API doubles; adds narrow-initial-viewport popup sizing regression. |
+| Rendered R3 journey | **16 scenario groups passed** | Reviewed intake, roles, privacy, coverage, evidence sheets, backups and closure; Chrome API doubles. |
+| Actual Chromium service-worker journey | **7 scenario groups passed** | Actual background module/router in ServiceWorkerGlobalScope, real IndexedDB/Web Locks and real worker stop/restart; Chrome API doubles. |
+| Installed Chrome/Edge extension | **Blocked in this runner** | Administrator disables unpacked extension loading. The user's 1.8.0 screenshot is evidence of a failure, not a native pass for this correction. |
+| Live platforms | **Not run** | No claim that a live Instagram or other platform account was extracted successfully. |
 
-The 34 rendered scenario groups are integration checks, not 34 additional Node unit tests and not native extension acceptance. Final logs, scenario lists and screenshots are under `evidence/1.8.0/`. Older evidence files remain historical rather than being overwritten as 1.8 results.
+Current evidence: `evidence/1.8.1/`. Historical 1.8.0 evidence remains in `evidence/1.8.0/` and its testing notes in `history/1.8.0-TESTING.md`. Earlier baseline 66, continuity 76 and capture 94 checks remain preserved. Counts are separate: 110 Node tests, 35 rendered-browser groups and 7 real-worker groups; do not describe all 42 browser groups as native extension tests.
 
-## Exercised journeys
+## Reproduction before correction
 
-The capture journey launches Northbridge / October review research, supplies a browser-opener double, starts the actual selection controller, switches the global destination to Southridge during delayed work and verifies the image remains attached to Northbridge / Alex Example with its search reference. It covers duplicate subject names, stable rename history, original/derivative hashes, real canvas stitching and bottom overlap, cancellation restoring actual scroll/sticky styles, opaque redaction, denied Downloads followed by retry, binary backup merge, restore into separate empty browser-origin storage, corrupt image rejection, aborted transactions, interrupted-write journal recovery, missing assets, reload persistence and scan-isolated reports.
+`browser-worker.mjs` was first run against unchanged 1.8.0. Its first routed workspace read failed with the exact Chromium exception visible in the user's screenshot. See `evidence/1.8.1/baseline-worker.txt`. This is an expected failed reproduction, not a green test run.
 
-The R3 journey reviews/edits locally parsed intake, excludes a private contact and unwanted term, creates three distinct roles and verifies ephemeral values are absent from durable context. It launches tokenized queue searches, records negative coverage, verifies manual queries/drafts remain session-only, and saves role-filed metadata after the global destination changes. Similar names do not associate; an explicit reviewed confirmation records a reason. Clipboard preview preserves a long exact string ID.
+Previous page-based browser tests invoked store modules in a document, where dynamic import works. Node store tests did not supply IndexedDB, so startup binary recovery was skipped. Neither imposed ServiceWorkerGlobalScope's restriction. The new test executes the actual background entry point in a real module service worker rather than merely emulating a worker-shaped object.
 
-It stores a visible-image fixture in real IndexedDB, checks Evidence IDs and role-only paths, explicitly includes the image, exports a selected derivative without original bytes/hash, renames an ephemeral friendly label without changing durable role history, and backs up/restores relationships without session names. Simulated session loss requires seed re-entry. Close Case rejects a stale snapshot; denied backup retains images; retry verifies download completion before removing only that project. Quick Lookup remains project-free and focused. Actual popup rendering puts five usable rows first, one technical group next and two quiet gone rows last without current-ID fields.
+## Worker regression coverage
 
-The Node fixtures additionally exercise positive structured YouTube gone evidence versus ambiguous/authentication/markup cases, restored gone-state validation, previous exact ID history, Local Case retention, role duplication, coverage semantics, association validation, research ID remapping, limits and removal scoping.
+1. Actual background message routing reads workspace state from popup, side-panel document, full tool and evidence page with real IndexedDB.
+2. Project-free Quick Lookup completes through the real handler and Web Lock, retaining fictional ID `9007199254740993123` as a string. The source-page API is a controlled fixture; outbound platform network is disabled.
+3. Case creation and queue/manual/reopened search execute in the worker. Ephemeral values resolve for launch but durable queries retain tokens.
+4. Northbridge/role survives a Southridge global switch. Metadata save, capture launch/finish, negative coverage and explicit rejected association execute through actual handlers.
+5. Private binary image backup validates and merge-imports through the worker, preserving bytes and remapped relationships.
+6. DevTools stops the actual Chromium service worker. A new message starts another instance, replaying a pending metadata journal once and retaining images/session context through controlled storage APIs.
+7. Guarded Close Case reaches binary purge and session/context cleanup while preserving another project and restored images.
 
-## What the browser evidence does and does not establish
+The test's Chrome local/session storage doubles are backed by a separate test IndexedDB database so worker termination does not erase their state. This does not assert native Chrome session-storage lifecycle semantics or full browser-restart behavior. The capture launch windows and injected profile source are also doubles; screenshot permission and native window focus remain unverified.
 
-The harness uses Playwright screenshots of an actual fictional rendered page as the screenshot API double. It runs the real capture controller, page manipulation, canvas and IndexedDB code. It does **not** establish native `captureVisibleTab` permission, toolbar/controller focus or native download completion. Browser session loss and worker interactions are controlled simulations; they are not a real installed-extension lifecycle acceptance.
+## Rendered browser coverage and visual review
 
-Screenshots were actually generated. Visual inspection covered the full/narrow workspace, panel document, collapsed-capture popup, selection and redaction screens, Case Start review, final default case workspace, narrow case view and evidence sheet. Native popup/panel opening, context-menu selection grant, OS folder writes, native print/PDF pagination, full keyboard/screen-reader acceptance, live adapters and comprehensive zoom/DPI behavior remain unverified. Local Case is covered by deterministic model tests; the full R3 rendered journey uses Ephemeral Case.
+The retained capture journey covers search/result context, delayed selection while switching projects, duplicate subject names and rename history, full-page tile overlap, cancellation restoring actual page styles/scroll, opaque derivative pixels, denied Downloads/retry, backup/restore, corrupt/missing assets, transaction rollback, recovery journals and scan-isolated reporting. It now loads the actual popup from an initial **160 px viewport**, verifies its root/body request **420 px**, then verifies that width remains stable without horizontal overflow at 420 px.
 
-## Reproduce
+The R3 journey covers reviewed intake minimization, ephemeral names/query drafts, stable role filing, no name-based automatic association, deliberate confirmation, exact-ID clipboard preview, Evidence IDs, explicit inclusion, derivative-only review-sheet export, rename, backup merge, simulated session loss, stale-close guards, denied-download retention and retry before scoped removal. It renders usable, unknown and gone account groups in the actual popup.
 
-From the extracted development package root, using Node 24 and Python 3:
+Final popup, panel and account-result screenshots were generated and visually inspected. They are rendered product documents, not screenshots of a natively installed toolbar/panel. The empty input's Get UserIDs button is intentionally disabled; the unsupported local HTTP fixture also leaves Run on this page disabled. Project-free worker lookup is tested separately with a controlled supported-profile source. Native toolbar auto-sizing still needs local acceptance even though the CSS feedback regression is covered.
+
+## Commands
+
+From the development package root:
 
 ```sh
 node --test tests/*.test.mjs
+node tests/browser-capture.mjs
+node tests/browser-case.mjs
+node tests/browser-worker.mjs
 python3 scripts/package.py
 ```
 
-The extension has no install step or runtime dependency. Browser tests additionally used Playwright 1.62.1 and Chromium 151. If these are not supplied by the runner, install Playwright separately from the extension:
+Node 24, Python 3, Playwright 1.62.1 and Chromium 151 were used. No extension runtime install or bundler is needed. Browser tests require Playwright and sandbox-capable Chromium. If not supplied by a runner:
 
 ```sh
 npm install --prefix .tools --no-save --package-lock=false playwright@1.62.1
-NODE_PATH="$PWD/.tools/node_modules" GATHER_CHROMIUM_PATH=/path/to/chromium node tests/browser-capture.mjs
-NODE_PATH="$PWD/.tools/node_modules" GATHER_CHROMIUM_PATH=/path/to/chromium node tests/browser-case.mjs
+NODE_PATH="$PWD/.tools/node_modules" GATHER_CHROMIUM_PATH=/path/to/chromium node tests/browser-worker.mjs
 ```
 
-`GATHER_BROWSER_ARTIFACTS` optionally selects the evidence output directory. Tests serve temporary internal HTTP fixtures; this is test infrastructure, not a replacement hosted product. Both journeys clean their temporary browser profiles.
+Apply the same variables to the other browser journeys. `GATHER_BROWSER_ARTIFACTS` selects an output directory. `GATHER_EXTENSION_ROOT` can point the worker regression at a preserved unpacked source; setting it to the 1.8.0 checkpoint reproduces the failed startup. These tests use temporary internal HTTP fixtures and isolated profiles; they do not replace the extension with a hosted app.
 
-Use a browser with a working security sandbox. This runner's tool filesystem sandbox presents incorrect ownership for Chrome's setuid helper and prevents namespace setup. Approved execution outside that tool sandbox restored the normal helper/namespaces while keeping `chromiumSandbox:true`. Do not use `--no-sandbox`, weaken TLS, or change administrator policies. The current runner supplies Playwright at `/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright` and Chromium at `/usr/lib/chromium/chromium`.
+This runner requires approved execution outside the tool filesystem sandbox for Chromium's normal sandbox helper/namespaces. `chromiumSandbox:true` stays enabled. No `--no-sandbox`, TLS bypass or administrator-policy change was used.
 
-## Native blocker and single next milestone
+## Remaining native acceptance
 
-The existing supported DevTools diagnostic returned:
+The recorded diagnostic remains: **“Loading of unpacked extensions is disabled by the administrator.”** It was not repeatedly retried. Use a permitted runner or the user's local Chrome/Edge. `browser-acceptance.mjs` is a starting harness, not a substitute for all native acceptance. Do not count a zero-worker launch as a pass.
 
-> Protocol error (Extensions.loadUnpacked): Loading of unpacked extensions is disabled by the administrator.
-
-This is recorded in `evidence/native-extension-status.txt`. Repeating the same command cannot validate the extension; use a runner/profile whose administrator permits unpacked extensions, or local Chrome/Edge. The separate Playwright browser download also returned proxy `403 Domain forbidden` from `cdn.playwright.dev`. No policy or network bypass was attempted.
-
-On a permitted runner:
-
-```sh
-GATHER_CHROMIUM_PATH=/path/to/chromium node tests/browser-acceptance.mjs
-```
-
-`browser-journey.mjs` forwards to this sandbox-enabled entry point. That harness is a starting diagnostic, not the entire acceptance checklist; do not count a zero-worker launch as success.
-
-Accept the packaged **1.8.0** extension in isolated Chrome and Edge profiles before adding features:
-
-1. Project-free exact-ID lookup, keyboard focus, native toolbar/side-panel sizing, selected-text Case Start and activeTab grant/expiry.
-2. Northbridge / Alex → search → related result → visible/selection/full-page capture; switch global destination to Southridge during delayed work. Verify actual opener availability and explicit assign/detach.
-3. Tab switch/navigation during capture, sticky/lazy/infinite/nested fixtures, zoom/DPI, size/time limits, cancellation and abrupt controller closure restoration. Nested scrolling remains unsupported, with honest limitations.
-4. Native Downloads subfolders, interrupted download/retry, independent saved/export states and completed private backup before Close Case removal.
-5. Worker suspension, browser restart, ephemeral value loss, Local Case retention, private image backup/restore into another installation and report isolation. Verify no cross-project loss during closure.
-6. Evidence-sheet export pixels/metadata and native Print / Save PDF. Review live platform adapter fixtures separately, using permitted fictional/test accounts.
-
-No performance superiority, live success rate, production readiness or store readiness is claimed.
+Use `LOCAL-ACCEPTANCE.md` after updating to 1.8.1. Remaining areas include native toolbar size/focus, side-panel opening, selected-text context menu, activeTab grants/expiry, native captureVisibleTab and tab switches, OS Downloads/retry, actual browser restart, restore into another installed extension, print/PDF, zoom/DPI and full accessibility. Live platform adapter correctness requires separate evidence.

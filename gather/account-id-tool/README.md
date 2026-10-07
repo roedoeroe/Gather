@@ -1,14 +1,22 @@
-# Gather 1.8.0 — development build
+# Gather 1.8.1 — corrective development build
 
 Gather is a local browser extension for fast account lookup, deliberate research and screenshot capture. Quick Lookup remains project-free. The R3 update adds reviewed Case Start, role IDs, private session context, search coverage and guarded closure to the preserved 1.7.0 capture build.
 
+## Fixed in 1.8.1
+
+The reported narrow popup and `import() is disallowed on ServiceWorkerGlobalScope` startup error were defects in 1.8.0. Use **1.8.1**. Chrome service workers now load their entire dependency graph statically, including image recovery/restore and case closure. The popup requests a stable 420 px width without depending on its initially narrow viewport. Page-only capture controls still load on demand.
+
+The 1.8.0 failure was reproduced in an actual Chromium service worker before fixing it. 1.8.1 passes 110 automated checks, 35 rendered-browser scenario groups and 7 real-service-worker scenario groups. Chrome extension APIs remain controlled doubles in those browser tests; installed-extension acceptance on this managed runner is still blocked. See `../docs/TESTING.md` and `../docs/LOCAL-ACCEPTANCE.md`.
+
+This correction adds no permissions, resets no data and changes no storage/backup schema. Replace **all** extension files together; the worker uses the new `backup-validation.js` module. Updating/reloading still clears Ephemeral Case session values, as documented below.
+
 ## Install or update
 
-1. Extract `Gather-1.8.0-extension.zip` to a permanent folder.
+1. Extract `Gather-1.8.1-extension.zip` to a permanent folder.
 2. Open `chrome://extensions` or `edge://extensions`, enable Developer mode, select **Load unpacked**, and choose the extracted **account-id-tool** directory containing `manifest.json`.
 3. Pin Gather. Open a supported profile → Gather → inspect/copy. Chrome 116+ or compatible Edge is required.
 
-Before updating an existing installation, back up all work and preserve its source folder. Finish captures and close Gather pages. Replace files **at the same installed directory path**, then Reload the extension. Do not uninstall or clear browser storage. There are no additional permissions over 1.7.0; updating from 1.6.x adds Downloads for exports. Native browser acceptance remains outstanding; this is a development build.
+Before updating an existing installation, back up all work if the current build opens and preserve its source folder. If 1.8.0 cannot open because of the startup error, keep the existing browser profile/storage intact and update in place; do not uninstall or clear data. Finish captures and close Gather pages. Replace files **at the same installed directory path**, then Reload the extension and confirm version **1.8.1**. Close and reopen the toolbar popup. Do not uninstall or clear browser storage. There are no additional permissions over 1.7.0; updating from 1.6.x adds Downloads for exports. Native browser acceptance remains outstanding; this is a development build.
 
 ## Case workflow
 
@@ -69,6 +77,8 @@ Downloaded files, browser history, clipboard contents and legacy conflicting-set
 - Custom folders, scrolling-element capture, full Gather Bar, automatic privacy scrubbing, general annotation graphics, organization packs and encrypted resume capsules are deferred.
 
 ## Rollback
+
+The preserved 1.8.0 package reproduces the reported startup defect; it is retained for diagnosis, not recommended for routine use. The 1.7.0 checkpoint also lacks native acceptance.
 
 Preserve a **pre-update backup made by the older version**, its source, and a current 1.8.0 `.gather` backup. To roll back, use a separate clean Chrome/Edge profile, load the preserved older build, and restore the backup made by that version. Keep the current profile until recovery is verified. Do not ask 1.7.0 or earlier to rewrite 1.8.0 case/account-state data; a code rollback is not a data-format downgrade. The 1.7.0 checkpoint and its ZIPs remain available alongside this delivery.
 

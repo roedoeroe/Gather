@@ -1,3 +1,4 @@
+import {projectSignature} from './case-close.js';
 import {updateCaseSession} from './case-session.js';
 // Capture binaries deliberately live outside the 4 MiB workspace JSON.
 export const CAPTURE_DB = 'gather-captures-v1';
@@ -125,7 +126,6 @@ export async function importCaptureBundle(bundle,{idMap=new Map(),pendingRestore
 // Atomic binary deletion plus exact workspace journal. A restart finishes the
 // metadata write; it cannot resurrect a half-deleted project.
 export async function purgeProjectAssets(projectId,pendingRestore,expectedSignature){
-  const {projectSignature}=await import('./case-close.js');
   const db=await openCaptureDB(),tx=db.transaction(['captures','assets','subjects','settings'],'readwrite'),done=finish(tx);let counts;
   try{
     const captures=await request(tx.objectStore('captures').getAll()),subjects=await request(tx.objectStore('subjects').getAll()),settings=await request(tx.objectStore('settings').getAll());

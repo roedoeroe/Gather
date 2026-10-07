@@ -1,5 +1,6 @@
 import {snapshotCaptureBundle,hashBytes,captureId,frozenDestination,CAPTURE_LIMITS,writeCaptureSetting} from './capture-store.js';
-import {validateBackup} from './workspace-store.js';
+import {validateBackup} from './backup-validation.js';
+import {projectScope} from './case-close.js';
 // A length-prefixed binary container keeps original image bytes out of JSON.
 // No executable code, paths, compression, or base64 images are accepted.
 const MAGIC=new TextEncoder().encode('GATHER-BINARY-1\n');
@@ -54,7 +55,7 @@ export async function validateCaptureBundle(bundle,workspace){
 export async function createFullBackup(workspaceBackup,{projectId=null}={}){
   validateBackup(workspaceBackup);const bundle=await snapshotCaptureBundle();
   if(bundle.settings.some(s=>s.key==='pending-workspace-restore'))fail('Finish the interrupted restore before creating a backup.');
-  if(projectId){const {projectScope}=await import('./case-close.js');const state=projectScope(workspaceBackup.workspace,projectId);const legacy=Object.fromEntries(Object.entries(workspaceBackup.legacy).filter(([key,value])=>key.startsWith('gather.batch.')&&value.lookupContext?.projectId===projectId));workspaceBackup={...workspaceBackup,workspace:state,legacy};bundle.captures=bundle.captures.filter(c=>c.projectId===projectId);const captures=new Set(bundle.captures.map(c=>c.id));bundle.assets=bundle.assets.filter(a=>captures.has(a.captureId));bundle.subjects=bundle.subjects.filter(s=>s.projectId===projectId);const scans=new Set(state.scans.map(s=>s.id));bundle.settings=bundle.settings.filter(s=>s.key==='preferences'||s.key==='project-label:'+projectId||s.key.startsWith('subject:')&&scans.has(s.key.slice(8)));}
+  if(projectId){const state=projectScope(workspaceBackup.workspace,projectId);const legacy=Object.fromEntries(Object.entries(workspaceBackup.legacy).filter(([key,value])=>key.startsWith('gather.batch.')&&value.lookupContext?.projectId===projectId));workspaceBackup={...workspaceBackup,workspace:state,legacy};bundle.captures=bundle.captures.filter(c=>c.projectId===projectId);const captures=new Set(bundle.captures.map(c=>c.id));bundle.assets=bundle.assets.filter(a=>captures.has(a.captureId));bundle.subjects=bundle.subjects.filter(s=>s.projectId===projectId);const scans=new Set(state.scans.map(s=>s.id));bundle.settings=bundle.settings.filter(s=>s.key==='preferences'||s.key==='project-label:'+projectId||s.key.startsWith('subject:')&&scans.has(s.key.slice(8)));}
   bundle.settings=bundle.settings.filter(s=>s.key==='preferences'||s.key.startsWith('subject:')||s.key.startsWith('project-label:'));
   await validateCaptureBundle(bundle,workspaceBackup.workspace);
   const manifest={format:'gather-binary-backup',schemaVersion:1,createdAt:new Date().toISOString(),workspaceBackup,bundle:{...bundle,assets:bundle.assets.map(({blob,...asset})=>asset)}};

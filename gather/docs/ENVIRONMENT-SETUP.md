@@ -1,11 +1,21 @@
-# Cloud environment setup
+# Cloud environment setup — Gather 1.8.1
 
-Setup and validation completed in the existing `/workspace/Gather` checkout. The extension lives in `gather/account-id-tool`; no runtime install, bundler, service, credential or application environment variable is needed. Node 24 and Python 3 run automated tests and packaging. Playwright 1.62.1 and sandboxed Chromium 151 run the rendered fixture journeys; see `TESTING.md` for commands and limitations.
+Use the existing `/workspace/Gather` checkout; runtime source is `gather/account-id-tool`. No runtime install, bundler, service, credential or application environment variable is needed. Node 24 and Python 3 run automated tests and packaging. Playwright 1.62.1 and sandboxed Chromium 151 run the browser journeys.
 
-Reusable startup instructions were saved successfully through the cloud-environment-onboarding configuration tool. The save returned `status: saved`, `requires_publish: true`, draft ID `f48a87a3-f937-4677-9d9e-d9c40b45e675~cecfgdraft_6ac55bcaa29481909166e1267d756bd6`. Only `start_skill` was updated; repository membership, network policy, secret requirements and existing runtime settings were preserved. No install script is necessary.
+From `/workspace/Gather/gather`:
 
-Review and save the changes in environment settings, then **Publish** the environment. Saving a draft does not apply/publish it or prove that a fresh task can restore this source. No fresh-task restoration was performed. Do not rely on a local checkout/commit alone as proof of remote synchronization; retain the development ZIP independently.
+```sh
+node --test tests/*.test.mjs
+node tests/browser-capture.mjs
+node tests/browser-case.mjs
+node tests/browser-worker.mjs
+python3 scripts/package.py
+```
 
-Native unpacked extension acceptance remains blocked by administrator policy. A permitted native runner or local Chrome/Edge is the supported diagnostic path. Browser security sandbox, TLS and administrator policy were not weakened.
+Read `TESTING.md` for exact evidence and the distinction between real ServiceWorkerGlobalScope, mocked Chrome APIs and native installed-extension acceptance. Version 1.8.1 fixes the native worker import restriction and popup sizing feedback missed by the earlier page-based harness. Do not select the older 1.8.0 just because its historical tests were green.
 
-The user subsequently approved source publication. The tested implementation was pushed to `roedoeroe/Gather`, branch `develop/1.8.0-r3`, commit `c0da3abe660d3c4154c3e282a3c3a73144af1040`, and the remote ref was verified. `main` remains unchanged. Startup instructions were updated to identify this durable source; configuration publication and fresh-task restoration remain separate, unperformed steps.
+Reusable startup instructions are maintained in the cloud-environment-onboarding configuration draft, ID `f48a87a3-f937-4677-9d9e-d9c40b45e675~cecfgdraft_6ac55bcaa29481909166e1267d756bd6`. Only startup instructions are updated; repository membership, network policy, secrets and unrelated settings remain unchanged. Review and save in environment settings, then **Publish**. A saved draft does not publish the environment or prove fresh-task restoration; neither action has been performed here.
+
+The user-authorized source branch is `roedoeroe/Gather:develop/1.8.0-r3`; its manifest now advances to 1.8.1. The final delivery receipt records the verified correction commit. Main is unchanged. If a new checkout begins on the README-only main branch, fetch the development branch after checking for local changes; do not reset user work or restart from an older upload. Downloadable development ZIPs provide another independent source/evidence copy. No Drive upload occurred.
+
+Native unpacked-extension loading remains blocked by administrator policy. Use a permitted runner or local Chrome/Edge. Do not repeatedly retry the blocked path or weaken browser sandbox, TLS or administrator policy. Approved browser-test execution outside the tool filesystem sandbox retained `chromiumSandbox:true`.

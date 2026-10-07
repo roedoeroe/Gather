@@ -4,3 +4,21 @@ test('manifest resources exist and no broad host permissions were added',()=>{co
 for(const [page,script] of [['workspace.html','workspace.js'],['popup.html','popup.js'],['index.html','app.js'],['capture.html','capture.js'],['capture-edit.html','capture-edit.js','case-ui.js','account-state-ui.js'],['evidence.html','evidence.js']])test(page+' has every direct DOM target used by its controller',()=>{const html=fs.readFileSync(path.join(root,page),'utf8'),js=fs.readFileSync(path.join(root,script),'utf8'),ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]);assert.equal(new Set(ids).size,ids.length,'duplicate IDs');for(const [,id] of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.includes(id),'missing #'+id);for(const [,ref] of html.matchAll(/(?:src|href)="([^"#]+)"/g)){if(/^(https?:|data:)/.test(ref))continue;assert.ok(fs.existsSync(path.join(root,ref.split('?')[0])),ref);}});
 test('new UI renders stored text without HTML injection sinks',()=>{for(const name of ['workspace.js','workspace-integration.js','capture.js','capture-ui.js','capture-edit.js','case-ui.js','account-state-ui.js']){const code=fs.readFileSync(path.join(root,name),'utf8');assert.ok(!/\.innerHTML\s*=|insertAdjacentHTML|eval\(/.test(code),name);}});
 test('every shipped JavaScript module parses before packaging',async()=>{const {spawnSync}=await import('node:child_process');for(const name of fs.readdirSync(root).filter(n=>n.endsWith('.js'))){const result=spawnSync(process.execPath,['--check',path.join(root,name)],{encoding:'utf8'});assert.equal(result.status,0,name+'\n'+result.stderr);}});
+
+test('the complete service-worker module graph uses only supported static imports',()=>{
+  const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'))),visited=new Set();
+  function visit(file){
+    if(visited.has(file))return;visited.add(file);
+    const code=fs.readFileSync(path.join(root,file),'utf8');
+    assert.doesNotMatch(code,/\bimport\s*\(/,file+': dynamic import is forbidden in ServiceWorkerGlobalScope');
+    const declarations=[...code.matchAll(/^\s*import\s+(?:[^;]+?\s+from\s+)?['"]([^'"]+)['"]/gm),
+      ...code.matchAll(/^\s*export\s+(?:\{[^}]+\}|\*)\s+from\s+['"]([^'"]+)['"]/gm)];
+    for(const [,specifier] of declarations){
+      assert.ok(specifier.startsWith('./'),file+': worker modules must be packaged locally');
+      const next=path.normalize(path.join(path.dirname(file),specifier));
+      assert.ok(!next.startsWith('..'));visit(next);
+    }
+  }
+  visit(manifest.background.service_worker);
+  assert.ok(visited.size>10,'Traverse the transitive graph, not just background.js');
+});

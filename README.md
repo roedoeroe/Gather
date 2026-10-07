@@ -6,17 +6,17 @@ A local browser extension for fast account lookup, deliberate research and scree
 
 ## Get the current build
 
-**[Download Gather 1.8.4](https://github.com/roedoeroe/Gather/raw/da107b1109c39315dbf5a3cc0fc1ca54071322c3/releases/1.8.4/Gather-1.8.4-extension.zip)** · Development build for Chrome and Edge
+**[Download Gather 1.8.5](https://github.com/roedoeroe/Gather/raw/d29ba5475e0f53795f3f4695155038de8036414f/releases/1.8.5/Gather-1.8.5-extension.zip)** · Development build for Chrome and Edge
 
-[Source/test package](releases/1.8.4/Gather-1.8.4-development.zip) · [SHA-256 checksums](releases/1.8.4/Gather-1.8.4-SHA256SUMS.txt) · [Delivery notes](releases/1.8.4/Gather-1.8.4-DELIVERY.md)
+[Source/test package](releases/1.8.5/Gather-1.8.5-development.zip) · [SHA-256 checksums](releases/1.8.5/Gather-1.8.5-SHA256SUMS.txt) · [Delivery notes](releases/1.8.5/Gather-1.8.5-DELIVERY.md)
 
-Choose `Gather-1.8.4-extension.zip`, extract it to a permanent folder, and load its **account-id-tool** directory from your browser's Extensions page with Developer mode enabled. For an update, replace all files at the same installed path and Reload; do not uninstall or clear storage. See the [installation and rollback guide](gather/README.md#install-or-update).
+Choose `Gather-1.8.5-extension.zip`, extract it to a permanent folder, and load its **account-id-tool** directory from your browser's Extensions page with Developer mode enabled. For an update, replace all files at the same installed path and Reload; do not uninstall or clear storage. See the [installation and rollback guide](gather/README.md#install-or-update).
 
-The development source is maintained on **develop/1.8.0-r3**; the branch name is historical, while the current extension version is **1.8.4**. Release ZIPs are pinned to their release commit. Main is unchanged.
+The development source is maintained on **develop/1.8.0-r3**; the branch name is historical, while the current extension version is **1.8.5**. Release ZIPs are pinned to their release commit. Main is unchanged.
 
 ## Capture directly from the toolbar
 
-Choose **Full page**, **Visible area**, or **Select area** with the destination beside them. Saved images offer readable previews, editing/export and a direct jump to their original scan.
+Choose **Select area & copy** to drag directly on the page, save locally and copy the image. **Full page**, **Visible area**, and **Select area** remain direct actions with a visible destination. Saved images offer PNG/JPEG save, Print / Save PDF, editing and history grouped by case/scan. The side panel is optional.
 
 **Research · Captures · Case · Settings** separates daily work from management. New cases can start without intake. The side panel is optional.
 
@@ -24,11 +24,11 @@ Choose **Full page**, **Visible area**, or **Select area** with the destination 
 
 Cases, findings, captures and lookup history stay in the browser on your computer. Gather has no case server, cloud sync or analytics. Searches and profile lookups contact the services you choose. Exports create separate files.
 
-Workspace → **Settings → Data & Privacy** offers red **Delete case…** and **Clear recent lookup history…** controls. Case deletion requires its name and offers an optional backup. Clearing recent lookups preserves saved cases and images. Browser history, clipboard and downloaded files are outside those controls.
+Workspace → **Settings → Data & Privacy** offers red **Delete case…** and **Clear recent lookup history…** controls. Case deletion requires its name and offers an optional backup. Clearing recent lookups preserves saved cases and images. Capture history also offers red individual/selected-capture deletion with confirmation. Browser history, clipboard and downloaded files are outside those controls.
 
 ## Verification
 
-The 1.8.4 release passed **123 automated tests**, **50 rendered-browser scenario groups** and **9 real service-worker groups**. Browser journeys use controlled Chrome API doubles. Native installed-extension testing is blocked by this runner's administrator policy; live-platform reliability remains unverified. Use the [local Chrome/Edge checklist](gather/docs/LOCAL-ACCEPTANCE.md) before relying on native behavior.
+The 1.8.5 release passed **129 automated tests**, **61 rendered-browser scenario groups** and **10 real service-worker groups**. Browser journeys use controlled Chrome API doubles. Native installed-extension testing is blocked by this runner's administrator policy; live-platform reliability remains unverified. Use the [local Chrome/Edge checklist](gather/docs/LOCAL-ACCEPTANCE.md) before relying on native behavior.
 
 ## Continue development
 
@@ -36,6 +36,6 @@ The 1.8.4 release passed **123 automated tests**, **50 rendered-browser scenario
 - [Test evidence and commands](gather/docs/TESTING.md)
 - [Next-run handoff](gather/docs/NEXT-RUN-HANDOFF.md)
 - [Product direction](gather/docs/PRODUCT-DIRECTION.md)
-- [Proposed Quick Parts / Reference Library](gather/docs/QUICK-PARTS-DIRECTION.md) — local search and reviewed composition; **not included in 1.8.4**
+- [Proposed Quick Parts / Reference Library](gather/docs/QUICK-PARTS-DIRECTION.md) — local search and reviewed composition; **not included in 1.8.5**
 
 The extension has no runtime dependencies, bundler or server. From `gather`, run `node --test tests/*.test.mjs` and `python3 scripts/package.py`. Browser validation setup is documented in the testing guide. Public fixtures contain invented data only.

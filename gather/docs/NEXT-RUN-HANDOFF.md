@@ -53,7 +53,12 @@ Install ZIP → Load unpacked `account-id-tool`. Update all files at the **same 
 ## Narrow next milestone
 
 1. Native Chrome/Edge acceptance of **packaged 1.8.2** using `LOCAL-ACCEPTANCE.md`: popup, activeTab, capture focus/cancellation, Downloads, optional-backup/no-backup deletion, open-window history clear, real browser restart and independent image restore. Use fictional data only.
-2. Then validate live adapter reliability against current primary evidence and controlled permissioned examples. Do not convert ambiguous failures to Gone.
-3. Validate zoom/DPI/dynamic full-page behavior before nested scrolling; evaluate custom directory permission/revocation separately.
+2. The user requested a generic local **Quick Parts / Reference Library** as the next bounded feature: see [QUICK-PARTS-DIRECTION.md](QUICK-PARTS-DIRECTION.md) for inspected architecture, provisional pack/schema, suggestions, temporary composer and acceptance gates. This is design only; do not change 1.8.2 ZIPs. Actual SST references are not attached; inspect authorized local exports before taxonomy/approval mapping. Keep private packs outside the checkout and separate from case backups.
+3. Then validate live adapter reliability against current primary evidence and controlled permissioned examples. Do not convert ambiguous failures to Gone.
+4. Validate zoom/DPI/dynamic full-page behavior before nested scrolling; evaluate custom directory permission/revocation separately.
 
-No cloud case storage, passive browsing collection or automated identity/relationship/threat conclusions. Full Gather Bar, workflow packs, richer annotations and encrypted resume capsules stay deferred.
+No cloud case storage, passive browsing collection or automated identity/relationship/threat conclusions. Full Gather Bar, broad workflow/QC packs, richer annotations and encrypted resume capsules stay deferred. The separately proposed reference-pack importer is a narrow exception, not a commitment to that larger framework.
+
+## Post-release documentation and durable downloads
+
+The 1.8.2 packages remain byte-identical to the delivered release at `13db06de81bce578e5a0ba4f1aef3739329bd0cd`. A later documentation commit adds the Quick Parts proposal and a development-branch landing page. ZIPs/checksums/delivery notes are mirrored at repository root `releases/1.8.2/` so they persist on GitHub as well as in the workspace. GitHub Releases binary uploads returned HTTP 400 Bad Content-Length through this environment; the incomplete draft was removed, and Git transport was used for the artifact mirror. Do not claim a GitHub Release was published. Main/default branch remain unchanged; use the explicit development-branch link.

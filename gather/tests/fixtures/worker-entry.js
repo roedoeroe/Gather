@@ -19,6 +19,10 @@ async function runtime(message, page = 'workspace.html') {
 async function execute({command, payload}) {
   if (command === 'runtime') return runtime(payload.message, payload.page);
   if (command === 'environment') return {generation,scope:self.constructor.name,hasDocument:typeof document !== 'undefined',hasIndexedDB:!!indexedDB};
+  if(command==='pauseLookup'){testPauseLookup();return true;}
+  if(command==='releaseLookup'){testReleaseLookup();return true;}
+  if(command==='local')return chrome.storage.local.get(null);
+  if(command==='writeLocal'){await chrome.storage.local.set(payload);return true;}
   if (command === 'tabs') return chrome.tabs.query({});
   if (command === 'session') return chrome.storage.session.get(null);
   if (command === 'caseInput') return {name:'Northbridge',scanName:'October review',mode:'ephemeral',fields:parseIntake('SOC: Alex Example\nSchool: Northbridge School')};

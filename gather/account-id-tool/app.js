@@ -4,6 +4,8 @@ import {accountState,orderAccounts,accountSummary} from './account-state.js';
 import {parseInput, extractId, formatIds, formatDetails, accountTitle, LABELS, suppliedIds, idCheck, isCopyableId, applyLookup} from './core.js';
 import {resolveProfile, isExtension, closeOwnedTabs} from './resolver.js';
 import {storage, recentBatches, loadBatch, saveBatch, removeBatch, flushSavedBatch} from './batches.js';
+import {clearHistoryDialog} from './history-ui.js';
+import {historyEpoch,saveLookupDraft,HISTORY_EPOCH_KEY} from './batches.js';
 import {notesInfo, parseNotes} from './profile-status.js';
 import {recoverPastedLinks} from './paste.js';
 import {patchPreferences, onPreferencesChanged} from './preferences.js';
@@ -12,7 +14,7 @@ const $ = id => document.getElementById(id);
 let parsed = parseInput(''), batch = null, busy = false, controller = null, sourceEntry = null;
 let saveQueue = Promise.resolve(), saveFailed = false, readOnly = false, releaseLock = null;
 let toastTimer, draftTimer, titleTimer, transitioning = false, persistedId = null;
-let notesEntry = null;
+let notesEntry = null, pageEpoch='';
 const dateLabel = time => new Date(time).toLocaleString(undefined, {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 const entries = () => batch?.entries || [];
 function notify(message) {
@@ -22,9 +24,11 @@ function notify(message) {
 function detailsOutput() { return formatDetails(entries(),null,{includeNames:$('includeNames').checked}); }
 function output() { return $('copyMode').value === 'ids' ? formatIds(entries(),null,$('separator').value) : detailsOutput(); }
 async function copyText(text, message = 'Copied to clipboard') {
+  const epoch=pageEpoch;
   if (!text) {notify('No checked IDs to copy yet. Account details keeps all supplied IDs.');return false;}
   try { await navigator.clipboard.writeText(text); notify(message); return true; }
   catch {
+    if(epoch!==pageEpoch)return false;
     $('copyText').value=text;
     if(!$('copyDialog').open)$('copyDialog').showModal();
     $('copyText').focus();$('copyText').select();
@@ -67,7 +71,7 @@ function renderInput() {
   parsed=parseInput($('links').value);
   const n=parsed.entries.length;
   $('inputCount').textContent=n ? n+' account'+(n===1?'':'s')+(parsed.duplicates?' · '+parsed.duplicates+' duplicates merged':'')+(parsed.ignoredCount?' · extra text ignored':'') : $('links').value.trim()?'No supported profile links found':'Commas, spaces, or new lines';
-  $('start').disabled=!n||transitioning;
+  $('start').disabled=!n||transitioning||busy;
   $('invalidDetails').hidden=!parsed.invalid.length;
   $('invalidSummary').textContent=parsed.invalid.length+' items will be skipped';
   $('invalidList').replaceChildren();
@@ -75,10 +79,11 @@ function renderInput() {
 }
 function saveDraft() {
   clearTimeout(draftTimer);
-  const value=$('links').value;
-  draftTimer=setTimeout(()=>storage.set({'gather.draft':value}).catch(()=>$('draftStatus').textContent='Draft could not be saved in this browser.'),180);
+  const value=$('links').value,epoch=pageEpoch;
+  draftTimer=setTimeout(()=>saveLookupDraft('gather.draft',value,epoch).catch(()=>$('draftStatus').textContent='Draft could not be saved in this browser.'),180);
 }
 function renderResults() {
+  if(!batch)return;
   document.body.classList.toggle('omit-display-names',$('copyMode').value==='details'&&!$('includeNames').checked);
   const rows=entries(), resolved=rows.filter(e=>e.status==='resolved').length, unfinished=rows.filter(e=>!['resolved','gone'].includes(e.status)).length;
   const needsReview=rows.filter(e=>['mismatch','conflict','unverified'].includes(idCheck(e).state)).length;
@@ -186,10 +191,11 @@ async function startBatch(){
   if(busy||transitioning||!parsed.entries.length)return;
   transitioning=true;$('start').disabled=true;
   try {
-  const lookupContext=await captureLookupContext();
-  batch={...(lookupContext?{lookupContext}:{}),id:crypto.randomUUID(),title:'',createdAt:Date.now(),updatedAt:Date.now(),entries:structuredClone(parsed.entries),invalid:parsed.invalid,duplicates:parsed.duplicates};
+  const epoch=pageEpoch,lookupContext=await captureLookupContext();
+  if(epoch!==pageEpoch)throw new Error('History was cleared. Start again.');
+  batch={historyEpoch:epoch,...(lookupContext?{lookupContext}:{}),id:crypto.randomUUID(),title:'',createdAt:Date.now(),updatedAt:Date.now(),entries:structuredClone(parsed.entries),invalid:parsed.invalid,duplicates:parsed.duplicates};
   readOnly=!await acquireBatch(batch.id);saveFailed=false;showResults();await persist();
-  clearTimeout(draftTimer);await storage.remove('gather.draft').catch(()=>{});
+  clearTimeout(draftTimer);await saveLookupDraft('gather.draft',null,epoch).catch(()=>{});
   await runBatch(false);
   } catch(error){notify(error.message);} finally {transitioning=false;}
 }
@@ -213,19 +219,22 @@ async function runBatch(force=false){
   try{await Promise.all([worker(),worker()]);}
   finally{
     for(const e of queue){e.status='stopped';e.message='Lookup stopped. Retry to finish.';}
-    await closeOwnedTabs();busy=false;controller=null;renderResults();await persist();
+    await closeOwnedTabs();busy=false;controller=null;renderResults();renderInput();await persist();
   }
   if(!signal.aborted&&$('autoCopy').checked)await copyBatch(true);
 }
+$('clearLookupHistory').addEventListener('click',()=>clearHistoryDialog().catch(e=>notify(e.message)));
 async function openRecent(){
   if(busy||transitioning)return;
   transitioning=true;
   try {
   if(batch&&!await canLeave())return;
+  const epoch=pageEpoch;
   const list=$('historyList');list.replaceChildren();$('recentDialog').showModal();
   let history;
   try{history=await recentBatches();}catch{list.textContent='History could not be read from this browser.';return;}
   if(!history.length){list.textContent='No saved batches yet. Your first list will appear here.';return;}
+  if(epoch!==pageEpoch)return;
   for(const saved of history){
     const row=document.createElement('div');row.className='history-row';
     const open=document.createElement('button');open.className='history-open';
@@ -237,6 +246,7 @@ async function openRecent(){
       try {
         if(batch?.id!==saved.id||readOnly)readOnly=!await acquireBatch(saved.id);
         const fresh=await loadBatch(saved.id);
+        if(epoch!==pageEpoch){releaseLock?.();releaseLock=null;return;}
         if(!fresh){throw new Error('This batch is no longer available.');}
         batch=fresh;persistedId=fresh.id;saveFailed=false;$('recentDialog').close();showResults();
         if(readOnly)notify('Open in another tab. Reopen from Recent batches after closing that tab to edit here.');
@@ -360,7 +370,8 @@ $('uploadFile').addEventListener('change',async()=>{
   if(file.size>100000){notify('Please use a text list under 100 KB.');return;}
   if(busy||transitioning||$('inputView').hidden)return;
   transitioning=true;$('start').disabled=true;$('uploadButton').disabled=true;$('links').readOnly=true;
-  try{const text=await file.text();if(text.includes('\0'))throw Error('binary');$('links').readOnly=false;insertInputText(text,true);}
+  const epoch=pageEpoch;
+  try{const text=await file.text();if(epoch!==pageEpoch)throw new Error('History was cleared');if(text.includes('\0'))throw Error('binary');$('links').readOnly=false;insertInputText(text,true);}
   catch{notify('Could not read this file. Use a plain .txt, .csv, or .tsv list.');}
   finally{transitioning=false;$('links').readOnly=false;$('uploadButton').disabled=false;renderInput();}
 });
@@ -374,7 +385,7 @@ $('download').addEventListener('click',()=>{
 window.addEventListener('beforeunload',event=>{
   clearTimeout(titleTimer);
   if(batch&&!readOnly&&persistedId===batch.id)flushSavedBatch(batch).catch(()=>{});
-  if(!$('inputView').hidden){clearTimeout(draftTimer);storage.set({'gather.draft':$('links').value}).catch(()=>{});}
+  if(!$('inputView').hidden){clearTimeout(draftTimer);saveLookupDraft('gather.draft',$('links').value,pageEpoch).catch(()=>{});}
   controller?.abort();closeOwnedTabs();
   if(saveFailed){event.preventDefault();event.returnValue='';}
 });
@@ -382,6 +393,7 @@ $('copyDialog').addEventListener('close',()=>{$('copyText').value='';});
 async function init(){
   if(!isExtension)$('previewNotice').hidden=false;
   try{
+    pageEpoch=await historyEpoch();
     const prefs=(await storage.get('gather.prefs'))['gather.prefs'];
     applyPreferences(prefs);
     const draft=(await storage.get('gather.draft'))['gather.draft'];
@@ -396,5 +408,15 @@ async function init(){
   }catch{$('draftStatus').textContent='Local history is unavailable. You can still find and copy IDs.';}
   renderInput();
 }
+if(isExtension)chrome.storage.onChanged.addListener((changes,area)=>{
+  if(area!=='local')return;
+  if(!changes[HISTORY_EPOCH_KEY]&&!(batch&&changes['gather.batch.'+batch.id]?.newValue===null))return;
+  if(changes[HISTORY_EPOCH_KEY])pageEpoch=changes[HISTORY_EPOCH_KEY].newValue||'';
+  controller?.abort();clearTimeout(draftTimer);clearTimeout(titleTimer);batch=null;persistedId=null;saveFailed=false;readOnly=false;releaseLock?.();releaseLock=null;
+  for(const d of document.querySelectorAll('dialog[open]'))d.close();
+  for(const id of ['links','copyText','sourceText','notesText','batchTitle'])$(id).value='';
+  $('accountList').replaceChildren();$('historyList')?.replaceChildren();$('resultsView').hidden=true;$('inputView').hidden=false;
+  history.replaceState(null,'',location.pathname);renderInput();notify('Local lookup data removed.');
+});
 init();
 

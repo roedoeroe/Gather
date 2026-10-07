@@ -81,9 +81,11 @@ function render() {
   list.scrollTop=scroll;
 }
 async function copyText(text, message) {
+  const epoch=state.historyEpoch;
   if(!text){notice('No checked IDs to copy yet. Account details keeps supplied IDs.');return false;}
   try {await navigator.clipboard.writeText(text);notice(message,true);return true;}
   catch {
+    if(epoch!==state.historyEpoch)return false;
     $('quickCopyText').value=text;$('manualCopy').hidden=false;document.body.classList.add('has-manual');
     $('quickCopyText').focus();$('quickCopyText').select();
     return false;
@@ -117,6 +119,7 @@ async function refresh(restore=false) {
 }
 async function act(message, copyAfter=false) {
   if(submitting)return;
+  message.historyEpoch=state.historyEpoch;
   const origin=message.type==='quick.start'?captureLookupContext():null;
   const number=++requestNumber;
   submitting=true;render();$('quickMessage').hidden=true;
@@ -133,7 +136,7 @@ async function act(message, copyAfter=false) {
   finally{submitting=false;render();await refresh();}
 }
 function saveDraft() {
-  inputDirty=true;renderInput();send({type:'quick.draft',input:$('quickLinks').value}).catch(error=>notice('Draft could not be saved. '+error.message));
+  inputDirty=true;renderInput();send({type:'quick.draft',historyEpoch:state.historyEpoch,input:$('quickLinks').value}).catch(error=>notice('Draft could not be saved. '+error.message));
 }
 function insertText(text) {
   const input=$('quickLinks');input.focus();
@@ -203,6 +206,7 @@ $('closeManual').addEventListener('click',closeManual);
 async function init() {
   if(!globalThis.chrome?.runtime?.id){notice('Install Gather in Chrome or Edge to use this panel.');return;}
   chrome.storage.onChanged.addListener((changes,area)=>{
+    if(area==='local'&&changes['gather.lookupEpoch']){state={batch:null,busy:false,historyEpoch:changes['gather.lookupEpoch'].newValue};inputDirty=false;$('quickLinks').value='';closeManual();appliedNumber=++requestNumber;refresh(true);}
     if((area==='session'&&changes.quickRun)||(area==='local'&&Object.keys(changes).some(k=>k.startsWith('gather.batch.')||k==='gather.quick')))refresh();
   });
   try {

@@ -1,5 +1,6 @@
 import {handleWorkspace, readWorkspace, dispatch, updateSaveMenu} from './workspace-store.js';
 import {trackTemporary, untrackTemporary, tabRemoved} from './tab-ownership.js';
+import {saveBatch,saveLookupDraft} from './batches.js';
 import {handleQuick} from './quick-worker.js';
 import {patchPreferences} from './preferences.js';
 import {TAB_CONTEXT_KEY, inheritTabContext, removeTabContext, replaceTabContext, pruneTabContexts, resetTabContexts, resolveTabContext} from './tab-context.js';
@@ -27,8 +28,11 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   }
   if(capture&&message?.type==='capture.finished'){finishCapture(message.launchId).then(reply,error=>reply({error:error.message}));return true;}
   if ((full || page === chrome.runtime.getURL('popup.html') || workspace) && message?.type?.startsWith('workspace.')) {
-    handleWorkspace(message).then(reply,error=>reply({error:error.message})); return true;
+    const work=['workspace.clearLookups','workspace.closeProject'].includes(message.type)?handleQuick({type:'quick.privacy',operation:()=>handleWorkspace(message),projectId:message.projectId}):handleWorkspace(message);
+    work.then(reply,error=>reply({error:error.message})); return true;
   }
+  if(full&&message?.type==='history.flush'){saveBatch(message.batch).then(()=>reply({ok:true}),error=>reply({error:error.message}));return true;}
+  if(full&&message?.type==='history.draft'){saveLookupDraft(message.key,message.value,message.epoch).then(()=>reply({ok:true}),error=>reply({error:error.message}));return true;}
   const quick = page === chrome.runtime.getURL('popup.html');
   if((full||quick)&&message?.type==='savePreferences'&&message.patch&&typeof message.patch==='object'){
     patchPreferences(message.patch).then(()=>reply({ok:true}),error=>reply({error:error.message}));return true;
@@ -36,7 +40,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (quick && message?.type === 'quick.open') {
     openFull(message.batchId).then(()=>reply({ok:true}),error=>reply({error:error.message})); return true;
   }
-  if (quick && message?.type?.startsWith('quick.')) {
+  if (quick && message?.type?.startsWith('quick.') && message.type!=='quick.privacy') {
     handleQuick(message).then(reply,error=>reply({error:error.message})); return true;
   }
   if (!full || !sender.tab || !['trackTab','untrackTab'].includes(message?.type) || !Number.isInteger(message.tabId)) return;

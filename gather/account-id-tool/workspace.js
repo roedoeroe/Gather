@@ -113,7 +113,7 @@ $('savePage').onclick=()=>safely(async()=>{const scanId=currentScan(),sourceTabI
 $('searchForm').addEventListener('submit',event=>{event.preventDefault();const scanId=currentScan(),query=$('query').value,provider=$('provider').value,submit=event.submitter;submit.disabled=true;safely(async()=>{const r=await request('workspace.search',{action:{scanId,query,provider}});update(r.state);message('Search opened for '+label(scanId)+'. Mark it reviewed when you finish.');setView('searches');}).finally(()=>submit.disabled=false);});
 function draftKey(scanId){return 'gather.search-draft.'+(scanId||'inbox');}
 function draftStorage(scanId){const projectId=state.scans.find(s=>s.id===scanId)?.projectId;return state.projects.find(p=>p.id===projectId)?.mode==='ephemeral'?chrome.storage.session:chrome.storage.local;}
-function saveDraft(){const scanId=currentScan(),value={query:$('query').value,provider:$('provider').value};draftQueue=draftQueue.catch(()=>{}).then(()=>draftStorage(scanId).set({[draftKey(scanId)]:value})).catch(error=>message('Search draft could not be saved. '+error.message,true));}
+function saveDraft(){const scanId=currentScan(),value={query:$('query').value,provider:$('provider').value};draftQueue=draftQueue.catch(()=>{}).then(()=>request('workspace.searchDraft',{scanId,value})).catch(error=>message('Search draft could not be saved. '+error.message,true));}
 async function restoreDraft(scanId){await draftQueue.catch(()=>{});const key=draftKey(scanId),draft=(await draftStorage(scanId).get(key))[key];if(currentScan()!==scanId)return;$('query').value=draft?.query||'';$('provider').value=draft?.provider||'google';}
 $('query').oninput=saveDraft;$('provider').onchange=saveDraft;
 $('localSearch').oninput=renderViews;$('filter').onchange=renderViews;

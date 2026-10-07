@@ -5,6 +5,7 @@ import {cleanProfileStatus} from './profile-status.js';
 
 const PREFIX = 'gather.batch.';
 export const MAX_BATCHES = 50;
+export const HISTORY_EPOCH_KEY = 'gather.lookupEpoch';
 const extension = Boolean(globalThis.chrome?.storage?.local);
 export const storage = {
   async get(key) {
@@ -45,7 +46,7 @@ export function restoreBatch(value) {
     } catch {}
   }
   if (!entries.length) return null;
-  return {...(cleanLookupContext(value.lookupContext)?{lookupContext:cleanLookupContext(value.lookupContext)}:{}),id: value.id, title: cleanName(value.title).slice(0,80), createdAt: Number(value.createdAt) || Date.now(), updatedAt: Number(value.updatedAt) || Date.now(),
+  return {...(typeof value.historyEpoch==='string'&&/^[\w-]{1,80}$/.test(value.historyEpoch)?{historyEpoch:value.historyEpoch}:{}),...(cleanLookupContext(value.lookupContext)?{lookupContext:cleanLookupContext(value.lookupContext)}:{}),id: value.id, title: cleanName(value.title).slice(0,80), createdAt: Number(value.createdAt) || Date.now(), updatedAt: Number(value.updatedAt) || Date.now(),
     entries, invalid: Array.isArray(value.invalid) ? value.invalid.slice(0,100).map(i=>({input:String(i.input || '').slice(0,2048),error:String(i.error || '').slice(0,300)})) : [], duplicates: Number(value.duplicates) || 0};
 }
 export async function recentBatches() {
@@ -63,15 +64,83 @@ function batchSnapshot(batch) {
   }
   return safe;
 }
-// Call only for an existing, owned batch when this page is closing. Sending the
-// latest snapshot immediately avoids losing a just-edited title to a debounce.
+// Serialize lookup writes with clear/delete/restore across pages and the worker.
+let historyQueue=Promise.resolve();
+export function withHistoryLock(work) {
+  if(globalThis.navigator?.locks?.request)return navigator.locks.request('gather-lookup-history',{mode:'exclusive'},work);
+  const result=historyQueue.catch(()=>{}).then(work);historyQueue=result;return result;
+}
+export async function historyEpoch() {
+  return (await storage.get(HISTORY_EPOCH_KEY))[HISTORY_EPOCH_KEY] || '';
+}
+function sameEpoch(expected, actual) {
+  if ((expected || '') !== actual) throw new Error('Recent lookups were cleared. Start a new lookup.');
+}
+export async function historySummary() {
+  const all=await storage.get(null);
+  return {batches:Object.entries(all).filter(([key,value])=>key.startsWith(PREFIX)&&value!=null).length};
+}
+export function saveLookupDraft(key,value,epoch) {
+  if(!['gather.draft','gather.quick'].includes(key))throw new Error('Invalid lookup draft.');
+  if(extension&&globalThis.document&&!globalThis.navigator?.locks)return chrome.runtime.sendMessage({type:'history.draft',key,value,epoch}).then(checkReply);
+  return withHistoryLock(async()=>{sameEpoch(epoch,await historyEpoch());if(key==='gather.quick'&&value?.batchId&&!await loadBatch(value.batchId))throw new Error('This lookup was deleted. Start a new lookup.');await storage.set({[key]:value});});
+}
+// A closing page delegates to the worker so a queued write survives page closure.
+// The worker applies the same epoch/case guards, so deletion cannot be undone.
 export function flushSavedBatch(batch) {
-  return storage.set({[PREFIX + batch.id]: batchSnapshot(batch)});
+  if(extension&&globalThis.chrome?.runtime?.id&&chrome.runtime.sendMessage)
+    return chrome.runtime.sendMessage({type:'history.flush',batch:batchSnapshot(batch)}).then(result=>{
+      if(!result||result.error)throw new Error(result?.error||'Batch could not be saved.');
+    });
+  return saveBatch(batch);
 }
-export async function saveBatch(batch) {
-  const existing = await storage.get(PREFIX + batch.id);
-  if (!existing[PREFIX + batch.id] && (await recentBatches()).length >= MAX_BATCHES) throw new Error('Recent batches is full (50). Remove one to save this batch.');
-  // Store only list data. Page HTML and session credentials are never persisted.
-  await storage.set({[PREFIX + batch.id]: batchSnapshot(batch)});
+function checkReply(result){if(!result||result.error)throw new Error(result?.error||'History could not be saved.');return result;}
+export function saveBatch(batch) {
+  if(extension&&globalThis.document&&!globalThis.navigator?.locks)return chrome.runtime.sendMessage({type:'history.flush',batch:batchSnapshot(batch)}).then(checkReply);
+  return withHistoryLock(async()=>{
+    sameEpoch(batch.historyEpoch,await historyEpoch());
+    const projectId=batch.lookupContext?.projectId;
+    if(projectId){
+      const state=(await storage.get('gather.workspace.v1'))['gather.workspace.v1'];
+      if(!state||!state.projects.some(p=>p.id===projectId))throw new Error('This case was deleted. Start a new lookup.');
+    }
+    const existing=await storage.get(PREFIX+batch.id);
+    if(!existing[PREFIX+batch.id]&&(await recentBatches()).length>=MAX_BATCHES)
+      throw new Error('Recent batches is full (50). Remove one to save this batch.');
+    await storage.set({[PREFIX+batch.id]:batchSnapshot(batch)});
+  });
 }
-export async function removeBatch(id) { await storage.remove(PREFIX + id); }
+export function removeBatch(id) {return withHistoryLock(()=>storage.remove(PREFIX+id));}
+// Imported settings archives can contain old lookup copies. Scrub those copies
+// as well, without removing unrelated preferences or saved case records.
+export function scrubLookupArchive(value,remove,depth=0) {
+  if(!value||typeof value!=='object'||Array.isArray(value))return value;
+  if(depth>64)throw new Error('An imported settings archive is too deeply nested to clear safely.');
+  const next={};
+  for(const [key,item] of Object.entries(value)) {
+    if(remove(key,item))continue;
+    if(key.startsWith('gather.archive.')){
+      const cleaned=scrubLookupArchive(item,remove,depth+1);
+      if(cleaned&&Object.keys(cleaned).length)next[key]=cleaned;
+    }else next[key]=item;
+  }
+  return next;
+}
+export async function clearHistoryRecords() {
+  // Caller holds the history lock and the workspace mutation queue.
+  const all=await storage.get(null),writes={[HISTORY_EPOCH_KEY]:crypto.randomUUID()},remove=key=>
+    key.startsWith(PREFIX)||['gather.draft','gather.quick','gather.lookupEpoch'].includes(key);
+  let batches=0;
+  for(const [key,value] of Object.entries(all)) {
+    if(key===HISTORY_EPOCH_KEY)continue;
+    if(remove(key)){writes[key]=null;if(key.startsWith(PREFIX)&&value!=null)batches++;}
+    if(key.startsWith('gather.archive.')){
+      const cleaned=scrubLookupArchive(value,remove);
+      writes[key]=cleaned&&Object.keys(cleaned).length?cleaned:null;
+    }
+  }
+  // One write invalidates old writers and replaces their content with empty
+  // tombstones. A failed write cannot report a successful clear.
+  await storage.set(writes);
+  return {batches};
+}

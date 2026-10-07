@@ -9,6 +9,7 @@ import {validateCaptureBundle} from './capture-backup.js';
 import {prepareCase,resolveQuery} from './case-model.js';
 import {updateCaseSession} from './case-session.js';
 import {withoutProject,projectSignature} from './case-close.js';
+import {withHistoryLock,clearHistoryRecords,historySummary,HISTORY_EPOCH_KEY,scrubLookupArchive} from './batches.js';
 let queue=Promise.resolve();
 export async function readWorkspace(){await recoverBinaryRestore();const state=(await chrome.storage.local.get(WORKSPACE_KEY))[WORKSPACE_KEY];if(state&&state.schemaVersion!==SCHEMA)throw new Error('This workspace needs a different Gather version. Your data has not been changed.');return state||emptyState();}
 let recovering=null;
@@ -79,20 +80,22 @@ export async function backup(){
   await queue.catch(()=>{});
   await recoverBinaryRestore();
   const all=await chrome.storage.local.get(null),legacy={};
-  for(const [key,value] of Object.entries(all))if(key.startsWith('gather.')&&key!==WORKSPACE_KEY&&value!==null)legacy[key]=value;
+  for(const [key,value] of Object.entries(all))if(key.startsWith('gather.')&&key!==WORKSPACE_KEY&&key!==HISTORY_EPOCH_KEY&&value!==null)legacy[key]=value;
   return {format:'gather-backup',schemaVersion:1,createdAt:Date.now(),workspace:all[WORKSPACE_KEY]||emptyState(),legacy};
 }
 export function importBackup(value,stageId=null){
   validateBackup(value);
-  const operation=queue.catch(()=>{}).then(async()=>{
+  const operation=queue.catch(()=>{}).then(()=>withHistoryLock(async()=>{
     await recoverBinaryRestore();
     const all=await chrome.storage.local.get(null),idMap=new Map();
     if(stageId){const bundle=(await readCaptureSetting('restore-stage:'+stageId))?.value?.bundle,current=await snapshotCaptureBundle();for(const subject of bundle?.subjects||[])if(current.subjects.some(s=>s.id===subject.id)||all[WORKSPACE_KEY]?.projects?.length)idMap.set(subject.id,crypto.randomUUID());}
     const state=mergeWorkspace(all[WORKSPACE_KEY]||emptyState(),value.workspace,{idMap}),writes={[WORKSPACE_KEY]:state},conflicts={};
     for(const [key,original] of Object.entries(value.legacy)){
+      if(key===HISTORY_EPOCH_KEY)continue;
       const v=structuredClone(original);
+      if(key.startsWith('gather.batch.')&&v){delete v.historyEpoch;if(all[HISTORY_EPOCH_KEY])v.historyEpoch=all[HISTORY_EPOCH_KEY];}
       if(key.startsWith('gather.batch.')&&v.lookupContext){for(const field of ['scanId','projectId','originatingSearchId'])if(idMap.has(v.lookupContext[field]))v.lookupContext[field]=idMap.get(v.lookupContext[field]);}
-      if(all[key]===undefined)writes[key]=v;
+      if(all[key]==null)writes[key]=v;
       else if(JSON.stringify(all[key])!==JSON.stringify(v)){
         if(key.startsWith('gather.batch.')){const id=crypto.randomUUID();writes['gather.batch.'+id]={...v,id};}
         else conflicts[key]=v;
@@ -111,7 +114,7 @@ export function importBackup(value,stageId=null){
       await recoverBinaryRestore();
     }else await chrome.storage.local.set(writes);
     return {state,result:{imported:true,archivedSettings:Object.keys(conflicts).length,idMap:Object.fromEntries(idMap)}};
-  });queue=operation;return operation;
+  }));queue=operation;return operation;
 }
 export function createCase(input){
   const operation=queue.catch(()=>{}).then(async()=>{
@@ -123,21 +126,24 @@ export function createCase(input){
   });queue=operation;return operation;
 }
 export function closeProject(projectId,guard={}){
-  const operation=queue.catch(()=>{}).then(async()=>{
-    const previous=await readWorkspace();if(previous.revision!==guard.revision)throw new Error('Workspace changed after the backup. Export again before removing this project.');const next=withoutProject(previous,projectId),all=await chrome.storage.local.get(null),writes={[WORKSPACE_KEY]:next};
+  const operation=queue.catch(()=>{}).then(()=>withHistoryLock(async()=>{
+    const previous=await readWorkspace();if(previous.revision!==guard.revision)throw new Error('Workspace changed. Reopen Delete case to review the current data.');const next=withoutProject(previous,projectId),all=await chrome.storage.local.get(null),writes={[WORKSPACE_KEY]:next};
     // Null tombstones make interrupted removal idempotent; restoreBatch ignores them.
     const purgeScanIds=previous.scans.filter(s=>s.projectId===projectId).map(s=>s.id);for(const id of purgeScanIds)if(all['gather.search-draft.'+id]!==undefined)writes['gather.search-draft.'+id]=null;
     const removedBatches=[];for(const [key,value] of Object.entries(all))if(key.startsWith('gather.batch.')&&value?.lookupContext?.projectId===projectId){writes[key]=null;removedBatches.push(value.id);}
     if(removedBatches.includes(all['gather.quick']?.batchId))writes['gather.quick']={input:'',batchId:null};
+    const archivedBatches=new Set(removedBatches);for(const [key,value] of Object.entries(all))if(key.startsWith('gather.archive.'))scrubLookupArchive(value,(k,v)=>{if(k.startsWith('gather.batch.')&&v?.lookupContext?.projectId===projectId)archivedBatches.add(v.id);return false;});
+    for(const [key,value] of Object.entries(all))if(key.startsWith('gather.archive.')){const cleaned=scrubLookupArchive(value,(k,v)=>k.startsWith('gather.batch.')&&v?.lookupContext?.projectId===projectId||purgeScanIds.some(id=>k==='gather.search-draft.'+id)||k==='gather.quick'&&archivedBatches.has(v?.batchId));writes[key]=Object.keys(cleaned||{}).length?cleaned:null;}
     const bundle=await snapshotCaptureBundle(),deletedItems=new Set(previous.items.filter(i=>i.projectId===projectId).map(i=>i.id));
     if(bundle.subjects.some(s=>s.projectId!==projectId&&s.accountObservationIds.some(id=>deletedItems.has(id)))||bundle.captures.some(c=>c.projectId!==projectId&&[c.refs?.accountId,c.refs?.sourceId].some(id=>deletedItems.has(id))))throw new Error('Another project references this project’s findings. Review those explicit links before closing.');
-    const signature=projectSignature(bundle,projectId);if(await hashBytes(new Blob([signature]))!==guard.digest)throw new Error('Project images or roles changed after the backup. Export again before removing.');
+    const signature=projectSignature(bundle,projectId);if(await hashBytes(new Blob([signature]))!==guard.digest)throw new Error('Case images or roles changed. Reopen Delete case to review the current data.');
     const lock=(await chrome.storage.session.get('gather.captureLock'))['gather.captureLock'];if(lock){const seed=(await chrome.storage.session.get('gather.captureLaunch.'+lock.launchId))['gather.captureLaunch.'+lock.launchId];if(seed?.context.projectId===projectId)throw new Error('Finish or cancel the open capture before closing this project.');}
     const counts=await purgeProjectAssets(projectId,{writes,purgeProjectId:projectId,purgeScanIds,previous:Object.fromEntries(Object.keys(writes).filter(k=>all[k]!==undefined).map(k=>[k,all[k]]))},signature);await recoverBinaryRestore();
     await chrome.storage.session.remove('gather.case.'+projectId);const sessions=await chrome.storage.session.get(null);for(const [key,value]of Object.entries(sessions))if(key.startsWith('gather.captureLaunch.')&&value.context?.projectId===projectId)await chrome.storage.session.remove(key);
+    if(removedBatches.includes(sessions.quickRun?.batchId))await chrome.storage.session.remove('quickRun');
     await removeProjectTabContexts(projectId);
     return {state:next,result:{...counts,batches:removedBatches.length,remainingArchives:Object.keys(all).filter(k=>k.startsWith('gather.archive.')).length}};
-  });queue=operation;return operation;
+  }));queue=operation;return operation;
 }
 export async function launchQueued(id){
   const state=await readWorkspace(),row=state.research?.queue.find(q=>q.id===id);if(!row)throw new Error('Queued search is unavailable.');
@@ -146,8 +152,20 @@ export async function launchQueued(id){
   const result=await openSearch({scanId:row.scanId,provider:row.provider,query:row.tokenizedQuery,queueId:row.id});
   await dispatch({type:'research.queue',id,status:'launched',searchId:result.result.id});if(!state.research.coverage.some(c=>c.scanId===row.scanId&&c.subjectId===row.subjectId&&c.family===row.provider))await dispatch({type:'research.coverage',scanId:row.scanId,subjectId:row.subjectId,family:row.provider==='bing'?'google':row.provider,status:'Search launched'});return {state:await readWorkspace()};
 }
+export function saveSearchDraft(scanId,value){
+  const operation=queue.catch(()=>{}).then(async()=>{const state=await readWorkspace(),scan=state.scans.find(s=>s.id===scanId);if(scanId&&!scan)throw new Error('This scan was deleted.');
+    if(!value||typeof value.query!=='string'||value.query.length>2000||!['google','bing','instagram','facebook','tiktok','threads','youtube','x'].includes(value.provider))throw new Error('Invalid search draft.');
+    const area=state.projects.find(p=>p.id===scan?.projectId)?.mode==='ephemeral'?chrome.storage.session:chrome.storage.local;
+    await area.set({['gather.search-draft.'+(scanId||'inbox')]:{query:value.query,provider:value.provider}});return {ok:true};});queue=operation;return operation;
+}
+export function clearLookups(){
+  const operation=queue.catch(()=>{}).then(async()=>{await recoverBinaryRestore();return withHistoryLock(async()=>{const result=await clearHistoryRecords();await chrome.storage.session.remove('quickRun');return {result};});});queue=operation;return operation;
+}
 export async function handleWorkspace(message){
   switch(message.type){
+    case 'workspace.searchDraft': return saveSearchDraft(message.scanId,message.value);
+    case 'workspace.historySummary': return historySummary();
+    case 'workspace.clearLookups': return clearLookups();
     case 'workspace.closeProject': return closeProject(message.projectId,message.guard);
     case 'workspace.caseCreate': return createCase(message.input);
     case 'workspace.launchQueued': return launchQueued(message.id);

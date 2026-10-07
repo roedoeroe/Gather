@@ -38,6 +38,7 @@ function area(name) {
     async setAccessLevel() {}
   };
 }
+let lookupGate=null,lookupRelease=null;globalThis.testPauseLookup=()=>{lookupGate=new Promise(r=>lookupRelease=r);};globalThis.testReleaseLookup=()=>{lookupRelease?.();lookupGate=null;};
 const tabs = new Map([[10, {id:10, windowId:1, active:true, status:'complete', title:'Fictional profile', url:'https://www.instagram.com/alex.example/'}]]);
 let nextTab = 20;
 const tabEvents = {onRemoved:event(), onCreated:event(), onUpdated:event(), onActivated:event(), onReplaced:event()};
@@ -52,7 +53,7 @@ globalThis.chrome = {
     async update(id, patch) {const tab = tabs.get(id); if (!tab) throw new Error('No tab'); Object.assign(tab,patch); tabEvents.onUpdated.emit(id,patch,{...tab}); return {...tab};},
     async remove(id) {tabs.delete(id); tabEvents.onRemoved.emit(id);}
   },
-  scripting: {async executeScript() {return [{documentId:'fictional-document', result:{
+  scripting: {async executeScript() {if(lookupGate)await lookupGate;return [{documentId:'fictional-document', result:{
     url:'https://www.instagram.com/alex.example/',
     html:'<script type="application/json">{"user":{"username":"alex.example","id":"9007199254740993123","full_name":"Alex Example"}}</script>'
   }}];}},

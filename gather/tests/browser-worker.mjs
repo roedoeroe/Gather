@@ -94,7 +94,20 @@ try {
   const recovered=(await send({type:'workspace.state'})).state;assert.equal(recovered.revision,expected);assert.equal(recovered.tasks.filter(t=>t.title==='Recovered fictional task').length,1);
   assert.equal((await call('bundle')).captures.length,2);assert.equal((await call('session'))['gather.case.'+pid].names[role.id],'Alex Example');
   passed.push('Actual Chromium service-worker stop/restart replays a pending workspace journal once, retaining images and session context through controlled storage APIs.');
-  const guard=await call('guard',pid);await send({type:'workspace.closeProject',projectId:pid,guard});
+  // Privacy actions use the actual worker router while lookup work is delayed.
+  await call('pauseLookup');
+  const active=await send({type:'quick.start',input:'https://www.instagram.com/alex.example/',currentTabId:10,lookupContext:{projectId:pid,scanId:sid,startedAt:1780000000000}},'popup.html');assert.equal(active.busy,true);
+  const clearing=send({type:'workspace.clearLookups'});await call('releaseLookup');await clearing;
+  const cleared=await send({type:'quick.state'},'popup.html');assert.equal(cleared.batch,null);assert.equal(cleared.input,'');assert.equal(cleared.busy,false);
+  const late=await call('runtime',{message:{type:'history.flush',batch:active.batch},page:'index.html'});assert.match(late.error,/cleared/);
+  assert.deepEqual(await call('bundle'),bundle);assert.equal((await send({type:'workspace.state'})).state.revision,expected);
+  assert.ok(!(await call('local'))['gather.batch.'+active.batch.id]);
+  passed.push('Clear recent history stops delayed quick work, rejects stale full-tool flush and preserves case records, original image hashes and relationships in the real worker.');
+  await call('pauseLookup');
+  const next=await send({type:'quick.start',input:'https://www.instagram.com/alex.example/',currentTabId:10,historyEpoch:cleared.historyEpoch,lookupContext:{projectId:pid,scanId:sid,startedAt:1780000000000}},'popup.html');assert.equal(next.busy,true);
+  const guard=await call('guard',pid),deleting=send({type:'workspace.closeProject',projectId:pid,guard});await call('releaseLookup');await deleting;
+  const lateCase=await call('runtime',{message:{type:'history.flush',batch:next.batch},page:'index.html'});assert.match(lateCase.error,/deleted/);
+  passed.push('A fresh lookup works after clearing; deleting its case stops delayed work and rejects late case-linked saves without recreating case data.');
   const remaining=(await send({type:'workspace.state'})).state;
   assert.ok(!remaining.projects.some(p=>p.id===pid));assert.ok(remaining.projects.some(p=>p.name==='Southridge'));
   const after=await call('bundle');assert.ok(after.captures.every(c=>c.projectId!==pid));assert.equal(after.captures.length,1);

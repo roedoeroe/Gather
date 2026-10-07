@@ -2,7 +2,7 @@ import {cleanLookupContext,captureContext} from './lookup-context.js';
 import {readWorkspace} from './workspace-store.js';
 import {parseInput, normalizeProfile, applyLookup, idCheck} from './core.js';
 import {resolveProfile} from './resolver.js';
-import {storage, loadBatch, saveBatch} from './batches.js';
+import {storage, loadBatch, saveBatch, historyEpoch, saveLookupDraft} from './batches.js';
 import {trackTemporary, untrackTemporary, closeTemporary} from './tab-ownership.js';
 
 let active = null, commands = Promise.resolve();
@@ -18,6 +18,7 @@ async function recover() {
   }
 }
 async function lockBatch(id) {
+  if(!globalThis.navigator?.locks) return ()=>{};
   return new Promise((resolve, reject) => {
     navigator.locks.request('gather-batch-'+id, {ifAvailable:true}, async lock => {
       if (!lock) { reject(new Error('This batch is open in the full tool. Close that tab before retrying here.')); return; }
@@ -34,7 +35,7 @@ async function state() {
   // drafts and interrupted work; results remain in the saved batch.
   const completed = !active && batch?.entries.every(e=>['resolved','gone','error'].includes(e.status)) && previous.status!=='interrupted';
   const input = completed && quick.input===quick.submittedInput ? '' : quick.input;
-  return {input: typeof input === 'string' ? input.slice(0,100000) : '',
+  return {historyEpoch:await historyEpoch(),input: typeof input === 'string' ? input.slice(0,100000) : '',
     submittedInput: typeof quick.submittedInput === 'string' ? quick.submittedInput : null,
     batch,
     busy: Boolean(active), stopping: Boolean(active?.controller.signal.aborted),
@@ -76,7 +77,7 @@ async function run(job, retry) {
     await persist(job);
     if(!signal.aborted){
       const quick=(await storage.get('gather.quick'))['gather.quick'];
-      if(quick?.batchId===job.batch.id)await storage.set({'gather.quick':{...quick,input:''}});
+      if(quick?.batchId===job.batch.id)await saveLookupDraft('gather.quick',{...quick,input:''},job.batch.historyEpoch);
     }
     job.release(); active = null;
     await chrome.storage.session.set({quickRun:{batchId:job.batch.id, status:signal.aborted?'stopped':'done', warning:job.warning, autoCopy:job.autoCopy}});
@@ -105,19 +106,19 @@ async function start(message) {
         currentTabId=message.currentTabId;
       }catch{throw new Error('The current page changed. Open the profile and run it again.');}
     }
-    batch = {lookupContext:originalContext,id:crypto.randomUUID(), title:'', createdAt:Date.now(), updatedAt:Date.now(), entries:parsed.entries, invalid:parsed.invalid, duplicates:parsed.duplicates};
+    batch = {historyEpoch:message.historyEpoch,lookupContext:originalContext,id:crypto.randomUUID(), title:'', createdAt:Date.now(), updatedAt:Date.now(), entries:parsed.entries, invalid:parsed.invalid, duplicates:parsed.duplicates};
   }
   const release = await lockBatch(batch.id);
   let prefs;
   try {
     prefs = (await storage.get('gather.prefs'))['gather.prefs'] || {};
     await saveBatch(batch);
-    await storage.set({'gather.quick':{input, submittedInput:input, batchId:batch.id}});
+    await saveLookupDraft('gather.quick',{input, submittedInput:input, batchId:batch.id},batch.historyEpoch);
     await chrome.storage.session.set({quickRun:{batchId:batch.id, status:'running'}});
   } catch (error) { release(); throw error; }
   const job = {batch, controller:new AbortController(), release, saves:Promise.resolve(), warning:'', browserFallback:prefs.browserFallback !== false, autoCopy:prefs.autoCopy === true, currentTabId};
   active = job;
-  run(job, message.type === 'quick.retry').catch(async error => {
+  job.done=run(job, message.type === 'quick.retry').catch(async error => {
     job.release(); if (active === job) active = null;
     await chrome.storage.session.set({quickRun:{batchId:batch.id,status:'interrupted',warning:'Lookup interrupted. '+error.message}}).catch(() => {});
   });
@@ -140,11 +141,15 @@ export function handleQuick(message) {
   const action = async () => {
     await ready;
     switch (message.type) {
+      case 'quick.privacy': {
+        if(active&&(!message.projectId||active.batch.lookupContext?.projectId===message.projectId)){const job=active;job.controller.abort();await job.done;}
+        return message.operation();
+      }
       case 'quick.state': return state();
       case 'quick.draft': {
         if (active) return {ok:true};
         const previous=(await storage.get('gather.quick'))['gather.quick'] || {};
-        await storage.set({'gather.quick':{...previous,input:String(message.input || '').slice(0,100000), batchId:previous.batchId || null}});
+        await saveLookupDraft('gather.quick',{...previous,input:String(message.input || '').slice(0,100000), batchId:previous.batchId || null},message.historyEpoch);
         return {ok:true};
       }
       case 'quick.start': case 'quick.retry': return start(message);

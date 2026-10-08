@@ -1,6 +1,6 @@
 # What prevents testing the installed extension here?
 
-Checked October 8, 2026 against the current machine and Gather 1.8.6.
+Historical diagnosis checked October 8 UTC (October 7 in the user’s timezone) against this machine and Gather 1.8.6. Current release: [1.8.7 delivery](../../releases/1.8.7/Gather-1.8.7-DELIVERY.md), with 132 automated checks, 85 rendered groups and 10 worker groups passed; native installation remains blocked under the unchanged policy.
 
 “Browser acceptance” means checking Gather after installing it in Chrome/Edge: open the toolbar, select an area on a page, copy the screenshot, save it and check its destination. It is a testing step, not another product mode or a requirement to set up a case.
 
@@ -35,7 +35,7 @@ Evidence: [fresh results](evidence/browser-blocker-2026-10-08/README.md). Fetch 
 
 Use a disposable fictional page/case, not a real investigation:
 
-1. On the browser Extensions page confirm Gather **1.8.6**. If updating, replace all files in the same installed folder and Reload; keep stored data/profile intact. [Verified download and update instructions](../../releases/1.8.6/Gather-1.8.6-DELIVERY.md).
+1. On the browser Extensions page confirm Gather **1.8.7**. If updating, replace all files in the same installed folder and Reload; keep stored data/profile intact. [Verified download and update instructions](../../releases/1.8.7/Gather-1.8.7-DELIVERY.md).
 2. Open Gather on that page, choose the displayed scan and **Select area & copy**, drag a rectangle, and paste into a local image-capable app. The image should have the selected bounds, no selector overlay, and appear in that scan's Capture history.
 3. Choose **Save image**, then try Full page and Cancel. Verify the local image survives any denied save, Retry works, and the source scroll position is restored after Cancel.
 

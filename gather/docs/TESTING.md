@@ -55,3 +55,11 @@ Node 24.19.0, Python 3.12.14, supplied Playwright 1.62.1 and sandboxed Chromium 
 A toolbar assertion once inspected history during a second asynchronous rerender. It now waits for both expected groups before asserting; fresh source and extracted-package runs pass. Browser harnesses remove any prior results.json before running, so a failed command cannot leave a stale success report. The diagnostic failure is retained separately.
 
 Current logs/results/fictional screenshots are in `evidence/1.8.6`; prior evidence is preserved. Packaging verifies CRC, every runtime byte against SHA256.json, versions, entry points and archive paths. Installation/update/rollback are in README and the separate delivery receipt. Backup/workspace schemas stay compatible. No permission, dependency, network service or passive collection was added.
+
+## Fresh browser restriction diagnosis — October 8
+
+The six existing suites passed again: 130 Node, 71 rendered-browser groups and 10 worker groups. A further seven UI groups verify the repaired installed-runner journey through rendered/API-double fixtures (`node tests/browser-installed-ui.mjs` from `gather`); they are not native results or new runtime features. See [fresh evidence](evidence/browser-blocker-2026-10-08/README.md).
+
+The old `browser-acceptance.mjs` still used pre-redesign controls. It now follows current New case/Add/Findings/Settings navigation and uses a bounded worker wait. It checks Linux managed installation policy before launching, writes fresh structured results, and distinguishes **exit 2 blocked**, **exit 1 failed**, and **exit 0 completed**. The current wildcard policy produced a verified blocked result with no browser launch and zero native groups. Run it only for its stated installed workspace/worker smoke scope; native toolbar screenshot grants/OS dialogs and live profiles remain separate. [Plain-language explanation and supported path](BROWSER-TEST-BLOCKER.md).
+
+No new release was packaged for testing-tool changes. Runtime bytes and both 1.8.6 ZIP checksums/CRC were reverified unchanged. Fetch the maintained development branch for the latest runner and documentation.

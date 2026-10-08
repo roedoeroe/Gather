@@ -52,6 +52,8 @@ Current docs include the new audit and refinements to the Quick Parts contract; 
 
 ## Environment and delivery
 
+October 8 follow-up: diagnosed the installed-test block against the current machine and official Chromium policy, reran 130 Node / 71 rendered / 10 worker groups, and repaired stale installed-runner controls. Seven shared UI groups passed separately with API doubles; installed preflight correctly reports blocked/exit 2/zero native groups without launching. See [BROWSER-TEST-BLOCKER](BROWSER-TEST-BLOCKER.md) and [fresh evidence](evidence/browser-blocker-2026-10-08/README.md). Runtime/package bytes remain unchanged. ENVIRONMENT-SETUP is now current; a startup draft cannot override managed browser policy. Keep user explanations concrete: this restriction is in the cloud test machine, not evidence their Gather installation is broken.
+
 Use this isolated checkout; no new worktree unless requested. Node 24/Python 3, supplied Playwright 1.62.1 and sandboxed Chromium 151 `/usr/lib/chromium/chromium` support the documented six suites and Python packaging. No runtime install/server/bundler is needed. Harnesses manage temporary servers/profiles; no process must survive restoration. Ignore artifacts/chrome-docs-repo as an official documentation cache, not another Gather source.
 
 If a restored environment has main without gather, preserve edits and fetch/switch to the existing development branch without reset. Use platform HTTPS Git proxy authentication. Do not extract credentials or repeat permission requests. GitHub Release uploads previously returned 400 Bad Content-Length; versioned Git ZIP mirrors are the successful route. Git source publication, saved startup draft and cloud snapshot publication remain different actions.

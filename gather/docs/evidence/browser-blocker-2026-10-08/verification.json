@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-08",
+  "runtimeVersion": "1.8.6",
+  "nodeChecksPassed": 130,
+  "existingRenderedGroupsPassed": 71,
+  "workerGroupsPassed": 10,
+  "additionalRunnerUIGroupsPassed": 7,
+  "nativeInstalledGroupsPassed": 0,
+  "nativeStatus": "blocked-by-managed-policy",
+  "nativeExitCode": 2,
+  "runs": {
+    "capture": {
+      "groupsPassed": 21,
+      "nativeExtension": false,
+      "kind": "rendered-browser-with-extension-api-doubles"
+    },
+    "toolbar": {
+      "groupsPassed": 22,
+      "nativeExtension": false,
+      "kind": "rendered-browser-with-extension-api-doubles"
+    },
+    "case": {
+      "groupsPassed": 18,
+      "nativeExtension": false,
+      "kind": "rendered-browser-with-extension-api-doubles"
+    },
+    "stabilization": {
+      "groupsPassed": 10,
+      "nativeExtension": false,
+      "kind": "rendered-browser-with-extension-api-doubles"
+    },
+    "worker": {
+      "groupsPassed": 10,
+      "nativeExtension": false,
+      "kind": "real-service-worker-with-chrome-api-doubles"
+    },
+    "installed-ui": {
+      "groupsPassed": 7,
+      "nativeExtension": false,
+      "kind": "rendered-native-runner-ui-with-extension-api-doubles"
+    }
+  },
+  "runtimeBytesUnchanged": true,
+  "packageSHA256": {
+    "Gather-1.8.6-extension.zip": "b43ab9398f07a3b73dbc18fd79426c855f4572994a559571787a05a4e4db1a6a",
+    "Gather-1.8.6-development.zip": "102d3dd7c751c34f799e0cef51e081189feab1a06e8c62f82b052172e4e548f3"
+  },
+  "policyDefinition": "https://raw.githubusercontent.com/chromium/chromium/main/components/policy/resources/templates/policy_definitions/Extensions/ExtensionInstallBlocklist.yaml",
+  "visualInspection": [
+    "toolbar/direct-toolbar.png",
+    "installed-ui/workspace-desktop.png",
+    "installed-ui/workspace-narrow.png"
+  ]
+}

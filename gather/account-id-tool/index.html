@@ -32,6 +32,7 @@
       <div class="copy-options"><label for="copyMode" class="sr-only">Copy format</label><select id="copyMode"><option value="details">Account details</option><option value="ids">IDs only</option></select><label for="separator" class="sr-only">Separate IDs with</label><select id="separator" hidden><option value="newline">New lines</option><option value="comma">Commas</option><option value="space">Spaces</option></select><label id="namesOption" class="auto-label names-option" title="Show and include display names when copying or saving account details"><input id="includeNames" type="checkbox" role="switch" checked>Display names</label><button id="copyAll" class="primary-button">Copy list</button></div>
       <label class="auto-label"><input id="autoCopy" type="checkbox" role="switch">Auto-copy</label>
     </div>
+    <p class="quiet">Copied content leaves Gather and may remain in clipboard history.</p>
     <div class="result-status"><p id="summary" aria-live="polite"></p><div class="run-actions"><button id="retry" class="text-button" hidden>Retry unfinished</button><button id="recheck" class="text-button" hidden>Recheck</button><button id="stop" class="text-button" hidden>Stop</button></div></div>
     <button id="issuesButton" class="issue-button" hidden></button>
     <ul id="accountList" class="account-list" aria-label="Accounts"></ul>

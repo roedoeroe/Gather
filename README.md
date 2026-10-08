@@ -6,15 +6,17 @@ A local browser extension for fast account lookup, deliberate research and scree
 
 ## Get the current build
 
-**[Download Gather 1.8.11](https://raw.githubusercontent.com/roedoeroe/Gather/29dd714087235820d389996d85b9178fa5ee2f15/releases/1.8.11/Gather-1.8.11-extension.zip)** · Development build for Chrome and Edge
+**[Download Gather 1.8.12](releases/1.8.12/Gather-1.8.12-extension.zip)** · Development checkpoint for Edge and Chrome
 
-[Source/test package](releases/1.8.11/Gather-1.8.11-development.zip) · [SHA-256 checksums](releases/1.8.11/Gather-1.8.11-SHA256SUMS.txt) · [Delivery notes](releases/1.8.11/Gather-1.8.11-DELIVERY.md)
+[Source/test package](releases/1.8.12/Gather-1.8.12-development.zip) · [SHA-256 checksums](releases/1.8.12/Gather-1.8.12-SHA256SUMS.txt) · [Delivery notes](releases/1.8.12/Gather-1.8.12-DELIVERY.md)
 
-Choose `Gather-1.8.11-extension.zip`, extract it to a permanent folder, and load its **account-id-tool** directory from your browser's Extensions page with Developer mode enabled. For an update, replace all files at the same installed path and Reload; do not uninstall or clear storage. See the [installation and rollback guide](gather/README.md#install-or-update).
+The new [Edge-first R4 review](gather/docs/R4-WORKFLOW-RECONCILIATION.md) records reported Instagram/selection issues and the next workflow fixes. **1.8.12 is not R4-complete or native-Edge-verified.**
 
-The development source is maintained on **develop/1.8.0-r3**; the branch name is historical, while the current extension version is **1.8.11**. Delivery notes pin release ZIPs to their source/package commit. Main is unchanged.
+Choose `Gather-1.8.12-extension.zip`, extract it to a permanent folder, and load its **account-id-tool** directory from your browser's Extensions page with Developer mode enabled. For an update, replace all files at the same installed path and Reload; do not uninstall or clear storage. See the [installation and rollback guide](gather/README.md#install-or-update).
 
-1.8.11 launches searches without saved queries/drafts, adds reverse-image provider launching and reads missing profile source automatically. Gray field examples and clear saved-item labels improve everyday use; capture history refreshes without flicker. No new permissions. Old search text is cleaned up while deliberate findings/images remain. See the [search and lookup changes](gather/docs/SEARCH-AND-LOOKUP-1.8.11.md).
+The development source is maintained on **develop/1.8.0-r3**; the branch name is historical, while the current extension version is **1.8.12**. Delivery notes pin release ZIPs to their source/package commit. Main is unchanged.
+
+1.8.12 preserves the search/capture improvements and tightens privacy boundaries: anonymous profile fetches, ID parsing inside the requested page, stricter storage/messages, clear unencrypted-backup wording and a package check for accidental private files. No new permissions or cloud endpoint. See the [hardening review](gather/docs/HARDENING-REVIEW-1.8.12.md).
 
 ## Capture directly from the toolbar
 
@@ -30,7 +32,7 @@ Workspace → **Settings → Data & Privacy** offers red **Delete case…** and 
 
 ## Verification
 
-The 1.8.11 release passed **178 automated tests**, **105 rendered-browser scenario groups** and **10 actual service-worker groups**. Sixteen image-tool groups also passed at 2× device scale. Browser journeys use controlled Chrome API doubles with real DOM, canvas, clipboard and IndexedDB. Native Edge/Chrome installation is blocked by this runner's administrator policy; OS paste/save/print and managed Edge behavior remain unverified. See [test evidence](gather/docs/TESTING.md) and the [short local checklist](gather/docs/LOCAL-ACCEPTANCE.md).
+The 1.8.12 release passed **191 automated tests**, **105 rendered-browser scenario groups** and **10 actual service-worker groups**. Five additional real Chromium isolated-world parser groups passed with fictional intercepted network. Sixteen image-tool groups also passed at 2× device scale. Browser journeys use controlled Chrome API doubles with real DOM, canvas, clipboard and IndexedDB. Native Edge/Chrome installation is blocked by this runner's administrator policy; OS paste/save/print and managed Edge behavior remain unverified. See [test evidence](gather/docs/TESTING.md) and the [short local checklist](gather/docs/LOCAL-ACCEPTANCE.md).
 
 ## Continue development
 
@@ -41,6 +43,6 @@ The 1.8.11 release passed **178 automated tests**, **105 rendered-browser scenar
 - [Goals audit: original workflow, later requests and remaining work](gather/docs/GOALS-AUDIT.md)
 - [Whole-workflow usability audit and retained priorities](gather/docs/USABILITY-AUDIT.md)
 - [Product direction](gather/docs/PRODUCT-DIRECTION.md)
-- [Proposed Quick Parts / Reference Library](gather/docs/QUICK-PARTS-DIRECTION.md) — local search and reviewed composition; **not included in 1.8.11**
+- [Proposed Quick Parts / Reference Library](gather/docs/QUICK-PARTS-DIRECTION.md) — local search and reviewed composition; **not included in 1.8.12**
 
 The extension has no runtime dependencies, bundler or server. From `gather`, run `node --test tests/*.test.mjs` and `python3 scripts/package.py`. Browser validation setup is documented in the testing guide. Public fixtures contain invented data only.

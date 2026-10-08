@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "tests": 191,
+  "failed": 0,
+  "skipped": 0,
+  "sourceRunExit": 0,
+  "extractedRunExit": 0,
+  "scope": "Node deterministic fixtures; no live platform or native extension claim"
+}

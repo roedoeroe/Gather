@@ -1,5 +1,7 @@
 # Gather goals audit — 1.6.1 through 1.8.6
 
+Latest steering: read [R4 workflow reconciliation](R4-WORKFLOW-RECONCILIATION.md) first. It narrows the product to Edge utilities and supersedes older coverage/intake/composer priorities. The signed-in Instagram and horizontal-selection defects reported there remain open; 1.8.12 is a tested development checkpoint, not completion of R4.
+
 Audited 2026-10-07 against source HEAD `f1047f266033c1c0b28d6bbb3f392cf010a756a0`, the visible conversation, unique supplied continuation/design documents, and saved release evidence. This is a documentation reconciliation, not another runtime release. Runnable version remains **1.8.6** on `develop/1.8.0-r3`; published ZIPs remain unchanged.
 
 ## What this audit establishes
@@ -172,3 +174,7 @@ This is a bounded usability checkpoint, not completion of the Reference Library,
 The user’s latest instruction supersedes automatic search logging and draft retention from earlier milestones. Search the web opens a new tab, and reverse-image search opens the chosen provider; neither creates search records or saves the entered query. Session-only project/scan assignments preserve filing. Existing legacy query text is removed without breaking saved evidence references. Deliberate case intake/plans and saved findings remain distinct. Gray placeholder examples now support persistent labels. Missing hydrated IDs trigger a bounded automatic same-document source read, with exact-account guards. Capture history now refreshes atomically. See [the release implementation note](SEARCH-AND-LOOKUP-1.8.11.md).
 
 Retained priorities remain selected-result saving, local generic Quick Parts, confirmed-identifier scan carry-forward and provenance. User-owned query recipes must obey launch-only query privacy. Do not reintroduce automatic search history, require manual page source for normal lookup, add automatic redaction, or replace the extension with a hosted product.
+
+## 1.8.12 hardening follow-through
+
+Working 1.8.11 retained as checkpoint; privacy boundaries hardened without new workflow features. Public fetch is anonymous, page parsing returns minimal validated results, storage/messages and packaging are restricted. Clear backup/clipboard limits accompany existing manual redaction and red deletion controls. Local does not mean encrypted or legally compliant. Next priority is permitted installed Edge verification and organization deployment requirements before returning to retained product features. See HARDENING-REVIEW-1.8.12.md; no earlier worthwhile goal is silently marked shipped.

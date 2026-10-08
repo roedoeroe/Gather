@@ -1,3 +1,4 @@
+import {validateMessage,restrictStorageAccess} from './message-boundary.js';
 import {handleWorkspace, readWorkspace, dispatch, updateSaveMenu} from './workspace-store.js';
 import {trackTemporary, untrackTemporary, tabRemoved} from './tab-ownership.js';
 import {saveBatch,saveLookupDraft} from './batches.js';
@@ -16,7 +17,21 @@ async function openFull(batchId) {
     await chrome.windows.update(match.windowId,{focused:true});
   } else await chrome.tabs.create({url});
 }
-chrome.runtime.onMessage.addListener((message, sender, reply) => {
+// Reapply on every worker lifecycle, not only installation. Keep a handled
+// promise and refuse worker operations on failure without leaking raw errors.
+const storageReady=restrictStorageAccess().then(()=>null,error=>error);
+chrome.runtime.onMessage.addListener((message,sender,reply)=>{
+  const allowed=['index.html','popup.html','workspace.html','capture.html','evidence.html'];
+  if(sender.id!==chrome.runtime.id||!allowed.some(p=>sender.url?.split(/[?#]/)[0]===chrome.runtime.getURL(p)))return;
+  try{validateMessage(message);}catch(error){reply({error:error.message});return false;}
+  storageReady.then(error=>{
+    if(error){reply({error:error.message});return;}
+    try{if(routeMessage(message,sender,reply)!==true)reply({error:'This Gather action is not available from this page.'});}
+    catch{reply({error:'Gather could not process this action.'});}
+  });
+  return true;
+});
+function routeMessage(message, sender, reply) {
   if (sender.id !== chrome.runtime.id) return;
   const page = sender.url?.split(/[?#]/)[0];
   const full = page === chrome.runtime.getURL('index.html');
@@ -46,7 +61,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (!full || !sender.tab || !['trackTab','untrackTab'].includes(message?.type) || !Number.isInteger(message.tabId)) return;
   const action = message.type === 'trackTab' ? trackTemporary : untrackTemporary;
   action(message.tabId,sender.tab.id).then(()=>reply({ok:true}),()=>reply({ok:false}));return true;
-});
+}
 chrome.tabs.onRemoved.addListener(id=>{tabRemoved(id).catch(()=>{});removeTabContext(id).catch(()=>{});});
 chrome.windows.onRemoved?.addListener(id=>{captureWindowRemoved(id).catch(()=>{});});
 chrome.tabs.onCreated?.addListener(tab=>{inheritTabContext(tab).catch(()=>{});});
@@ -61,13 +76,13 @@ chrome.runtime.onInstalled.addListener(()=>{
     chrome.contextMenus.create({id:'gather-case-selection',title:'Case Start from selected text…',contexts:['selection'],documentUrlPatterns:['http://*/*','https://*/*']});
     chrome.contextMenus.create({id:'gather-screenshot',title:'Capture visible page in Gather',contexts:['page'],documentUrlPatterns:['http://*/*','https://*/*']});
   });
-  chrome.storage.local.setAccessLevel({accessLevel:'TRUSTED_CONTEXTS'}).catch(()=>{});
 });
 chrome.storage.onChanged.addListener((changes,area)=>{
   if(area==='local'&&changes['gather.workspace.v1'])updateSaveMenu().catch(()=>{});
   if(area==='session'&&changes[TAB_CONTEXT_KEY])updateSaveMenu().catch(()=>{});
 });
-chrome.contextMenus.onClicked.addListener((info,tab)=>{
+chrome.contextMenus.onClicked.addListener(async(info,tab)=>{
+  if(await storageReady){chrome.action.setBadgeText({text:'!'}).catch(()=>{});return;}
   if(info.menuItemId==='gather-case-selection'){chrome.storage.session.set({'gather.caseSelection':{text:String(info.selectionText||'').slice(0,100000)}}).then(()=>chrome.tabs.create({url:chrome.runtime.getURL('workspace.html')})).catch(()=>{});return;}
   if(info.menuItemId==='gather-screenshot'){launchCapture({mode:'visible',tabId:tab.id}).catch(async error=>{await chrome.storage.session.set({gatherCaptureError:error.message});chrome.action.setBadgeText({text:'!'}).catch(()=>{});});return;}
   if(info.menuItemId!=='gather-save')return;

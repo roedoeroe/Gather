@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "groups": 5,
+  "passed": [
+    "Actual isolated-world parser returns exact ID and status only; page main world cannot access reader and no HTML/session sentinel returns.",
+    "Display name returns only when requested; exact numeric ID remains a string.",
+    "Automatic source fallback makes only the requested same-origin GET and returns the minimal parsed result; all network is intercepted fictionally.",
+    "Real DOM sign-in screen gives a bounded recovery error without an ID.",
+    "Conflicting account data is rejected by the same generated adapter running in Chromium."
+  ],
+  "scope": "Real Chromium isolated world; mocked network; no native extension or live platform"
+}

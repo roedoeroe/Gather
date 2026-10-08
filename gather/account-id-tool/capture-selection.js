@@ -23,7 +23,7 @@ export function pageSelectionOperation(operation,token,options={}){
     const node=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
     const dialog=node('dialog'),surface=node('div',null,'surface'),outline=node('div',null,'rect'),horizontal=node('div',null,'guide horizontal'),vertical=node('div',null,'guide vertical'),tools=node('section',null,'tools'),row=node('div',null,'row'),cancel=node('button','Cancel'),details=node('details'),form=node('form'),error=node('p',null,'error'),size=node('p','Drag, then scroll or hold near an edge to extend the area.','hint');
     size.setAttribute('aria-live','polite');cancel.type='button';dialog.setAttribute('aria-label','Select a screenshot area');row.append(node('strong','Drag to capture'),cancel);
-    tools.append(row,node('p','Saved to '+(options.destination||'Gather')+' · Esc cancels','hint'),size);
+    tools.append(row,node('p','Saved in Gather · Esc cancels','hint'),size);
     details.append(node('summary','Precise selection · keyboard'));
     const fields={};for(const [key,label,value]of [['x','Left',viewport.scrollX],['y','Top',viewport.scrollY],['width','Width',Math.min(400,viewport.width)],['height','Height',Math.min(300,viewport.height)]]){
       const field=node('label',label),input=node('input');input.type='number';input.value=value;input.min=['width','height'].includes(key)?1:0;input.max=['x','width'].includes(key)?viewport.scrollX+viewport.width:pageHeight;input.required=true;field.append(input);fields[key]=input;form.append(field);
@@ -70,7 +70,7 @@ export async function selectPageArea({source,signal,destination,token=crypto.ran
   chrome.tabs.onActivated.addListener(activated);chrome.tabs.onUpdated.addListener(updated);signal?.addEventListener('abort',cancel,{once:true});
   try{
     await api.assertSource();if(signal?.aborted)throw new CaptureStopped();
-    const rows=await chrome.scripting.executeScript({target:{tabId:source.tabId},func:pageSelectionOperation,args:['start',token,{destination}]});
+    const rows=await chrome.scripting.executeScript({target:{tabId:source.tabId},func:pageSelectionOperation,args:['start',token,{}]});
     const result=rows[0]?.result;if(signal?.aborted||stopping||!result?.ok)throw new CaptureStopped(result?.message||'Selection was interrupted.');
     await api.assertSource();return {...result,documentId:rows[0].documentId};
   }finally{cancel();api.dispose();chrome.tabs.onActivated.removeListener(activated);chrome.tabs.onUpdated.removeListener(updated);signal?.removeEventListener('abort',cancel);}

@@ -1,0 +1,38 @@
+# Gather data flow and storage inventory
+
+Review baseline: 1.8.11, commit bd02c1566e0c8d01bf8f3826438829647533467d, 2026-10-08. Prepared before 1.8.12 implementation; final changes and evidence are in HARDENING-REVIEW-1.8.12.md. Case data is local; local does not mean encrypted, anonymous, or inaccessible to the computer's users/administrators.
+
+| Data | Origin and purpose | Lifetime / location | Boundary and deletion |
+|---|---|---|---|
+| Raw intake | Analyst paste for explicit review | Dialog memory; selected-page intake briefly in chrome.storage.session | Not sent to sites; discard on review/cancel; session clears on reload/restart. Approved fields have their own retention. |
+| Ephemeral case names, roles, identifiers, queued search terms | Analyst-approved case fields | Session overlay; durable role/record IDs preserve relationships | Names released on browser restart/reload. Saved URLs, notes, findings, pixels, and exports can still identify people. Ephemeral is not an anonymous case. |
+| Local case fields | Explicit retained-case choice | chrome.storage.local workspace JSON (4 MiB cap) | Retained until case deletion/reset; no cloud sync. Local profile/OS backups may retain copies. |
+| Saved findings, account observations, notes, tasks, coverage, changes | Deliberate save / analyst-confirmed status | Workspace JSON; historical lookup batches capped at 50 | IDs remain exact strings; no identity merging. Clear recent lookups does not delete saved findings; case deletion removes associated records. |
+| Lookup input, results and display names | Explicit current-profile/pasted-list lookup | Draft/history local storage, quick-operation state in session; ephemeral case overlay where applicable | Clear recent lookup history releases drafts/results and blocks late writers using generations. Deliberately saved observations remain. |
+| Web/image search | Analyst types query or chooses provider | DOM-only query; URL passed to tab creation, no retained Gather query/log | Provider and browser receive query. Browser history, account history and provider retention are separate. Legacy query text/drafts are scrubbed; empty reference IDs can remain for relationships. |
+| Page HTML / profile source | Explicit ID lookup | Bounded 15M characters, memory only, never stored/logged | Baseline transfers source from injected page reader to extension. Planned in-page extraction returns small structured result only. Same-page source GET uses normal same-origin login; anonymous extension GET will omit cookies. |
+| Tab assignments | Explicit assignment, Gather-launched tab, reliable opener relationship | chrome.storage.session project/scan IDs | No URL/timing guesses; restart/reset/closed-tab pruning. Context is not discovery proof. |
+| Capture metadata | Explicit screenshot | IndexedDB captures: URL/title/time/coordinates/hash/context/status | Source can identify people. Frozen IDs do not follow later global destination changes. Case/capture deletion removes metadata and assets. |
+| Original pixels / tiles | captureVisibleTab after user invocation | IndexedDB blobs; 64 MiB asset / 192 MiB capture / 512 MiB total | Never base64 workspace JSON; originals immutable. May contain names, faces, school details or session-visible content. Manual redactions produce derivatives. |
+| Derivatives | Analyst edits/crops/redacts | Separate IndexedDB blobs, parent IDs, operations; selected share asset | Copy/save/print prefer selected derivative. Missing selected derivative fails rather than falling back to original. Original remains for private backup. |
+| Subjects | Explicit association; no inferred identity | IndexedDB stable IDs/project membership plus session name overlays | Rename preserves history. Subject roles and durable names depend on retention selection. |
+| Clipboard | Explicit Copy or enabled Auto-copy | OS clipboard and possible clipboard history/sync | Outside Gather after copying. Not erased by Gather deletion; no silent clipboard reads. |
+| Downloads, folder exports, reports | Explicit export or enabled automatic export | Downloads-relative paths via downloads API; opaque IDs in folders | Selected image + record sidecar; record may contain URL/context. Browser downloads, external copies and OS backups are outside Gather deletion. Custom roots are not supported. |
+| All-work / case backup | Explicit backup | Unencrypted .gather container with workspace, originals, derivatives and relationships | Anyone who obtains the file may read it. Exported separately, not deleted with case. Restore is bounded and validates references/hash/size with recovery journal. |
+| Settings / tombstones / restore journal | Preferences, deletion and recovery guards | local/session and IndexedDB settings | Operational IDs prevent resurrection; no passive browsing. Tombstones may survive deletion without case content. |
+| Organization reference packs | Future local Quick Parts feature | Not implemented | Keep proprietary content outside public source and separate from cases; no live OneNote/AI dependency. |
+| Diagnostics / test evidence | Local tests using fictional fixtures | Ignored artifacts and reviewed public summaries/screenshots | No telemetry/support upload. Do not publish real URLs, account IDs, source dumps, clipboard, names or images. |
+
+## Network and permissions
+
+No telemetry, Gather server, cloud case storage, storage.sync, image upload, WebSocket, or background browsing collection was found in production code. This is a source review finding, not an unrestricted network audit. Navigation and platform page subresources are normal browser traffic.
+
+- Profile lookup: HTTPS to normalized Instagram, Facebook, Threads, TikTok and YouTube profiles; source readers bounded by time/size and stop at login/challenge/ambiguous IDs. X has search only.
+- Search: explicit browser tabs to configured search services; reverse image opens Google Images/Lens, Lenso.ai, Bing, Yandex, Baidu, Sogou, TinEye or Shutterstock. User decides whether to upload on that site; Gather transfers no image.
+- Capture engine fetches its own data URL to decode pixels, not a remote endpoint. Blob URLs stay local. Downloads API writes files; no arbitrary absolute paths.
+- Permissions retained: activeTab (explicit toolbar/context invocation), scripting (profile/page capture helpers), storage, clipboardWrite, sidePanel, contextMenus, downloads. Six platform host patterns support explicit ID lookup. No tabs, history, cookies, clipboardRead, webRequest, debugger, all-URLs, external messaging or remote code permissions.
+- current-profile source fetch needs the user's same-origin session to reproduce the page they explicitly requested; it never automates login or sends case fields. Public pasted-profile fetch should be anonymous first. Optional browser fallback opens the requested profile in the user's regular browser session and closes only its own tab.
+
+## Access and retention limits
+
+Chrome extension pages and service worker are trusted contexts. Injected scripts are less trusted and should receive no case names or complete workspace. IndexedDB is extension-origin storage; chrome.storage.local/session access is to be locked at every worker start. No at-rest encryption is implemented. A compromised OS, browser profile, extension update, developer-tools session, clipboard-sync service or downloaded backup is outside these controls. Retention is manual, not a legal retention schedule. Deletion is logical removal with late-write guards, not forensic erasure; use organizational endpoint controls for device storage, backups, access and disposal.

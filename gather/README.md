@@ -1,8 +1,12 @@
-# Gather 1.8.11 — search without a saved trail
+# Gather 1.8.12 — local workflow hardening
 
 Gather is a browser extension for project-free account lookup, deliberate research and screenshot capture. Case data stays in the browser on your computer. Gather has no case server, cloud sync or analytics. The public GitHub repository contains source and fictional test data, not your cases. Searches and profile lookups contact the services you choose; exported files are separate local copies.
 
-## Changes in 1.8.11
+## Changes in 1.8.12
+
+Profile lookup now parses inside an isolated page environment and returns small structured results. Anonymous profile requests omit cookies; explicitly enabled browser fallback remains available. Storage and messages have stricter boundaries, backups clearly say they are unencrypted, and packaging rejects common private files/credential patterns. Capture, editing, copy preferences, saved research and local deletion keep their existing workflows. No new permissions or cloud endpoint.
+
+## Preserved from 1.8.11
 
 - Web searches open a new tab without saving the query, a draft or a launch log. Related tabs keep only their filing context for the browser session.
 - Reverse image search sits beside Search the web: Google Lens, Lenso.ai, Bing, Yandex, Baidu, Sogou, TinEye and Shutterstock. Choose/upload the image on the provider’s website; Gather uploads nothing automatically.
@@ -43,11 +47,11 @@ The 1.8.1 fixes remain: static service-worker imports and stable 420 px popup si
 
 ## Install or update
 
-1. Extract `Gather-1.8.11-extension.zip` into a permanent directory.
+1. Extract `Gather-1.8.12-extension.zip` into a permanent directory.
 2. Open `chrome://extensions` or `edge://extensions`, enable Developer mode, choose **Load unpacked**, and select **account-id-tool** containing `manifest.json`.
 3. Pin Gather. Open a supported profile → Gather → inspect/copy. Chrome 116+ or compatible Edge is required.
 
-For an existing installation, preserve its folder and optionally back up work before updating. Finish captures and close Gather windows. Replace **all files in the same installed directory**, then Reload on the Extensions page and confirm **1.8.11**. Do not uninstall or clear browser storage. Extension reload/update clears Ephemeral Case session values; durable findings and images remain. If an older startup error prevents backup, preserve the browser profile/storage and update in place.
+For an existing installation, preserve its folder and optionally back up work before updating. Finish captures and close Gather windows. Replace **all files in the same installed directory**, then Reload on the Extensions page and confirm **1.8.12**. Do not uninstall or clear browser storage. Extension reload/update clears Ephemeral Case session values; durable findings and images remain. If an older startup error prevents backup, preserve the browser profile/storage and update in place.
 
 Rollback: retain the preserved 1.8.10 package and its matching pre-update backup. Test the older release in a **separate clean browser profile**, restoring its matching backup. Retain the current profile until recovery is verified. Older versions do not enforce all current clipboard and privacy guards; do not downgrade in place or let 1.7.x rewrite R3 records. Deletion without backup cannot be undone.
 
@@ -83,8 +87,10 @@ GATHER_TEST_DPR=2 node tests/browser-image-tools.mjs
 python3 scripts/package.py
 ```
 
-**178 Node checks, 105 unique rendered groups and 10 actual Chromium worker groups passed**. Sixteen image-tool groups repeated at 2× device scale are not counted twice. Native extension APIs are doubles; canvas, PNG bytes, clipboard, IndexedDB and applicable worker lifecycle are real. One anonymous source read of the user-authorized Instagram profile returned HTTP 200 and an exact string ID using the matched profile-route parser. Raw live source/IDs were not retained or packaged. This does not test the installed Edge flow or other live adapters.
+**191 Node checks, 105 unique rendered groups and 10 actual Chromium worker groups passed**. Sixteen image-tool groups repeated at 2× device scale are not counted twice. Native extension APIs are doubles; canvas, PNG bytes, clipboard, IndexedDB and applicable worker lifecycle are real. One anonymous source read of the user-authorized Instagram profile returned HTTP 200 and an exact string ID using the matched profile-route parser. Raw live source/IDs were not retained or packaged. This does not test the installed Edge flow or other live adapters.
 
 This cloud Chromium blocks unpacked extension installation by administrator policy. Native Edge screenshots, activeTab invocation, OS application paste/save/print, native zoom and screen readers remain unverified. No universal guarantee or legal compliance certification is implied. [TESTING](docs/TESTING.md) records scope; [LOCAL-ACCEPTANCE](docs/LOCAL-ACCEPTANCE.md) gives the remaining installed-browser steps.
 
 Node 24, Python 3, supplied Playwright 1.62.1 and sandboxed Chromium 151 were used. Versioned packages, checksums and handoff accompany the release. Earlier packages remain immutable. Source publication stays on `develop/1.8.0-r3`; main is unchanged. Quick Parts and older retained goals remain in [PRODUCT-DIRECTION](docs/PRODUCT-DIRECTION.md) / [GOALS-AUDIT](docs/GOALS-AUDIT.md), not silently claimed shipped.
+
+1.8.12 hardening: see [review](docs/HARDENING-REVIEW-1.8.12.md) for credential omission, in-page parsing, storage/message restrictions, package privacy gate and remaining limits.

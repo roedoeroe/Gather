@@ -380,7 +380,7 @@ $('download').addEventListener('click',()=>{
   const title=batch.title||'Gather batch';
   const text='Batch: '+title+'\nSaved: '+new Date(batch.updatedAt||batch.createdAt).toLocaleString()+'\n\n'+detailsOutput();
   const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
-  const link=document.createElement('a');link.href=url;link.download=title.replace(/[<>:"/\\|?*\u0000-\u001f]/g,'-').slice(0,80)+'.txt';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const link=document.createElement('a');link.href=url;link.download='Gather-accounts-'+new Date().toISOString().replace(/[:.]/g,'-')+'.txt';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
 window.addEventListener('beforeunload',event=>{
   clearTimeout(titleTimer);

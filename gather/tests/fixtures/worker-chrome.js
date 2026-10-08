@@ -1,3 +1,4 @@
+import * as core from './core.js';
 // Chrome API doubles only. Loaded before the real background module in a REAL
 // ServiceWorkerGlobalScope; IDB, Web Locks and module restrictions are native.
 export function event() {
@@ -53,10 +54,7 @@ globalThis.chrome = {
     async update(id, patch) {const tab = tabs.get(id); if (!tab) throw new Error('No tab'); Object.assign(tab,patch); tabEvents.onUpdated.emit(id,patch,{...tab}); return {...tab};},
     async remove(id) {tabs.delete(id); tabEvents.onRemoved.emit(id);}
   },
-  scripting: {async executeScript() {if(lookupGate)await lookupGate;return [{documentId:'fictional-document', result:{
-    url:'https://www.instagram.com/alex.example/',
-    html:'<script type="application/json">{"user":{"username":"alex.example","id":"9007199254740993123","full_name":"Alex Example"}}</script>'
-  }}];}},
+  scripting: {async executeScript(options) {if(lookupGate)await lookupGate;if(options.files)return [{documentId:'fictional-document'}];if(options.func?.name!=='readProfileResult')return [{documentId:'fictional-document',result:true}];return [{documentId:'fictional-document', result:core.extractId('<script type="application/json">{"user":{"username":"alex.example","id":"9007199254740993123","full_name":"Alex Example"}}</script>',core.normalizeProfile(options.args[0]))}];}},
   windows: {onRemoved:event(), async get(){return {id:1};}, async create(){return {id:2};}, async update(){}},
   contextMenus: {onClicked:event(), async update(){}, removeAll:fn=>fn(), create:(_,fn)=>fn?.()},
   action:{async setBadgeText(){}}, sidePanel:{async open(){}}

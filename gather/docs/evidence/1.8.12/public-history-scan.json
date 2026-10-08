@@ -1,0 +1,12 @@
+{
+  "scope": "All reachable refs/local Git objects; unique blobs, including nested release ZIPs; no values printed",
+  "counts": {
+    "objects": 953,
+    "blobs": 742,
+    "archives": 20,
+    "bytes": 129015939
+  },
+  "issues": [],
+  "limits": "Path/credential pattern scan cannot classify names, screenshots or proprietary prose.",
+  "manualReview": "Reviewed source/test evidence provenance and three current screenshots. Did not visually inspect every historical pixel."
+}

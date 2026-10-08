@@ -1,6 +1,6 @@
 // Conservative adapter contract. Missing IDs, HTTP status and generic page text
 // never establish that an account is gone.
-export const ADAPTER_VERSION = '1.8.11';
+export const ADAPTER_VERSION = '1.8.12';
 export const ACCOUNT_STATES = ['AVAILABLE','PRIVATE_INACCESSIBLE','GONE','UNKNOWN_TECHNICAL'];
 export function confirmedGone(roots, profile, current) {
   if (profile.platform !== 'youtube' || current.key !== profile.key) return null;

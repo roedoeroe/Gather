@@ -1,5 +1,5 @@
 import {extractId, normalizeProfile, pageAccessIssue} from './core.js';
-import {readProfileSource} from './read-profile-source.js';
+import {readProfileInPage} from './profile-read-client.js';
 
 export const isExtension = Boolean(globalThis.chrome?.runtime?.id && globalThis.chrome?.scripting);
 const ownedTabs = new Set();
@@ -25,7 +25,7 @@ async function fetchSource(profile, signal) {
   try {
     check(signal);
     // Only normalized, allowlisted profile URLs ever reach this function.
-    const response = await fetch(profile.url, {credentials: 'include', signal: controller.signal, redirect: 'follow', cache: 'no-store'});
+    const response = await fetch(profile.url, {credentials: 'omit', signal: controller.signal, redirect: 'follow', cache: 'no-store'});
     if (!response.ok) return {error: `The site returned HTTP ${response.status}. Open the profile to check its response, then retry.`};
     if (!response.body) return {error: 'The site returned no page source'};
     const reader = response.body.getReader(), decoder = new TextDecoder(); let html = '';
@@ -45,7 +45,7 @@ async function fetchSource(profile, signal) {
   } finally { clearTimeout(timer); signal?.removeEventListener('abort', abort); }
 }
 
-async function readBrowserPage(profile, signal, onStage, tabOwner) {
+async function readBrowserPage(profile, signal, onStage, tabOwner, includeName) {
   check(signal);
   const tab = await chrome.tabs.create({url: profile.url, active: false});
   ownedTabs.add(tab.id);
@@ -63,13 +63,9 @@ async function readBrowserPage(profile, signal, onStage, tabOwner) {
       let actual;
       try { actual = normalizeProfile(state.url); } catch { return {error: pageAccessIssue('',state.url)||'The browser page did not return a supported profile URL. Open the intended profile and retry.'}; }
       if (actual.platform !== profile.platform) return {error: 'The profile redirected outside its platform'};
-      const results = await chrome.scripting.executeScript({
-        target: {tabId: tab.id},
-        func: () => ({html: document.documentElement.outerHTML.slice(0, 15000001), url: location.href})
-      });
+      const snapshot = await readProfileInPage(tab.id, profile, {includeName});
       check(signal);
-      const snapshot = results[0]?.result;
-      if (snapshot) last = extractId(snapshot.html, profile, snapshot.url);
+      last = snapshot.result;
       if (last.id || last.accountState==='GONE' || /security check|sign in|Multiple account IDs|different profile/.test(last.error || '')) return last;
       // Allow hydrated profile data to arrive, but never solve login or CAPTCHA screens.
       if (Date.now() > deadline - 17000) return last;
@@ -97,25 +93,20 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
       let actual;
       try {actual=normalizeProfile(tab.url);} catch {return {error:'The current page changed. Open the profile and run it again.'};}
       if(actual.key!==profile.key)return {error:'The current page changed. Open the profile and run it again.'};
-      const results=await chrome.scripting.executeScript({target:{tabId:currentTabId},func:()=>({html:document.documentElement.outerHTML.slice(0,15000001),url:location.href})});
+      const snapshot=await readProfileInPage(currentTabId,profile,{includeName});
       check(signal);
-      const snapshot=results[0]?.result;
       if(snapshot){
-        const result=extractId(snapshot.html,profile,snapshot.url);
+        const result=snapshot.result;
         if(result.id||result.accountState==='GONE')return {...result,method:'Current page · '+result.method};
         // Authentication, conflicting IDs and a different profile are explicit
         // failures. Only missing hydrated data triggers an automatic source read.
         if(!result.error?.startsWith('No matching account ID'))return result;
         onStage?.('Reading profile source automatically…');
-        const documentId=results[0]?.documentId;
-        const sourceResults=await chrome.scripting.executeScript({target:{tabId:currentTabId,...(documentId?{documentIds:[documentId]}:{})},func:readProfileSource});
+        const source=await readProfileInPage(currentTabId,profile,{source:true,includeName,documentId:snapshot.documentId});
         check(signal);
         const latest=await chrome.tabs.get(currentTabId);
         if(normalizeProfile(latest.url).key!==profile.key)return {error:'The page changed during lookup. Open the intended profile and retry.'};
-        const source=sourceResults[0]?.result;
-        if(source?.error)return source;
-        if(!source)return {error:'The profile returned no readable source. Reload it, then retry.'};
-        const found=extractId(source.html,profile,source.url);
+        const found=source.result;
         return found.id||found.accountState==='GONE'?{...found,method:'Current profile source · '+found.method}:found;
       }
       return {error:'The current page returned no readable source. Reload the profile, then retry.'};
@@ -127,6 +118,6 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
   const direct = await fetchSource(profile, signal);
   check(signal);
   if (direct.id || direct.accountState==='GONE' || !browserFallback) return fallbackId(direct);
-  try { return fallbackId(await readBrowserPage(profile, signal, onStage, tabOwner)); }
+  try { return fallbackId(await readBrowserPage(profile, signal, onStage, tabOwner, includeName)); }
   catch (error) { check(signal); return fallbackId({error: 'Could not read the browser page. Open the profile, then choose Find IDs on this page.'}); }
 }

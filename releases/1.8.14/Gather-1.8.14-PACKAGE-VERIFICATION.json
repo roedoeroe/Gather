@@ -1,0 +1,43 @@
+{
+  "version": "1.8.14",
+  "packages": [
+    {
+      "file": "Gather-1.8.14-extension.zip",
+      "bytes": 206874,
+      "sha256": "1c5257460407ec178cb4bf2ac34ee3111250e311ca26c87b3103b8f46c77b90b",
+      "runtime_files_match": 81,
+      "crc": "passed"
+    },
+    {
+      "file": "Gather-1.8.14-development.zip",
+      "bytes": 14398120,
+      "sha256": "96f907977decc928b19def4065b39fc8e16f644e0af6da578a9540cd44bbb85f",
+      "runtime_files_match": 81,
+      "crc": "passed"
+    }
+  ],
+  "permissions_unchanged_from": "1.8.13",
+  "source_evidence": "../../gather/docs/evidence/1.8.14/README.md",
+  "extracted_package_tests": {
+    "node": {
+      "passed": 208,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0
+    },
+    "toolbar": {
+      "passed_groups": 29,
+      "exit_code": 0
+    },
+    "worker": {
+      "passed_groups": 10,
+      "exit_code": 0
+    },
+    "profile-reader": {
+      "passed_groups": 5,
+      "exit_code": 0
+    }
+  },
+  "native_extension_tested": false,
+  "extracted_runtime_matches_source": 81
+}

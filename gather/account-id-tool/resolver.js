@@ -107,7 +107,32 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
         const latest=await chrome.tabs.get(currentTabId);
         if(normalizeProfile(latest.url).key!==profile.key)return {error:'The page changed during lookup. Open the intended profile and retry.'};
         const found=source.result;
-        return found.id||found.accountState==='GONE'?{...found,method:'Current profile source · '+found.method}:found;
+        if(found.id||found.accountState==='GONE')return {...found,method:'Current profile source · '+found.method};
+        if(profile.platform!=='instagram'||!found.error?.startsWith('No matching account ID'))return found;
+        // A signed-in page can omit the profile data exposed by the public
+        // response. Previously only a second, pasted-link lookup tried this
+        // path. Do it once in the original operation, without cookies or a tab.
+        onStage?.('Checking public profile source…');
+        const publicResult=await fetchSource(profile,signal);
+        check(signal);
+        // Pin the original document and recheck hydration after the request.
+        // Navigation, access checks and conflicting IDs must never be hidden
+        // by a result from the public response.
+        const current=await readProfileInPage(currentTabId,profile,{includeName,documentId:source.documentId});
+        check(signal);
+        const stillCurrent=await chrome.tabs.get(currentTabId);
+        if(normalizeProfile(stillCurrent.url).key!==profile.key)return {error:'The page changed during lookup. Open the intended profile and retry.'};
+        if(/Multiple account IDs|different account ID/.test(publicResult.error||''))return publicResult;
+        if(current.result.id){
+          if(publicResult.id&&current.result.id!==publicResult.id)return {error:'The page and public profile returned different account IDs. Gather did not choose either ID.'};
+          return {...current.result,method:'Current page · '+current.result.method};
+        }
+        if(!current.result.error?.startsWith('No matching account ID'))return current.result;
+        if(publicResult.id){
+          if(!includeName)delete publicResult.displayName;
+          return {...publicResult,method:'Public profile source · '+publicResult.method};
+        }
+        return {error:'No matching account ID was available from this page or its public profile.'+(!publicResult.error?.startsWith('No matching account ID')&&publicResult.error?' '+publicResult.error:'')};
       }
       return {error:'The current page returned no readable source. Reload the profile, then retry.'};
     }catch{check(signal);return {error:'Gather could not read this tab. Reopen Gather using its toolbar button on the profile, then retry.'};}

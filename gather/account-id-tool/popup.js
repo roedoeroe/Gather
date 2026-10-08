@@ -13,7 +13,7 @@ const $ = id => document.getElementById(id);
 // screen instead, leaving space for the browser toolbar on smaller displays.
 document.documentElement.style.setProperty('--panel-limit',Math.max(360,Math.min(580,screen.availHeight-40))+'px');
 let state = {batch:null,busy:false}, submitting=false, initialized=false, requestNumber=0, appliedNumber=0;
-let currentPage='', currentTabId=null, pageRequest=0, checkingPage=false, lastRun=null, messageTimer, inputDirty=false, copying=false, prefsPending=Promise.resolve();
+let currentPage='', currentTabId=null, pageRequest=0, checkingPage=false, lastRun=null, messageTimer, inputDirty=false, pageLookupInput='', copying=false, prefsPending=Promise.resolve();
 const entries = () => state.batch?.entries || [];
 async function send(message) {
   const result = await chrome.runtime.sendMessage(message);
@@ -36,7 +36,7 @@ function renderInput() {
   $('usePage').disabled=!initialized||submitting||state.busy||checkingPage||!currentPage;
   $('usePage').hidden=fromPage;
 }
-function useCurrentPage(){return !$('quickLinks').value.trim()&&Boolean(currentPage);}
+function useCurrentPage(){return Boolean(currentPage)&&(!$('quickLinks').value.trim()||!inputDirty&&pageLookupInput===currentPage&&$('quickLinks').value===pageLookupInput);}
 function line(className, text) { const el=document.createElement('div');el.className=className;el.textContent=text;return el; }
 function renderSummary() {
   const rows=entries(), n=rows.filter(e=>e.status==='resolved').length;
@@ -47,7 +47,7 @@ function renderSummary() {
 function render() {
   document.body.classList.toggle('omit-display-names',$('quickMode').value==='details'&&!$('quickNames').checked);
   renderInput();const rows=entries();
-  $('quickResults').hidden=!rows.length;document.body.classList.toggle('has-results',Boolean(rows.length));document.body.classList.toggle('single-result',rows.length===1&&rows[0].status==='resolved');
+  $('quickResults').hidden=!rows.length;document.body.classList.toggle('has-results',Boolean(rows.length));document.body.classList.toggle('single-result',rows.length===1);
   $('stopQuick').hidden=!state.busy;$('stopQuick').disabled=state.stopping||submitting;$('stopQuick').textContent=state.stopping?'Stopping…':'Stop';
   $('retryQuick').hidden=state.busy||!rows.some(e=>!['resolved','gone'].includes(e.status));$('retryQuick').disabled=submitting;
   const ids=$('quickMode').value==='ids';$('quickSeparator').hidden=!ids;
@@ -56,7 +56,7 @@ function render() {
   $('quickSaved').textContent=state.warning||(state.batch?.invalid?.length?state.batch.invalid.length+' items skipped · Review in the full tool.':'Kept in your five recent lookups.');
   const list=$('quickList'),scroll=list.scrollTop;list.replaceChildren();
   let goneHeading=false,unknownHeading=false;for(const entry of orderAccounts(rows)) {
-    const gone=accountState(entry)==='GONE';if(!state.busy&&accountState(entry)==='UNKNOWN_TECHNICAL'&&!unknownHeading){const heading=document.createElement('li');heading.className='row-issue';heading.textContent='Could not determine — review';list.append(heading);unknownHeading=true;}if(gone&&!goneHeading){const heading=document.createElement('li');heading.className='quiet';heading.textContent='Accounts no longer available';list.append(heading);goneHeading=true;}
+    const gone=accountState(entry)==='GONE';if(rows.length>1&&!state.busy&&accountState(entry)==='UNKNOWN_TECHNICAL'&&!unknownHeading){const heading=document.createElement('li');heading.className='row-issue';heading.textContent='Could not determine — review';list.append(heading);unknownHeading=true;}if(gone&&!goneHeading){const heading=document.createElement('li');heading.className='quiet';heading.textContent='Accounts no longer available';list.append(heading);goneHeading=true;}
     const row=document.createElement('li');row.className='account-row';
     const name=line('account-name','');const caption=document.createElement('span');caption.className='name-caption';caption.textContent='Display name:  ';
     name.append(caption,document.createTextNode(entry.displayName||entry.suppliedName||(entry.status==='loading'?'Finding…':'Unavailable')));row.append(name);
@@ -107,6 +107,10 @@ async function copyAll(automatic=false) {
     await send({type:'quick.copied',batchId}).catch(()=>{});
   }
 }
+function showResults(){
+  if(entries().length===1)document.querySelector('.lookup-pane').scrollTop=0;
+  else $('quickResults').scrollIntoView({block:'nearest'});
+}
 async function refresh(restore=false) {
   const number=++requestNumber;
   try {
@@ -118,7 +122,7 @@ async function refresh(restore=false) {
     if((restore&&!inputDirty)||clearCompleted){$('quickLinks').value=next.input;inputDirty=false;if(next.input)$('pasteLinks').open=true;}
     if(next.busy)lastRun=next.batch?.id;
     initialized=true;render();if($('quickRecent').open)renderRecent().catch(error=>notice(error.message));
-    if(finished)$('quickResults').scrollIntoView({block:'nearest'});
+    if(finished)showResults();
     if(clearCompleted&&$('manualCopy').hidden&&!$('copyQuick').disabled)$('copyQuick').focus({preventScroll:true});
     if(!copying&&$('quickAuto').checked&&(next.copyPending||finished)&&!next.interrupted&&!next.stopping&&entries().every(e=>e.status!=='stopped')){
       copying=true;try{await copyAll(true);}finally{copying=false;}
@@ -141,10 +145,10 @@ async function act(message, copyAfter=false) {
     if(state.busy)lastRun=state.batch?.id;render();if(copyAfter&&$('quickAuto').checked)await copyAll(true);
   }
   catch(error){notice(error.message);}
-  finally{submitting=false;render();await refresh();if(['quick.start','quick.retry'].includes(message.type)&&!state.busy&&state.batch)$('quickResults').scrollIntoView({block:'nearest'});}
+  finally{submitting=false;render();await refresh();if(['quick.start','quick.retry'].includes(message.type)&&!state.busy&&state.batch)showResults();}
 }
 function saveDraft() {
-  inputDirty=true;renderInput();send({type:'quick.draft',historyEpoch:state.historyEpoch,input:$('quickLinks').value}).catch(error=>notice('Draft could not be saved. '+error.message));
+  inputDirty=true;pageLookupInput='';renderInput();send({type:'quick.draft',historyEpoch:state.historyEpoch,input:$('quickLinks').value}).catch(error=>notice('Draft could not be saved. '+error.message));
 }
 function insertText(text) {
   const input=$('quickLinks');input.focus();
@@ -174,14 +178,16 @@ async function updateCurrentPage() {
   if(request===pageRequest){currentPage=url;currentTabId=tab?.id??null;$('usePage').title=hint;renderInput();}
   return request===pageRequest?{url:currentPage,tabId:currentTabId}:null;
 }
-async function runCurrentPage(automatic=false) {
+async function runCurrentPage() {
   if(submitting||state.busy||checkingPage)return;
   checkingPage=true;renderInput();
   try {
     const page=await updateCurrentPage();
     if(!page?.url){notice('This page is not a supported profile. Open a profile or paste its link.');return;}
-    if(automatic)$('quickLinks').value=page.url;else{$('quickLinks').readOnly=false;$('quickLinks').focus();$('quickLinks').select();insertText(page.url);}
-    await act({type:'quick.start',input:page.url,currentTabId:page.tabId});if(automatic)$('pasteLinks').open=false;
+    // A current-page lookup is not a paste interaction. Do not focus a hidden
+    // textarea: browsers open its <details> and scroll the capture tools away.
+    $('quickLinks').value=page.url;inputDirty=false;pageLookupInput=page.url;$('pasteLinks').open=false;
+    await act({type:'quick.start',input:page.url,currentTabId:page.tabId});$('pasteLinks').open=false;
   }catch{notice('Could not read this page. Paste its profile link to continue.');}
   finally{checkingPage=false;renderInput();}
 }
@@ -230,7 +236,7 @@ async function init() {
     chrome.tabs.onActivated.addListener(()=>updateCurrentPage());
     await updateCurrentPage();
   }catch{notice('Settings could not be restored.');}
-  await refresh(true);if(currentPage&&!state.busy&&!$('quickLinks').value.trim())await runCurrentPage(true);else if($('quickLinks').value.trim())$('pasteLinks').open=true;if($('manualCopy').hidden)(!state.busy&&state.batch?.entries.length&&!$('copyQuick').disabled?$('copyQuick'):useCurrentPage()&&!$('getIds').disabled?$('getIds'):$('pasteLinks').open?$('quickLinks'):$('pasteLinks').querySelector('summary')).focus({preventScroll:true});
+  await refresh(true);if(currentPage&&!state.busy&&!$('quickLinks').value.trim())await runCurrentPage();else if($('quickLinks').value.trim())$('pasteLinks').open=true;if($('manualCopy').hidden)(!state.busy&&state.batch?.entries.length&&!$('copyQuick').disabled?$('copyQuick'):useCurrentPage()&&!$('getIds').disabled?$('getIds'):$('pasteLinks').open?$('quickLinks'):$('pasteLinks').querySelector('summary')).focus({preventScroll:true});
 }
 let recentTicket=0;
 async function renderRecent(){

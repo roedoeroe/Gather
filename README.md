@@ -2,15 +2,15 @@
 
 A local browser extension for fast account lookup and precise screenshots. **Open a profile → Gather → inspect or copy.** A case is optional.
 
-## Get Gather 1.8.13
+## Get Gather 1.8.14
 
-[Extension ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/91fdc6c3a9b32361e75a69ca896dd5576b42f1c6/releases/1.8.13/Gather-1.8.13-extension.zip) · [Source/test ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/91fdc6c3a9b32361e75a69ca896dd5576b42f1c6/releases/1.8.13/Gather-1.8.13-development.zip) · [SHA-256 checksums](releases/1.8.13/Gather-1.8.13-SHA256SUMS.txt) · [Installation and delivery](releases/1.8.13/Gather-1.8.13-DELIVERY.md)
+[Extension ZIP](releases/1.8.14/Gather-1.8.14-extension.zip) · [Source/test ZIP](releases/1.8.14/Gather-1.8.14-development.zip) · [SHA-256 checksums](releases/1.8.14/Gather-1.8.14-SHA256SUMS.txt) · [Installation and delivery](releases/1.8.14/Gather-1.8.14-DELIVERY.md)
 
-This development release fixes the obstructing selection helper, rejects silently clipped selections, adds adjustable Crop handles and simplifies Case/SOC filing. The toolbar resolves the current supported profile on opening, preserves pasted drafts and keeps only five recent lookup batches. One **Select area** button uses your screenshot auto-copy preference; Full page and Visible area remain available. The side panel is optional.
+This fix addresses first-click Instagram failures that succeeded on a second click. The initial current-page operation now performs the needed public-source check automatically, with no cookies, an exact account binding and document/conflict guards. Current-page retry keeps pasted input closed. Case/SOC and all three screenshot buttons stay in a fixed bottom area while results scroll.
 
 The blue/white workspace separates **Research · Captures · Case · Settings**. New cases need only a non-identifying case label and SOCs. All captures / Unassigned / SOC history filters never change the saving destination. Existing cases and image backups remain compatible.
 
-Extract the extension ZIP and load **account-id-tool** from `edge://extensions` → Developer mode → Load unpacked. For updates, replace all files in the same installed directory and Reload; **do not uninstall or clear storage**. Keep the previous 1.8.12 package and a matching backup for rollback in a separate clean browser profile. [Complete update/rollback instructions](gather/README.md#install-or-update).
+Extract the extension ZIP and load **account-id-tool** from `edge://extensions` → Developer mode → Load unpacked. For updates, replace all files in the same installed directory and Reload; **do not uninstall or clear storage**. Keep the previous 1.8.13 package and a matching backup for rollback in a separate clean browser profile. [Complete update/rollback instructions](gather/README.md#install-or-update).
 
 ## Local by design
 
@@ -20,11 +20,11 @@ Cases, SOCs, screenshots and recent lookups stay in this browser on your compute
 
 ## Tested scope
 
-**201 Node tests, 110 rendered workflow groups, 11 pixel-selection groups, 10 actual service-worker groups and five isolated-world reader groups passed.** Image editing also passes at 2× scale. Pixel checks trace corner/edge/center markers through capture, local binary storage, clipboard and downloaded bytes at five simulated display scales.
+**208 Node tests, 112 rendered workflow groups, 11 pixel-selection groups, 10 actual worker groups and five isolated-world reader groups passed.** A real signed-out profile read and a controlled missing-markup/live-public-response test also passed: the first operation recovered a matching ID with one public request. Actual account details remain outside public source.
 
-Rendered tests use controlled extension API doubles. This cloud machine's administrator blocks unpacked extensions, so installed Windows Edge, native browser zoom, signed-in Instagram and OS dialogs remain unverified. The originally reported native failures are not declared closed solely by passing fixtures. [Evidence](gather/docs/TESTING.md) · [Remaining Edge check](gather/docs/LOCAL-ACCEPTANCE.md).
+Rendered extension APIs are simulated. This machine still blocks installing unpacked extensions, so signed-in Windows Edge and native toolbar/zoom/OS dialogs remain unverified. [Evidence](gather/docs/TESTING.md).
 
-**1.8.13 is not R4-complete.** Source-image acquisition and Reference Library remain behind the R4 correctness gate. No AI/composer/email system was added. [Exact completed/pending scope](gather/docs/R4-WORKFLOW-RECONCILIATION.md).
+**1.8.14 is not R4-complete.** Source-image acquisition and Reference Library remain behind the R4 correctness gate. No AI/composer/email system was added. [Exact completed/pending scope](gather/docs/R4-WORKFLOW-RECONCILIATION.md).
 
 ## Development
 

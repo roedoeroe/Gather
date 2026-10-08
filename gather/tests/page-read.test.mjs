@@ -35,3 +35,34 @@ test('navigation, wrong-source profile, denied source and cancellation never ret
  reset();const controller=new AbortController();afterSource=()=>controller.abort();await assert.rejects(resolveProfile(profile,{currentTabId:10,signal:controller.signal}),{name:'AbortError'});
  reset();fetched={error:'Source timed out'};assert.match((await resolveProfile(profile,{currentTabId:10})).error,/timed out/);
 });
+
+let publicReads=[],afterPublic;
+globalThis.fetch=async(url,options)=>{
+ publicReads.push({url,options});const response=new Response(publicHTML);Object.defineProperty(response,'url',{value:publicURL||url});afterPublic?.();return response;
+};
+let publicHTML=html,publicURL;
+function missingSignedIn(){reset();source.html='<p>Fictional loaded profile</p>';fetched.html=source.html;publicReads=[];publicHTML=html;publicURL=null;afterPublic=null;}
+test('first current-page operation checks the public profile once when signed-in markup omits the ID',async()=>{
+ missingSignedIn();const result=await resolveProfile(profile,{currentTabId:10});assert.equal(result.id,'9007199254740993123');assert.match(result.method,/Public profile source/);assert.equal(publicReads.length,1);assert.equal(publicReads[0].url,profile.url);assert.equal(publicReads[0].options.credentials,'omit');assert.equal(publicReads[0].options.cache,'no-store');assert.equal(reads.length,6);assert.deepEqual(reads.at(-1).target,{tabId:10,documentIds:['document-one']});assert.ok(!('displayName'in result));
+});
+test('profile hydration completing during the public request returns the now-loaded current page',async()=>{
+ missingSignedIn();afterPublic=()=>source.html=html;const result=await resolveProfile(profile,{currentTabId:10});assert.equal(result.id,'9007199254740993123');assert.match(result.method,/Current page/);assert.equal(publicReads.length,1);
+});
+test('public fallback never overrides a newly conflicting ID, authentication screen, or navigation',async()=>{
+ for(const body of [html.replace('9007199254740993123','123'),'<p>Log in to Instagram</p>','<p>Verify you are human</p>']){missingSignedIn();afterPublic=()=>source.html=body;const result=await resolveProfile(profile,{currentTabId:10});assert.ok(result.error);assert.ok(!result.id);assert.equal(publicReads.length,1);}
+ missingSignedIn();afterPublic=()=>tabUrl='https://www.instagram.com/other.example/';assert.match((await resolveProfile(profile,{currentTabId:10})).error,/changed/);
+});
+test('public fallback rejects wrong profiles and unbound IDs without looping',async()=>{
+ for(const body of [html.replace('alex.example','other.example'),'<script>{"recommendations":[{"profile_id":"123"}]}</script>']){missingSignedIn();publicHTML=body;const result=await resolveProfile(profile,{currentTabId:10});assert.ok(result.error);assert.ok(!result.id);assert.equal(publicReads.length,1);}
+ missingSignedIn();publicURL='https://www.instagram.com/other.example/';assert.ok((await resolveProfile(profile,{currentTabId:10})).error);
+});
+test('explicit sign-in, conflicting IDs and successful initial reads never request public fallback',async()=>{
+ for(const body of [html,'<p>Log in to Instagram</p>','<script>[{"username":"alex.example","id":"123"},{"username":"alex.example","id":"456"}]</script>']){missingSignedIn();source.html=body;await resolveProfile(profile,{currentTabId:10});assert.equal(publicReads.length,0);}
+});
+test('cancelling during the public request prevents a result from being returned',async()=>{
+ missingSignedIn();const controller=new AbortController();afterPublic=()=>controller.abort();await assert.rejects(resolveProfile(profile,{currentTabId:10,signal:controller.signal}),{name:'AbortError'});assert.equal(publicReads.length,1);
+});
+
+test('an ambiguous public response stays unresolved even if late hydration exposes one of its IDs',async()=>{
+ missingSignedIn();publicHTML='<script>[{"username":"alex.example","id":"123"},{"username":"alex.example","id":"456"}]</script>';afterPublic=()=>source.html=html.replace('9007199254740993123','123');const result=await resolveProfile(profile,{currentTabId:10});assert.match(result.error,/Multiple account IDs/);assert.ok(!result.id);
+});

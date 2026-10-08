@@ -1,46 +1,41 @@
-# Gather 1.8.13 validation
+# Gather 1.8.14 validation
 
-All test data is fictional. These checks verify specific behavior, not universal platform reliability or legal compliance.
-
-| Layer | Result | Actual scope |
+| Layer | Result | Scope |
 |---|---|---|
-| Node | **201 passed**, zero failed/skipped | Five adapters/exact strings, later assignments/conflicts, bounded selection, crop geometry, context, case/SOC model, five-recents migration/restore, history locks, privacy and package gate. |
-| Rendered workflows | **110 unique groups passed** | Capture 21, toolbar 27, case/privacy 19, stabilization 10, case clipboard 7, shared workspace 9, image tools 17. Real DOM/canvas/clipboard/IndexedDB; extension API doubles. |
-| Pixel-selection pipeline | **11 groups passed** | Visible/scrolling markers at five simulated DPR values, cancellation/restoration. Browser screenshots are provided by Playwright, not captureVisibleTab. Native zoom/DPI remains untested. |
-| Worker | **10 passed** | Actual Chromium ServiceWorkerGlobalScope and lifecycle; controlled Chrome APIs. |
-| Isolated profile reader | **5 passed** | Actual isolated-world DOM/fetch; intercepted fictional network. Small result, source fallback and account binding. |
-| Repeat at 2× | **17 image-tool groups passed** | Repeated evidence, not 17 additional unique scenarios. |
-| Native installed extension | **Blocked**, exit 2, zero groups | Administrator policy blocks unpacked extensions. No bypass or sandbox change. |
-| Live platform | **Not run for 1.8.13** | Earlier anonymous Instagram observation is historical; it does not validate signed-in Edge. |
-| Visual inspection | Actual generated screenshots inspected | Current-profile popup (including visible Select area), simple case creation, Case/SOC history, crop handles and the unsupported-page toolbar. Fictional content only. |
+| Node | **208 passed**, zero failed/skipped | Five adapters, exact strings, current-page/public fallback, conflict/navigation/cancellation guards, case/scan/context, image geometry, privacy/restore and package gate. |
+| Rendered workflows | **112 unique groups passed** | Toolbar 29, capture 21, case 19, stabilization 10, case clipboard 7, shared workspace 9, image tools 17. Real DOM/canvas/clipboard/IndexedDB with extension API doubles. |
+| Pixel selection | **11 passed** | Visible and scrolling selections with marker pixels, binary storage, clipboard, downloads and restoration at five simulated DPR scales. Acquisition adapter, not native captureVisibleTab. |
+| Worker | **10 passed** | Actual ServiceWorkerGlobalScope, controlled Chrome APIs, restart/restore/deletion behavior. |
+| Profile reader | **5 passed** | Actual isolated world, intercepted fictional page/source requests, minimal return data. |
+| Live public profile | **Passed** | Signed-out Chromium read of the user-authorized profile; a controlled missing-markup/live-public-response resolver run succeeded on its first operation with one public request and matching ID. |
+| Installed extension / signed-in Edge | **Not run; installation blocked** | The same managed wildcard policy forbids unpacked extensions here. No native acceptance claim, no bypass. |
+| Visual inspection | **Performed** | Generated success/failure popup screenshots: primary lookup and all screenshot buttons visible with Case/SOC; fictional content only. |
 
-The pixel fixture uses unique colors at four corners, four edge midpoints and center. Coordinates/dimensions are checked through real selection/crop/stitching. Its five simulated device scales (0.8/1/1.25/1.5/2) are not substitutes for Edge native 80/100/125/150/200% zoom or Windows DPI. See versioned scenario JSON for the exact exercised pipeline. Real Chrome/Edge API invocation, installed toolbar/side panel, activeTab grant, OS application paste/save/print, native zoom and live signed-in platforms remain separate gates.
+The new live check uses a real public response with omitted credentials. It does not reproduce the user's authenticated session. Public evidence contains only counts/status/timing, not account details. The original native Edge acceptance gate remains open. A prior native runner reported blocked (exit 2, zero groups); that blocked run is not a pass or a newly executed 1.8.14 suite.
 
 ## Reproduce
 
-From `/workspace/Gather/gather` with Node 24, Python 3, supplied Playwright 1.62.1 and sandboxed Chromium 151:
+From `/workspace/Gather/gather`, Node 24 / Python 3 / supplied Playwright 1.62.1 / sandboxed Chromium 151:
 
 ```sh
 export NODE_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules
 python3 scripts/build-profile-reader.py --check
 node --test tests/*.test.mjs
-node tests/browser-capture.mjs
 node tests/browser-toolbar.mjs
+node tests/browser-capture.mjs
 node tests/browser-case.mjs
 node tests/browser-stabilization.mjs
 node tests/browser-case-clipboard.mjs
 node tests/browser-installed-ui.mjs
 node tests/browser-image-tools.mjs
-GATHER_TEST_DPR=2 node tests/browser-image-tools.mjs
 node tests/browser-selection-pixels.mjs
 node tests/browser-worker.mjs
 node tests/browser-profile-reader.mjs
-node tests/browser-acceptance.mjs
 python3 scripts/package.py
 ```
 
-No runtime installation, server or bundler. Test scripts own and close fixture servers/profiles. `GATHER_BROWSER_ARTIFACTS` chooses ignored output; `GATHER_CHROMIUM_PATH` selects an available permitted browser. Keep `chromiumSandbox:true`. Do not edit runtime/tests while their suites execute. Capture exit codes and verify current result files; partial/zero-test runs are not passes.
+`GATHER_BROWSER_ARTIFACTS` chooses ignored output. Test scripts own/close their temporary servers and profiles. Do not edit runtime/tests while suites execute. Live checks are deliberate, user-authorized diagnostics outside public source; automated fixtures never depend on live accounts.
 
-Native runner status: exit 2 = blocked, 1 = failure, 0 = completed installed smoke journey. This machine has `/etc/chromium/policies/managed/extensions.json`, `ExtensionInstallBlocklist:["*"]`. It is a runner restriction, not a diagnosed problem with the user's Edge installation. See [local acceptance](LOCAL-ACCEPTANCE.md) and [R4 status](R4-WORKFLOW-RECONCILIATION.md).
+No runtime install script, server or bundler. `node tests/browser-acceptance.mjs` diagnoses the managed block and exits 2 with zero native groups; use it only when checking a changed environment. Do not alter policy, sandbox or TLS. Native Edge invocation, activeTab, signed-in platforms, native zoom/Windows scaling and OS dialogs remain separate from rendered checks.
 
-Versioned scenario records are in [evidence/1.8.13](evidence/1.8.13/README.md). Release receipts outside the source package record extracted-package byte/test checks, SHA-256 and public download verification. Packaging locally scans candidate files/archives for common private-file and credential patterns; this is not general PII detection and uploads nothing to a scanner. Original 1.8.12 artifacts and evidence remain immutable.
+[Scenario evidence](evidence/1.8.14/README.md) · [Local checks](LOCAL-ACCEPTANCE.md) · [R4 status](R4-WORKFLOW-RECONCILIATION.md). Extracted-package and public-download receipts are under releases/1.8.14. Packaging/privacy checks are local pattern checks, not general PII detection or a compliance guarantee.

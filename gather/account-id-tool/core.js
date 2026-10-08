@@ -370,7 +370,7 @@ export function extractId(html, profile, pageUrl = profile.url) {
   if (candidates.size > 1) return {error: 'Multiple account IDs found. Open the profile and check its source.'};
   const accessIssue=pageAccessIssue(html,pageUrl,roots);if(accessIssue)return {error:accessIssue};
   const gone=confirmedGone(roots,profile,current);if(gone)return gone;
-  return {error: 'No matching account ID was exposed by this page. Let the profile finish loading, then retry.'};
+  return {error: 'No matching account ID was exposed by this page. Gather could not verify this profile.'};
 }
 
 export function cleanName(value) {

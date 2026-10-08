@@ -20,8 +20,8 @@ html{width:420px}
 #pageOptions{margin-top:7px;font-size:11px;color:#53647a}#pageOptions summary{cursor:pointer;padding:3px 0}#pageOptions>div{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0}#pageOptions button{font-size:11px;white-space:normal;text-align:left}#pageOptions p{font-size:11px}#pageOptions summary:focus-visible{outline:2px solid #1463d6;outline-offset:3px}
 .quick-panel .account-tools-link{font-size:12px;align-self:flex-start;margin-top:15px}.quick-panel .quick-label{font-size:15px}.quick-panel #quickLinks{height:72px}.quick-panel .quick-meta{font-size:11px}
 
-/* Let the popup scroll as a document. Flex compression must never hide IDs. */
-.quick-panel{--blue:#1463d6}.quick-panel main{display:block;overflow-y:auto}
+/* Account results retain their own size inside the lookup pane. */
+.quick-panel{--blue:#1463d6}
 .quick-panel #quickResults{min-height:auto;flex-shrink:0}.quick-panel #quickList{min-height:120px;max-height:225px;flex-shrink:0}
 .quick-panel .account-tools-link{display:block;margin-top:14px}
 
@@ -40,3 +40,9 @@ html{width:420px}
 
 /* Keep the screenshot action reachable after a single current-profile result. */
 .quick-panel.single-result #quickSaved{display:none}.quick-panel.single-result .quick-status:has(#quickSummary[hidden]):has(#stopQuick[hidden]):has(#retryQuick[hidden]){display:none}.quick-panel.single-result .account-row{padding:8px 10px}.quick-panel.single-result #quickList{min-height:0}.quick-panel.single-result .lookup-heading #getIds{padding:5px 9px;font-size:11px}.quick-panel.single-result #pasteLinks{margin:6px 0}.quick-panel.single-result .quick-copy{margin-bottom:8px}.quick-panel.single-result .gather-save-account{margin-top:4px}
+
+/* Core page actions stay ahead of optional pasted input, including failed lookups. */
+.quick-panel .direct-captures{grid-template-columns:repeat(3,minmax(0,1fr))}.quick-panel .page-tools{margin-top:10px;padding-top:10px}.quick-panel.single-result .quick-status{font-size:10.5px}
+
+/* Results and pasted input scroll independently of the primary capture actions. */
+.quick-panel main{display:flex;flex-direction:column;height:calc(var(--panel-limit,580px) - 54px);overflow:hidden;padding-top:12px;padding-bottom:10px}.quick-panel .lookup-pane{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;padding:4px 1px 8px}.quick-panel .page-tools{flex:0 0 auto;max-height:65%;overflow-y:auto;margin:0;padding:10px 1px 0}.quick-panel.single-result #quickList{max-height:none}.quick-panel .capture-heading{margin-top:6px}.quick-panel #pageOptions{margin-top:6px}

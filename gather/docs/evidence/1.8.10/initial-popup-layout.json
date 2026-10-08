@@ -1,0 +1,47 @@
+{
+  "getIds": {
+    "top": 395.5,
+    "bottom": 433.5,
+    "width": 149.34375,
+    "height": 38,
+    "display": "block",
+    "hidden": false,
+    "scroll": 36
+  },
+  "quickLinks": {
+    "top": 443.5,
+    "bottom": 515.5,
+    "width": 384,
+    "height": 72,
+    "display": "block",
+    "hidden": false,
+    "scroll": 70
+  },
+  "quickCount": {
+    "top": 522.296875,
+    "bottom": 537.6875,
+    "width": 236.03125,
+    "height": 15.390625,
+    "display": "block",
+    "hidden": false,
+    "scroll": 15
+  },
+  "usePage": {
+    "top": 0,
+    "bottom": 0,
+    "width": 0,
+    "height": 0,
+    "display": "none",
+    "hidden": true,
+    "scroll": 0
+  },
+  "pageTools": {
+    "top": 70,
+    "bottom": 379.5,
+    "width": 384,
+    "height": 309.5,
+    "display": "block",
+    "hidden": false,
+    "scroll": 309
+  }
+}

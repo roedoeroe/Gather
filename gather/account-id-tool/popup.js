@@ -24,14 +24,17 @@ function notice(message, success=false) {
   if(success)messageTimer=setTimeout(()=>{$('quickMessage').hidden=true;},4000);
 }
 function renderInput() {
-  const parsed=parseInput($('quickLinks').value), count=parsed.entries.length;
+  const parsed=parseInput($('quickLinks').value), count=parsed.entries.length, fromPage=useCurrentPage();
   $('quickCount').textContent=count?count+' account'+(count===1?'':'s')+(parsed.duplicates?' · duplicates merged':'')+(parsed.invalid.length?' · '+parsed.invalid.length+' items skipped':''): $('quickLinks').value.trim()?'No supported profile links found':'Instagram, Facebook, Threads, TikTok, YouTube';
   renderSummary();
-  $('getIds').disabled=!initialized||submitting||state.busy||checkingPage||!count;
-  $('getIds').textContent=state.busy?'Getting UserIDs…':'Get UserIDs';
+  $('getIds').disabled=!initialized||submitting||state.busy||checkingPage||(!count&&!fromPage);
+  $('getIds').textContent=state.busy?'Finding account IDs…':fromPage?'Find IDs on this page':'Find account IDs';
+  $('getIds').title=fromPage?'Find account IDs from '+currentPage:'';
   $('quickLinks').readOnly=submitting||state.busy||checkingPage;
   $('usePage').disabled=!initialized||submitting||state.busy||checkingPage||!currentPage;
+  $('usePage').hidden=fromPage;
 }
+function useCurrentPage(){return !$('quickLinks').value.trim()&&Boolean(currentPage);}
 function line(className, text) { const el=document.createElement('div');el.className=className;el.textContent=text;return el; }
 function renderSummary() {
   const rows=entries(), n=rows.filter(e=>e.status==='resolved').length;
@@ -192,7 +195,7 @@ $('quickLinks').addEventListener('keydown',event=>{
   event.preventDefault();
   if(!event.repeat)$('getIds').click();
 });
-$('getIds').addEventListener('click',()=>act({type:'quick.start',input:$('quickLinks').value}));
+$('getIds').addEventListener('click',()=>useCurrentPage()?runCurrentPage():act({type:'quick.start',input:$('quickLinks').value}));
 $('stopQuick').addEventListener('click',()=>act({type:'quick.stop'}));
 $('retryQuick').addEventListener('click',async()=>{
   if(submitting||state.busy)return;
@@ -223,6 +226,6 @@ async function init() {
     chrome.tabs.onActivated.addListener(()=>updateCurrentPage());
     await updateCurrentPage();
   }catch{notice('Settings could not be restored.');}
-  await refresh(true);if($('manualCopy').hidden)$('quickLinks').focus();
+  await refresh(true);if($('manualCopy').hidden)(useCurrentPage()&&!$('getIds').disabled?$('getIds'):$('quickLinks')).focus();
 }
 init();

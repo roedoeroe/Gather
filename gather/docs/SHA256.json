@@ -1,5 +1,5 @@
 {
-  "version": "1.8.9",
+  "version": "1.8.10",
   "files": {
     "account-id-tool/README.md": "fa20f841c42938e82534c83e5ed891b823e8c2daa4c5d7471a9eb7793d41419b",
     "account-id-tool/account-state-ui.js": "c9cfa0c802a54ca8bbc4a048b44677e0b0befb06e7c3563651fe637ef596bfce",
@@ -12,7 +12,7 @@
     "account-id-tool/capture-backup.js": "9a0aa1cb56b5088d7c87ded5f64f1e84e528a7ebca5ca3e3a35e741d9f10e7d1",
     "account-id-tool/capture-edit.css": "ba9a488dca4ae8dee370799e97623a36adccb49d632b6b58fed0005883bfdeed",
     "account-id-tool/capture-edit.html": "b4f04d60110cc0b48aeda4b187852dab38e5370d35b82cd39914c485f3692e62",
-    "account-id-tool/capture-edit.js": "a0783e82e2ad9b11e01b3297f0f36b2af9b110cb27390461d041fc3c720a394f",
+    "account-id-tool/capture-edit.js": "3e8015cd93f2143f9706301c052726edcb8e2fa96d0bf70261a91da47d5d46b3",
     "account-id-tool/capture-engine.js": "67de0e36dcb688995f7ac63dacf777b393348f3fc1fdb5bca85834c7698a0060",
     "account-id-tool/capture-files.js": "aa60df01fa27103f68311a416e4451afc55833be8ec0f665c63ea81aa6a61a35",
     "account-id-tool/capture-history.js": "64cc3c26d369835213ee54921f633513470ea36b93ab4ceb45ba3c1a8afb1494",
@@ -50,13 +50,13 @@
     "account-id-tool/icons/48.png": "a707c90ded8c5c32599bcd181ad82168ff25ebd45fe42834bf0b5a16efaae4bf",
     "account-id-tool/index.html": "efd479c380d98eda9acde99205977567eab3b4ed4c49441fc3a274de20b2a636",
     "account-id-tool/lookup-context.js": "712b9c54046aaf50cb8d464f7be5b4f3635ca499e166ee851d9ea3b9e371531f",
-    "account-id-tool/manifest.json": "851d3b6ce0113614a419c49d7a17a6cbe3cd57a9501870f36652c93c5e881b2a",
-    "account-id-tool/package.json": "7c4cad7e3b34647ef74e56f92982704f8af6510173e01a9ed2544c3c0c8ee7c6",
+    "account-id-tool/manifest.json": "a33693b3449aff9adc6c7f36a5a8700a9fa5db7bf604262fcfe1c6f5b3787958",
+    "account-id-tool/package.json": "9a32f07e0f27b019a673dd1ef941e4c16d28c4f18db916b4ebee3b1241000b4a",
     "account-id-tool/page-tools.js": "1dec4690cb712cb0330f05d02dfddf93ee79edbdee0d9a942467d54bd56a3189",
     "account-id-tool/paste.js": "7e32d2757a12fda42f8e83c80e38bc9c5f1a9626422708378249b5eb40d23826",
-    "account-id-tool/popup.css": "2b631fd6c9003475ccf6cc6ffd6600a6f7560d463fb317f067dd762564969a64",
-    "account-id-tool/popup.html": "f52311de2421096daca49ef78084dec6652002d9a50e805fcfa6eb6bcefc0279",
-    "account-id-tool/popup.js": "7bfd96e0f3c2a0d4340cf8a838baa8f197925471186eb2e0cdb7c14de765e22c",
+    "account-id-tool/popup.css": "4775af6d8e43824cb90130520c3484dc5a9545068aa5edcb977782aff826f265",
+    "account-id-tool/popup.html": "020c5f5fe97cd55572ad66f4819f3a67e151a5f644e464f232105ff505c2c0ae",
+    "account-id-tool/popup.js": "603772e1fda1141a508ce4d54e386f30d95d7d9f5136f41b2086892ad549f480",
     "account-id-tool/preferences.js": "66f4e8864f280a72a478f2de2e6e435f679e3a589dc313936c7a369171dfe619",
     "account-id-tool/profile-status.js": "dd1d1109066fea31d0a68d8c0f41b289e2678f3284da2589934e7e365839aeee",
     "account-id-tool/quick-worker.js": "b9234a58c8866b462757b1f4b311ab021d64e275db1b60a4ea3066cd668aa67f",
@@ -74,6 +74,6 @@
     "account-id-tool/workspace-store.js": "dc3c1b0b5b84902232845e9d2558dc614ec79e342488a3c662d4d581243c6014",
     "account-id-tool/workspace.css": "3bfd94e582f618d3f56b88735f206bae7b0ad3c5071f7ba1b265043472870119",
     "account-id-tool/workspace.html": "b0f8ca41630e036c11bbb7d9d193b2c561d881822ea40018363309fdf8482419",
-    "account-id-tool/workspace.js": "e9ed1ded134f9b84d75dbae55c09d14826341b3281b44a9e83857edcae71f7ef"
+    "account-id-tool/workspace.js": "6ac917491ba9db930eaef28f168f51e87b77d9859eaf832bed59b946b5f6f490"
   }
 }

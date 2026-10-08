@@ -18,10 +18,10 @@
     <details id="pageOptions"><summary>Page options</summary><div><button data-capture-mode="selection" data-selection-method="screenshot" class="text-button" disabled>Select from screenshot…</button><button id="savePageLink" class="text-button" disabled>Save page link</button><button id="useDefaultScan" class="text-button" disabled>Use workspace default</button><button id="openPanel" class="text-button">Open side panel</button></div><p class="quiet">Save page link keeps its URL and title without an image. A scan assignment is research context, not proof of discovery.</p></details>
     <p id="pageToolsStatus" class="quiet" role="status"></p>
   </section>
-  <label for="quickLinks" class="quick-label">Find account IDs</label>
+  <div class="lookup-heading"><label for="quickLinks" class="quick-label">Find account IDs</label><button id="getIds" class="primary-button" disabled>Find account IDs</button></div>
   <textarea id="quickLinks" spellcheck="false" maxlength="100000" placeholder="Paste a profile link or a list of accounts…" title="Enter to run · Shift+Enter for a new line" aria-describedby="quickCount"></textarea>
   <div class="quick-meta"><span id="quickCount">Instagram, Facebook, Threads, TikTok, YouTube</span><button id="usePage" class="text-button" disabled title="Open a supported profile or channel to use this">Run on this page</button></div>
-  <div class="quick-actions"><button id="getIds" class="primary-button" disabled>Get UserIDs</button><label class="auto-label"><input id="quickAuto" type="checkbox" role="switch">Auto-copy</label></div>
+  <div class="quick-actions"><label class="auto-label"><input id="quickAuto" type="checkbox" role="switch">Auto-copy IDs</label></div>
   <p id="quickMessage" role="status" hidden></p>
   <section id="quickResults" aria-label="Account results" hidden>
     <div class="quick-copy"><label for="quickMode" class="sr-only">Copy format</label><select id="quickMode"><option value="ids">IDs only</option><option value="details">Account details</option></select><label for="quickSeparator" class="sr-only">Separate IDs with</label><select id="quickSeparator"><option value="newline">New lines</option><option value="comma">Commas</option><option value="space">Spaces</option></select><label id="quickNamesOption" class="auto-label names-option" hidden title="Show and include display names when copying account details"><input id="quickNames" type="checkbox" role="switch" checked>Display names</label><button id="copyQuick" class="primary-button">Copy IDs</button></div>

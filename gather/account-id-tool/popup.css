@@ -28,3 +28,9 @@ html{width:420px}
 .selection-copy{width:100%;margin-bottom:8px}.direct-captures #captureFullPage{background:white;color:var(--blue);border:1px solid var(--line)}
 
 .capture-copy-preference{display:flex;gap:6px;align-items:center;font-size:12px;margin:10px 0}.capture-copy-preference input{width:auto}
+
+/* Keep the main lookup action above optional pasted input on smaller screens. */
+.lookup-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.lookup-heading .quick-label{margin:0;min-width:0}
+.lookup-heading #getIds{flex-shrink:0}
+.quick-panel .quick-actions{justify-content:flex-end}

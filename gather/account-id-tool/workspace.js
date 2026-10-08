@@ -14,6 +14,7 @@ const currentScan=()=>isPanel&&tabContext?tabContext.context.scanId:state.active
 document.body.classList.toggle('panel',isPanel);
 const initialSection=location.hash.slice(1);initNavigation();
 let state=null,view='items',draftQueue=Promise.resolve(),editorSave=null,lastScan,windowId=null,undoId=null;
+const viewQueries=new Map();let filterScanId;
 const formatTime=t=>new Date(t).toLocaleString();
 const label=id=>destinationLabel(state,id);
 const rows=key=>state[key].filter(x=>x.scanId===currentScan());
@@ -25,7 +26,7 @@ async function action(payload){const response=await act(payload);update(response
 function button(title,fn,cls=''){const b=make('button',cls,title);b.type='button';b.addEventListener('click',()=>safely(fn));return b;}
 function empty(target,title,description){const el=make('div','empty');el.append(make('strong','',title),make('span','',description));target.append(el);}
 function matches(row){const q=$('localSearch').value.trim().toLowerCase();return !q||JSON.stringify(row).toLowerCase().includes(q);}
-function setView(next){view=isPanel?'tasks':next==='searches'?$('historyKind').value:next;renderViews();}
+function setView(next,{clearFilter=false}={}){viewQueries.set(view,$('localSearch').value);view=isPanel?'tasks':next;if(clearFilter)viewQueries.delete(view);$('localSearch').value=viewQueries.get(view)||'';renderViews();}
 function render(){
   const restoreFocus=retainFocus(document.querySelector('main'));const restoreLibraryFocus=retainFocus($('projects'));
   const scan=state.scans.find(x=>x.id===currentScan()),project=state.projects.find(x=>x.id===scan?.projectId);
@@ -49,6 +50,7 @@ function render(){
 }
 function renderViews(){
   if(isPanel)view='tasks';
+  if(filterScanId!==currentScan()){filterScanId=currentScan();viewQueries.clear();$('localSearch').value='';$('filter').value='all';}
   for(const name of ['items','tasks','searches','activity'])$(name).hidden=name!==view;
   for(const tab of document.querySelectorAll('.tabs [data-view]')){tab.classList.toggle('selected',(tab.dataset.view===view||(tab.dataset.view==='searches'&&view==='activity')));tab.setAttribute('aria-current',(tab.dataset.view===view||(tab.dataset.view==='searches'&&view==='activity'))?'page':'false');}
   $('historyKindLabel').hidden=!['searches','activity'].includes(view);
@@ -88,15 +90,15 @@ function renderItems(){
 }
 function renderTasks(){
   const target=$('tasks');target.replaceChildren();const tasks=rows('tasks').filter(t=>!isPanel||t.status==='open').filter(matches).slice().sort((a,b)=>(a.status!=='open')-(b.status!=='open')||b.createdAt-a.createdAt);
-  if(!tasks.length)empty(target,'No tasks yet','Add a task for something you want to follow up.');
+  if(!tasks.length){const filtered=!isPanel&&rows('tasks').length;empty(target,filtered?'No matching tasks':'No tasks yet',filtered?'Try another search.':'Add a task for something you want to follow up.');}
   for(const task of (isPanel?tasks.slice(0,3):tasks)){const card=make('article','card');card.dataset.focusKey=task.id;cardMeta(card,task.status,task.createdAt);card.append(make('h3','',task.title));const controls=make('div','card-controls');for(const [status,title] of (task.status==='open'?[['done','Mark done'],['dismissed','Dismiss']]:[['open','Reopen']]))controls.append(button(title,()=>action({type:'task.status',id:task.id,status})));card.append(controls);target.append(card);}
 }
 function renderSearches(){
   const target=$('searches');target.replaceChildren();const searches=rows('searches').filter(matches).slice().reverse();
-  if(!searches.length)empty(target,'No searches yet','Searches you launch from Gather appear here. They do not imply complete coverage.');
+  if(!searches.length)empty(target,rows('searches').length?'No matching searches':'No searches yet',rows('searches').length?'Try another search.':'Searches you launch from Gather appear here. They do not imply complete coverage.');
   for(const search of searches){const card=make('article','card');card.dataset.focusKey=search.id;cardMeta(card,search.status,search.createdAt);card.append(make('h3','',search.query),make('p','quiet',PROVIDERS[search.provider]));const controls=make('div','card-controls');controls.append(button('Open search ↗',async()=>{const r=await request('workspace.reopenSearch',{id:search.id});update(r.state);}));if(search.status==='opened')controls.append(button('Mark reviewed',()=>action({type:'search.status',id:search.id,status:'reviewed'})));card.append(controls);target.append(card);}
 }
-function renderActivity(){const target=$('activity');target.replaceChildren();const events=rows('activity').filter(matches).slice().reverse();if(!events.length)empty(target,'No activity yet','Your saves, reviews and searches appear here. Browsing history is not collected.');for(const event of events){const card=make('article','card');cardMeta(card,event.kind.replaceAll('.',' · '),event.at);card.append(make('p','',event.label));target.append(card);}}
+function renderActivity(){const target=$('activity');target.replaceChildren();const events=rows('activity').filter(matches).slice().reverse();if(!events.length)empty(target,rows('activity').length?'No matching activity':'No activity yet',rows('activity').length?'Try another search.':'Your saves, reviews and searches appear here. Browsing history is not collected.');for(const event of events){const card=make('article','card');cardMeta(card,event.kind.replaceAll('.',' · '),event.at);card.append(make('p','',event.label));target.append(card);}}
 async function selectScan(id){await action({type:'context.select',scanId:id});$('localSearch').value='';$('filter').value='all';setView('items');document.body.classList.remove('library-open');$('libraryToggle').setAttribute('aria-expanded','false');}
 function openEditor(title,fields,save,destination=currentScan(),submit='Save'){
   editorSave=save;$('editorTitle').textContent=title;$('editorDestination').textContent='Destination: '+label(destination);$('submitEdit').textContent=submit;$('fields').replaceChildren();$('editorError').textContent='';
@@ -121,7 +123,7 @@ $('addSource').onclick=()=>{const scanId=currentScan();openEditor('Save a source
 $('addNote').onclick=()=>{const scanId=currentScan();openEditor('Add a note',[{name:'title',label:'Title',value:'Note'},{name:'body',label:'Your note',type:'textarea',max:20000}],v=>action({type:'item.save',kind:'note',scanId,...v}),scanId);};
 $('addTask').onclick=()=>{const scanId=currentScan();openEditor('New task',[{name:'title',label:'What needs to happen?'}],v=>action({type:'task.create',scanId,...v}),scanId);};
 $('savePage').onclick=()=>safely(async()=>{const scanId=currentScan(),sourceTabId=tabId;if(!sourceTabId)throw new Error('Open a web page and use the Gather toolbar button.');const response=await request('workspace.capture',{scanId,tabId:sourceTabId});update(response.state);message('Page saved to '+(response.result?.destinationLabel||label(response.result?.scanId??scanId))+'.');});
-$('searchForm').addEventListener('submit',event=>{event.preventDefault();const scanId=currentScan(),query=$('query').value,provider=$('provider').value,submit=event.submitter;submit.disabled=true;safely(async()=>{const r=await request('workspace.search',{action:{scanId,query,provider}});update(r.state);message('Search opened for '+label(scanId)+'. Mark it reviewed when you finish.');setView('searches');}).finally(()=>submit.disabled=false);});
+$('searchForm').addEventListener('submit',event=>{event.preventDefault();const scanId=currentScan(),query=$('query').value,provider=$('provider').value,submit=event.submitter;submit.disabled=true;safely(async()=>{const r=await request('workspace.search',{action:{scanId,query,provider}});update(r.state);message('Search opened for '+label(scanId)+'. Mark it reviewed when you finish.');setView('searches',{clearFilter:true});}).finally(()=>submit.disabled=false);});
 function draftKey(scanId){return 'gather.search-draft.'+(scanId||'inbox');}
 function draftStorage(scanId){const projectId=state.scans.find(s=>s.id===scanId)?.projectId;return state.projects.find(p=>p.id===projectId)?.mode==='ephemeral'?chrome.storage.session:chrome.storage.local;}
 function saveDraft(){const scanId=currentScan(),value={query:$('query').value,provider:$('provider').value};draftQueue=draftQueue.catch(()=>{}).then(()=>request('workspace.searchDraft',{scanId,value})).catch(error=>message('Search draft could not be saved. '+error.message,true));}
@@ -131,7 +133,7 @@ $('query').oninput=saveDraft;$('provider').onchange=saveDraft;
 $('libraryToggle').onclick=()=>{const open=document.body.classList.toggle('library-open');$('libraryToggle').setAttribute('aria-expanded',String(open));};
 $('historyKind').onchange=()=>setView($('historyKind').value);
 $('localSearch').oninput=renderViews;$('filter').onchange=renderViews;
-for(const el of document.querySelectorAll('[data-view]'))el.onclick=()=>setView(el.dataset.view);
+for(const el of document.querySelectorAll('[data-view]'))el.onclick=()=>setView(el.dataset.view==='searches'?$('historyKind').value:el.dataset.view);
 for(const el of document.querySelectorAll('[data-filter]'))el.onclick=()=>{$('filter').value=el.dataset.filter;setView('items');};
 $('exportReport').onclick=()=>safely(async()=>{const scanId=state.activeScanId,data=report(state,scanId);data.captures=await scanCaptureReport(scanId);const readable=$('reportFormat').value==='md';downloadFile('Gather-report-'+new Date().toISOString().slice(0,10)+(readable?'.md':'.json'),readable?reportMarkdown(data)+captureReportMarkdown(data.captures):data,readable?'text/markdown':'application/json');message('Report exported: '+data.items.length+' included findings and '+data.captures.length+' capture records. Images can be exported from Captures.');});
 $('backup').onclick=()=>safely(async()=>{const r=await request('workspace.backup'),blob=await createFullBackup(r.backup);const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Gather-all-work-'+new Date().toISOString().slice(0,10)+'.gather';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);message('All-work backup downloaded, including unredacted originals, subjects, relationships and legacy batches. Keep it private.');});

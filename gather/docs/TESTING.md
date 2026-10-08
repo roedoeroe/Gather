@@ -1,90 +1,34 @@
-# Gather 1.8.9 validation
+# Gather 1.8.10 validation
 
-The latest direct user requests authorize scrolling selection, manual image tools, blue-and-white presentation and screenshot auto-copy. They explicitly exclude automatic redaction and ask to finish the current release before future feature expansion. All new fixtures are fictional.
+All public fixtures use deterministic fictional data. Counts describe executed checks, not guarantees about arbitrary websites or installed Edge behavior.
 
 | Layer | Fresh result | Scope |
 | --- | --- | --- |
-| Node | 165 passed, zero failed/skipped | Existing 154 plus 11 selected-region geometry, high-DPI rounding, bounds, pacing, cancellation, partial/failure and restoration checks. |
-| Rendered interface | 100 unique groups passed | Capture 21, toolbar 22, case/privacy 18, stabilization 10, case clipboard 7, shared workspace UI 7, new image tools 15. Chrome APIs are doubles. |
-| High-DPI repeat | Image tools 15/15 at 2× device scale | Real Chromium screenshot dimensions/canvas/clipboard bytes, wheel/reverse/edge selection and manual edits. Not extra unique groups or native browser zoom. |
-| Actual worker | 10 groups passed | ServiceWorkerGlobalScope, IndexedDB, Web Locks and stop/restart, with controlled extension APIs. |
-| Visual inspection | Actual fictional screenshots inspected | Full-viewport guides, extended selection, desktop/narrow editor, blue toolbar and workspace views. |
-| Native installed Edge/Chrome | Blocked, exit 2, zero native groups | Managed wildcard ExtensionInstallBlocklist detected before launch. No policy/sandbox/TLS workaround. |
-| Live platforms | No new live lookup in 1.8.9 | Prior authorized 1.8.8 anonymous Instagram observations remain separately qualified; other platforms/signed-in access remain unverified. |
+| Node | 165 passed, zero failed/skipped | Exact IDs, five adapter fixtures, account states, context continuity, capture geometry/storage/recovery, privacy and output guards. |
+| Rendered interface | 104 unique groups passed | Capture 21, toolbar 24, case/privacy 18, stabilization 10, case clipboard 7, shared workspace UI 8, image tools 16. Chrome extension APIs are controlled doubles. |
+| Worker | 10 actual ServiceWorkerGlobalScope groups passed | Real Chromium worker lifecycle with controlled Chrome APIs; static imports/restart/context behavior. |
+| Higher device scale | 16 image-tool groups repeated at 2× | Repeated evidence, not extra unique groups. Native browser zoom is a separate check. |
+| Visual inspection | Fictional screenshots inspected | Current-profile popup, desktop workspace and narrow editor. The layout check verifies the primary lookup action is above the actual popup clipping boundary. |
+| Native extension | Blocked; zero groups passed | Preflight exits 2 before browser launch because administrator policy blocks unpacked extensions. No policy workaround. |
+| Live platforms | No new live lookup in 1.8.10 | Prior authorized 1.8.8 observations remain historical and separately qualified; real observations stay outside public source/packages. |
 
-The selected rectangle is a document region, not an archived page. Original tiles are preserved; selected pixels are a separate derivative. Capture start freezes project/scan/subject. Scrolling is bounded by the initial extent and acquisition limits: 24 tiles, 48M stitched pixels, 24,000 CSS-pixel height and 60 seconds. Dynamic height/bounds/failures are partial, not complete. Source switches/navigation/zoom invalidate screenshots; cancellation restores the source.
+DOM, canvas, PNG pixels, clipboard, IndexedDB, BroadcastChannel and applicable locks/worker lifecycle are real in the rendered tests. Tabs, scripting, screenshot invocation and Downloads APIs are doubles. Ordinary browser confirmation/window closure is exercised; native extension invocation, OS clipboard paste/save/print, browser tab-close/reload prompts, actual zoom and screen readers remain unverified.
 
-Pixel readback confirms red arrows/circles and opaque black fills in flattened PNG output. Original hashes remain unchanged; no edits occur automatically. Save/copy/print/folder exports use the selected derivative. Tests restore edited binary images and their relationships, retry denied exports, clear stale review sheets/editors, and remove every original/derivative when deleted. Concurrent copy/export preference writes preserve both settings.
+## Usability regression evidence
 
-Extension APIs, downloads and tab relationships are controlled doubles. Native activeTab permission, screenshot window focus/lifecycle, OS paste/save/print dialogs, native browser zoom and screen-reader behavior are separate remaining checks. No guarantee across every site/browser or legal compliance certification is claimed. Private backup includes unredacted originals; logical deletion does not clear clipboard, browser history, downloads or prior backups.
+The baseline reproduced two problems: the main lookup button was disabled on a supported profile, and a findings filter hid an existing task. The current journeys check:
 
-Run the eight browser scripts in README and all Node tests from `gather`; repeat image tools with `GATHER_TEST_DPR=2`. Verify actual counts and exit status. `node tests/browser-acceptance.mjs` exits 2 for this documented policy restriction, 1 for a test failure and 0 only after an actual installed smoke journey. Package checks validate ZIP CRC, version, hashes, every runtime byte and extracted tests. Evidence: [1.8.9](evidence/1.8.9/README.md).
+- Explicit current-profile lookup with no case requirement or passive run; exact long ID; keyboard activation and visible main action.
+- Pasted input/Enter taking priority, invalid input staying invalid, and active-tab revalidation without replacing previous results.
+- Independent Findings/Tasks filters, truthful no-match text and filter reset in a new scan.
+- Unsaved marks/caption protection, Cancel retaining edits, deliberate discard closing once, delayed image encoding disabling Close, a saved image clearing the unload guard, and missing/deleted editors remaining closable.
+- Stale editor controls being disabled and a deliberately forced save attempt still failing without changing the newer selected image.
 
-## Previous 1.8.8 evidence (historical)
+The workspace fixture waits for the save dialog to close before typing into Research, matching the usable interaction rather than editing a modal-blocked field. The older stale-editor test was updated for the now-disabled controls; its storage-guard assertion remains. Failed intermediate runs are not counted as passing checks.
 
-# Gather 1.8.8 validation
+## Running the checks
 
-The requested validation-first run reproduced two concrete issues and fixed them: current Instagram ID namespaces/pre-hydration profile routing, and large findings rendering cost. No new features or permissions. Public fixtures are fictional; actual authorized profile observations and screenshots stay in ignored artifacts outside Git/packages.
-
-| Layer | Fresh result | What was exercised |
-| --- | --- | --- |
-| Node | 154 passed; zero failed/skipped | Existing 132 checks plus 22 conservative Instagram regressions. Five new checks failed before the fix. |
-| Rendered interface | 85 groups passed | Capture 21, toolbar 22, case/privacy 18, stabilization 10, case clipboard 7, installed-runner UI 7. Actual product documents with controlled extension APIs. |
-| Actual Chromium worker | 10 groups passed | Real worker lifecycle/IndexedDB/Web Locks with extension API doubles. |
-| Live Instagram | Three anonymous profiles loaded/resolved | Authorized supplied profile plus two official platform profiles. Old code was ambiguous on rendered DOM; new account keys corroborate matched route IDs. No universal success rate. |
-| Live DOM replay | Three popup lookup/copy workflows passed | Actual quick worker/resolver/UI and real text clipboard, but injected DOM/tab access is a double. No installed/live-injection claim. |
-| Usability/performance | Four views at 400/800/1440px; 420px popup | No horizontal overflow; tab arrows/Home/End, Escape/focus return, offscreen finding controls and unchanged filing. 1,000 notes/100 small PNG captures. |
-| Native installed Edge/Chrome | Not run | Unchanged managed policy blocks unpacked extension loading. Other live platforms, signed-in Instagram, native capture/save/print dialogs/zoom and screen readers remain unverified. |
-
-Baseline 1.8.7 was also freshly verified: 132 Node, 85 rendered and 10 worker groups. Reruns and package checks do not increase unique counts. Applicable DOM/canvas/clipboard/IndexedDB/BroadcastChannel and workers are real; extension APIs are doubles. The real user profile never enters public fixtures. Details and sanitized evidence are in [evidence/1.8.8](evidence/1.8.8/README.md). The current Edge checklist is [LOCAL-ACCEPTANCE](LOCAL-ACCEPTANCE.md).
-
-With 1,000 fictional notes (761,680-byte workspace JSON), clear-filter-to-two-animation-frames changed from 397 ms to 116 ms; navigation/reload-to-ready from 855 ms to 300 ms. Filtering to a small result was about 30 ms; capture filtering about 48 ms and Show more about 112 ms. Single-run Linux Chromium observations include harness overhead and are not a benchmark distribution or Edge guarantee. Deferred content remains in the DOM/search; scrolling to the last finding and opening/cancelling its editor passed. Printing disables containment. No screen-reader/native print performance claim.
-
-From `gather`, run `node --test tests/*.test.mjs` and all seven browser scripts listed in README. Verify nonzero counts and exit status. Packaging uses `python3 scripts/package.py`; no runtime dependency install/build service is needed. Use Node 24/Python 3, supplied Playwright 1.62.1 and sandboxed Chromium 151 as previously documented. Keep TLS/sandbox/policy intact. Never count a zero-test run as validation.
-
-## Preserved earlier release evidence
-
-# 1.8.6 validation (historical)
-
-This finalizing run adds fixes and regression coverage, not product features. All fixtures are deterministic fictional data. The untouched 1.8.5 baseline passed 129 Node checks, 61 rendered-browser groups and 10 worker groups before edits; both preserved ZIPs passed CRC, source-byte and checksum verification.
-
-| Layer | Result | Scope |
-| --- | --- | --- |
-| Node | 130 passed, zero failed/skipped | Models/adapters, exact IDs, continuity/privacy, geometry, history/deletion, startup race, syntax and static worker imports. |
-| Rendered capture/UX | 21 groups passed | Actual DOM/canvas/IndexedDB, stitching, cancellation/restoration, hashes, backup and responsive layouts. Chrome APIs are doubles. |
-| Rendered toolbar/capture/lookup | 22 groups passed | Actual controller, pointer/keyboard selection, real image/text clipboard, save formats, print pixels, history/deletion and current-page lookup. Chrome APIs are doubles. |
-| Rendered case/privacy | 18 groups passed | Actual intake, associations, retention, delayed writes, scoped deletion and restore. Chrome APIs are doubles. |
-| Rendered stabilization | 10 groups passed | Cross-window/output/interruption regressions below. Real IDB/canvas/BroadcastChannel; controlled downloads/clipboard failure gates. |
-| Actual Chromium worker | 10 groups passed | ServiceWorkerGlobalScope, IndexedDB/Web Locks and actual stop/restart. Extension APIs are doubles. |
-| Native installed Chrome/Edge | Unaccepted | Administrator policy still blocks unpacked loading. No bypass or identical launch retry. |
-| Live platforms / native FireShot | Not run | No live success rate or native FireShot acceptance claimed. |
-
-Release totals: **130 Node, 71 rendered-browser groups and 10 actual worker groups**. Packaged-build verification is recorded separately in the evidence; reruns do not increase these counts.
-
-## New defect regressions
-
-The early-finish Node test failed against 1.8.5: finish arrived before windows.create resolved, leaving a lock for a finished controller. The corrected queued release passes and permits another capture while the first completion window remains open.
-
-Nine browser scenarios failed against the preserved, extracted 1.8.5 extension. The tenth reproduced restore of an in-flight export before its specific fix. Their passing counterparts verify:
-
-1. An open print preview clears pixels/disables Print after redaction or deletion; reopening renders the selected image.
-2. Two documents cannot own one folder export; rejection preserves the first running/successful attempt.
-3. A healthy two-file export is not expired at 150 seconds; edits wait for it, then work and reset folder state.
-4. Case purge rejects an active export atomically, preserving records and bytes.
-5. A stale editor cannot overwrite a newer redaction; repeated current-editor saves work.
-6. Interrupted old work cannot overwrite a successful retry or dispatch its companion record afterward.
-7. A validated binary backup made during export restores hashes/relationships, makes the orphaned job retryable, and permits immediate export. Another restore remaps its exported asset reference.
-8. Clipboard PNG conversion rejects stale bytes if the selected image changes during encoding. This failure gate uses a clipboard double; ordinary toolbar clipboard readback is real.
-9. A simulated transient IndexedDB preview-read error after durable save releases the lock, retains the image and recovers on focus.
-10. Delayed clipboard denial after deletion leaves the preview empty, image actions disabled and deletion message visible.
-
-Existing Northbridge / SEO 6 / Alex Example → delayed capture → Southridge / SD 73 journeys preserve original filing. Other checks retain long exact IDs, same-name subject folders, rename history, denied export/retry, full-page cancellation/restoration, original/derivative hashes, selected-scan reports, corrupt-backup rejection and empty-origin restore. Privacy checks cover typed-name deletion, Cancel, failed-backup preservation, history clearing across windows, late writes and worker restart.
-
-Tests exercise actual product documents and browser storage/canvas/clipboard. Native activeTab grants, captureVisibleTab/rate/focus, save/print dialogs, browser zoom/reset and Edge require [LOCAL-ACCEPTANCE](LOCAL-ACCEPTANCE.md) on an allowed installation. CSS 200% reflow is not native zoom. Current managed policy has ExtensionInstallBlocklist ["*"]; security settings remain intact.
-
-## Reproduce
-
-From `gather`:
+From `/workspace/Gather/gather`:
 
 ```sh
 node --test tests/*.test.mjs
@@ -93,27 +37,17 @@ node tests/browser-toolbar.mjs
 node tests/browser-case.mjs
 node tests/browser-worker.mjs
 node tests/browser-stabilization.mjs
+node tests/browser-case-clipboard.mjs
+node tests/browser-installed-ui.mjs
+node tests/browser-image-tools.mjs
+GATHER_TEST_DPR=2 node tests/browser-image-tools.mjs
 python3 scripts/package.py
 ```
 
-Node 24.19.0, Python 3.12.14, supplied Playwright 1.62.1 and sandboxed Chromium 151 at `/usr/lib/chromium/chromium` were used. No extension runtime install, bundler or application server is needed. Harnesses own and close temporary servers/profiles. Keep chromiumSandbox:true. GATHER_CHROMIUM_PATH selects a browser and GATHER_BROWSER_ARTIFACTS selects output. The stabilization harness accepts GATHER_EXTENSION_ROOT to serve an extracted package; its optional GATHER_STABILIZATION_FILTER cannot silently execute zero scenarios.
+Node 24, Python 3, supplied Playwright 1.62.1 and sandboxed Chromium 151 were used. Browser scripts own and close their temporary servers/profiles. Use `GATHER_BROWSER_ARTIFACTS` for ignored output and `GATHER_CHROMIUM_PATH` for an available permitted browser. If module resolution needs it in this cloud, set `NODE_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules`. No runtime install or bundler is required. Verify exit status and nonzero executed counts; an empty Node glob is not evidence.
 
-A toolbar assertion once inspected history during a second asynchronous rerender. It now waits for both expected groups before asserting; fresh source and extracted-package runs pass. Browser harnesses remove any prior results.json before running, so a failed command cannot leave a stale success report. The diagnostic failure is retained separately.
+`node tests/browser-acceptance.mjs` exits 2 for the managed policy block, 1 for failure, and 0 only after actual installed smoke checks. This machine has `/etc/chromium/policies/managed/extensions.json` with wildcard `ExtensionInstallBlocklist`. Keep it intact. [The installed-browser checklist](LOCAL-ACCEPTANCE.md) covers the remaining acceptance work.
 
-Current logs/results/fictional screenshots are in `evidence/1.8.6`; prior evidence is preserved. Packaging verifies CRC, every runtime byte against SHA256.json, versions, entry points and archive paths. Installation/update/rollback are in README and the separate delivery receipt. Backup/workspace schemas stay compatible. No permission, dependency, network service or passive collection was added.
+Current evidence: [1.8.10](evidence/1.8.10/README.md). The release receipt records ZIP CRC, SHA-256, every runtime byte, unchanged permissions/storage versions and extracted-package gates. Package reruns do not increase unique counts. Historical evidence remains under `evidence/1.8.9`, `evidence/1.8.8` and prior versions.
 
-## Fresh browser restriction diagnosis — October 8
-
-The six existing suites passed again: 130 Node, 71 rendered-browser groups and 10 worker groups. A further seven UI groups verify the repaired installed-runner journey through rendered/API-double fixtures (`node tests/browser-installed-ui.mjs` from `gather`); they are not native results or new runtime features. See [fresh evidence](evidence/browser-blocker-2026-10-08/README.md).
-
-The old `browser-acceptance.mjs` still used pre-redesign controls. It now follows current New case/Add/Findings/Settings navigation and uses a bounded worker wait. It checks Linux managed installation policy before launching, writes fresh structured results, and distinguishes **exit 2 blocked**, **exit 1 failed**, and **exit 0 completed**. The current wildcard policy produced a verified blocked result with no browser launch and zero native groups. Run it only for its stated installed workspace/worker smoke scope; native toolbar screenshot grants/OS dialogs and live profiles remain separate. [Plain-language explanation and supported path](BROWSER-TEST-BLOCKER.md).
-
-No new release was packaged for testing-tool changes. Runtime bytes and both 1.8.6 ZIP checksums/CRC were reverified unchanged. Fetch the maintained development branch for the latest runner and documentation.
-
-## 1.8.7 case clipboard stabilization
-
-From `gather`, run `node --test tests/*.test.mjs`, the five existing browser suites, `node tests/browser-case-clipboard.mjs` and `node tests/browser-installed-ui.mjs`. Release results are 132 Node checks, 85 rendered groups (21 capture, 22 toolbar, 18 case/privacy, 10 stabilization, 7 case clipboard, 7 shared installed-runner UI) and 10 actual worker groups. Extension APIs remain doubles; native installed-extension/OS dialogs and live platforms remain unverified under the unchanged cloud administrator policy.
-
-The seven new clipboard groups reproduced against untouched runtime 1.8.6 before the fix and passed against 1.8.7: decision labels/exact IDs/dates and actual clipboard bytes; denied-write feedback/manual selection and 400px reflow; association changes; frozen scope despite a global switch; Cancel during delayed validation; coverage changes; and another window deleting the case. Two Node checks preserve separate cross-scan observations/rename references and same-named case isolation. [Fresh evidence](evidence/1.8.7/README.md) records distinct before/after results and packaging checks.
-
-Do not treat dispatched external clipboard writes as revocable. A preview revalidates immediately before dispatch and releases text on observed relevant changes; previously copied text, browser history and exported files remain outside Gather deletion. There is no native permission-dialog or universal accessibility claim. No dependencies, permissions or schema changes.
+The extracted development package passed 165 Node checks plus all 24 toolbar, 8 shared workspace and 16 image-tool groups. Final-package runtime bytes match those exercised in the extracted gate.

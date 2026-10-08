@@ -1,8 +1,16 @@
-# Gather 1.8.9 — capture and manual image tools
+# Gather 1.8.10 — smoother everyday workflows
 
 Gather is a browser extension for project-free account lookup, deliberate research and screenshot capture. Case data stays in the browser on your computer. Gather has no case server, cloud sync or analytics. The public GitHub repository contains source and fictional test data, not your cases. Searches and profile lookups contact the services you choose; exported files are separate local copies.
 
-## Changes in 1.8.9
+## Changes in 1.8.10
+
+- **Find IDs on this page** is the main lookup action when a supported profile is open and input is empty. Pasted links take priority; opening Gather does not automatically run a lookup.
+- Findings, Tasks, Searches and Activity remember independent temporary filters. A scan change clears them; filtered empty lists say No matching rather than suggesting saved work is absent.
+- Edit image warns before discarding unsaved marks or a caption. Cancel keeps the work; saving clears the warning. Close is disabled during a save, and missing/deleted images remain closable. Stale editors disable editing and cannot replace newer images.
+
+See the [whole-workflow audit](docs/USABILITY-AUDIT.md) for the justified changes and retained goals. No new permissions, runtime dependencies or storage migration.
+
+## Capture and manual image tools retained from 1.8.9
 
 - Select area shows dotted horizontal/vertical guides across the viewport. Drag and wheel-scroll, use PageDown/PageUp, or hold near a vertical edge to extend the rectangle. Release captures the selected document region. Escape restores your starting position and cancels. Only top-level scrolling is supported.
 - Edit image adds pointer-drawn red arrows, red circles, opaque black redactions and cropping. Precise coordinates and Undo support keyboard use. Save & copy uses the flattened edited PNG. No automatic redaction, face/name detection or interpretation.
@@ -14,7 +22,7 @@ Existing Instagram extraction, exact ID handling, scan continuity, binary recove
 
 ## Retained capture fixes
 
-This is a fixes-only release of the existing capture workflow. No features, permissions, runtime dependencies or storage-schema migrations were added.
+The earlier 1.8.8 capture-stability fixes remain part of this build.
 
 - Finished captures release the acquisition lock even when a controller finishes unusually early or its preview cannot load.
 - An open print preview removes stale pixels after redaction/deletion. An older editor cannot replace a newer redaction. Copy rechecks the chosen image after PNG conversion.
@@ -31,13 +39,13 @@ The 1.8.1 fixes remain: static service-worker imports and stable 420 px popup si
 
 ## Install or update
 
-1. Extract `Gather-1.8.9-extension.zip` into a permanent directory.
+1. Extract `Gather-1.8.10-extension.zip` into a permanent directory.
 2. Open `chrome://extensions` or `edge://extensions`, enable Developer mode, choose **Load unpacked**, and select **account-id-tool** containing `manifest.json`.
 3. Pin Gather. Open a supported profile → Gather → inspect/copy. Chrome 116+ or compatible Edge is required.
 
-For an existing installation, preserve its folder and optionally back up work before updating. Finish captures and close Gather windows. Replace **all files in the same installed directory**, then Reload on the Extensions page and confirm **1.8.9**. Do not uninstall or clear browser storage. Extension reload/update clears Ephemeral Case session values; durable findings and images remain. If an older startup error prevents backup, preserve the browser profile/storage and update in place.
+For an existing installation, preserve its folder and optionally back up work before updating. Finish captures and close Gather windows. Replace **all files in the same installed directory**, then Reload on the Extensions page and confirm **1.8.10**. Do not uninstall or clear browser storage. Extension reload/update clears Ephemeral Case session values; durable findings and images remain. If an older startup error prevents backup, preserve the browser profile/storage and update in place.
 
-Rollback: retain the preserved 1.8.8 package and its matching pre-update backup. Test the older release in a **separate clean browser profile**, restoring its matching backup. Retain the current profile until recovery is verified. Older versions do not enforce all current clipboard and privacy guards; do not downgrade in place or let 1.7.x rewrite R3 records. Deletion without backup cannot be undone.
+Rollback: retain the preserved 1.8.9 package and its matching pre-update backup. Test the older release in a **separate clean browser profile**, restoring its matching backup. Retain the current profile until recovery is verified. Older versions do not enforce all current clipboard and privacy guards; do not downgrade in place or let 1.7.x rewrite R3 records. Deletion without backup cannot be undone.
 
 ## Workflow and limits
 
@@ -71,7 +79,7 @@ GATHER_TEST_DPR=2 node tests/browser-image-tools.mjs
 python3 scripts/package.py
 ```
 
-**165 Node checks, 100 unique rendered groups and 10 actual Chromium worker groups passed**. Fifteen image-tool groups repeated at 2× device scale are not counted twice. Native extension APIs are doubles; canvas, PNG bytes, clipboard, IndexedDB and applicable worker lifecycle are real. No new live-platform lookup was performed in 1.8.9; authorized 1.8.8 Instagram evidence remains historical and private observations stay outside packages.
+**165 Node checks, 104 unique rendered groups and 10 actual Chromium worker groups passed**. Sixteen image-tool groups repeated at 2× device scale are not counted twice. Native extension APIs are doubles; canvas, PNG bytes, clipboard, IndexedDB and applicable worker lifecycle are real. No new live-platform lookup was performed in 1.8.10; authorized 1.8.8 Instagram evidence remains historical and private observations stay outside packages.
 
 This cloud Chromium blocks unpacked extension installation by administrator policy. Native Edge screenshots, activeTab invocation, OS application paste/save/print, native zoom and screen readers remain unverified. No universal guarantee or legal compliance certification is implied. [TESTING](docs/TESTING.md) records scope; [LOCAL-ACCEPTANCE](docs/LOCAL-ACCEPTANCE.md) gives the remaining installed-browser steps.
 

@@ -78,7 +78,7 @@ try {
     installed = true;
     passed.push('Actual installed extension worker starts with the expected manifest version.');
     passed.push(...await workspaceJourney(context, 'chrome-extension://' + extensionId, artifacts));
-    assert.equal(passed.length, 8, 'Every smoke scenario must execute.');
+    assert.equal(passed.length, 9, 'Every smoke scenario must execute.');
     await record('passed');
     console.log('PASS: ' + passed.length + ' installed-extension smoke groups. Toolbar capture, OS dialogs and live profiles need separate checks.');
   }

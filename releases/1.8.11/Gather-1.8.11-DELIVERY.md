@@ -36,3 +36,10 @@ See [handoff](../../gather/docs/NEXT-RUN-HANDOFF.md), [test evidence](../../gath
 ```
 
 Versioned Git ZIP mirrors are the delivery route. No GitHub Release object is claimed.
+
+Source/package commit: `29dd714087235820d389996d85b9178fa5ee2f15`.
+
+- [Gather-1.8.11-development.zip](https://raw.githubusercontent.com/roedoeroe/Gather/29dd714087235820d389996d85b9178fa5ee2f15/releases/1.8.11/Gather-1.8.11-development.zip)
+- [Gather-1.8.11-extension.zip](https://raw.githubusercontent.com/roedoeroe/Gather/29dd714087235820d389996d85b9178fa5ee2f15/releases/1.8.11/Gather-1.8.11-extension.zip)
+
+Public downloads returned HTTP200; SHA-256, ZIP CRC and all77 runtime files matched.

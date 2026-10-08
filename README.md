@@ -4,7 +4,7 @@ A local browser extension for fast account lookup and precise screenshots. **Ope
 
 ## Get Gather 1.8.13
 
-[Extension ZIP](releases/1.8.13/Gather-1.8.13-extension.zip) · [Source/test ZIP](releases/1.8.13/Gather-1.8.13-development.zip) · [SHA-256 checksums](releases/1.8.13/Gather-1.8.13-SHA256SUMS.txt) · [Installation and delivery](releases/1.8.13/Gather-1.8.13-DELIVERY.md)
+[Extension ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/91fdc6c3a9b32361e75a69ca896dd5576b42f1c6/releases/1.8.13/Gather-1.8.13-extension.zip) · [Source/test ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/91fdc6c3a9b32361e75a69ca896dd5576b42f1c6/releases/1.8.13/Gather-1.8.13-development.zip) · [SHA-256 checksums](releases/1.8.13/Gather-1.8.13-SHA256SUMS.txt) · [Installation and delivery](releases/1.8.13/Gather-1.8.13-DELIVERY.md)
 
 This development release fixes the obstructing selection helper, rejects silently clipped selections, adds adjustable Crop handles and simplifies Case/SOC filing. The toolbar resolves the current supported profile on opening, preserves pasted drafts and keeps only five recent lookup batches. One **Select area** button uses your screenshot auto-copy preference; Full page and Visible area remain available. The side panel is optional.
 

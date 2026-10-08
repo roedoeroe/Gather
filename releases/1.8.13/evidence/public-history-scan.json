@@ -1,0 +1,10 @@
+{
+  "scope": "reachable Git history",
+  "counts": {
+    "blobs": 887,
+    "archives": 24,
+    "bytes": 159357712
+  },
+  "issues": [],
+  "limits": "Credential/path patterns only; cannot classify personal names, proprietary prose or image pixels."
+}

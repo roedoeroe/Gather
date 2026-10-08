@@ -2,7 +2,7 @@
 
 This development release improves the existing lookup and capture workflow. It is runnable; installed Windows Edge acceptance and the remaining R4 features are not complete.
 
-[Extension ZIP](Gather-1.8.13-extension.zip) · [Development ZIP](Gather-1.8.13-development.zip) · [SHA-256 checksums](Gather-1.8.13-SHA256SUMS.txt) · [Package verification](Gather-1.8.13-PACKAGE-VERIFICATION.json)
+[Extension ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/91fdc6c3a9b32361e75a69ca896dd5576b42f1c6/releases/1.8.13/Gather-1.8.13-extension.zip) · [Development ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/91fdc6c3a9b32361e75a69ca896dd5576b42f1c6/releases/1.8.13/Gather-1.8.13-development.zip) · [SHA-256 checksums](Gather-1.8.13-SHA256SUMS.txt) · [Package verification](Gather-1.8.13-PACKAGE-VERIFICATION.json)
 
 ## What changed
 
@@ -48,3 +48,5 @@ Keep [1.8.12](../1.8.12/) and a matching pre-update private backup. Test rollbac
 ## Development continuation
 
 Published work stays on **develop/1.8.0-r3**. Main and repository visibility are unchanged. [Handoff](../../gather/docs/NEXT-RUN-HANDOFF.md) and [R4 reconciliation](../../gather/docs/R4-WORKFLOW-RECONCILIATION.md) distinguish completed work from blocked/pending work. Release ZIPs remain immutable; subsequent delivery receipts live outside them.
+
+Both pinned downloads returned HTTP 200 and passed SHA-256, CRC and all 81 runtime-file comparisons. [Download receipt](Gather-1.8.13-DOWNLOAD-VERIFICATION.json). Source/package commit: `91fdc6c3a9b32361e75a69ca896dd5576b42f1c6`. Local candidate and reachable-history credential/path scans found no flagged patterns; they are not general PII or image-content detection. [Scan receipts](evidence/).

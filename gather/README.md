@@ -1,14 +1,16 @@
-# Gather 1.8.8 — live lookup validation build
+# Gather 1.8.9 — capture and manual image tools
 
 Gather is a browser extension for project-free account lookup, deliberate research and screenshot capture. Case data stays in the browser on your computer. Gather has no case server, cloud sync or analytics. The public GitHub repository contains source and fictional test data, not your cases. Searches and profile lookups contact the services you choose; exported files are separate local copies.
 
-## Changes in 1.8.8
+## Changes in 1.8.9
 
-Live validation found that current Instagram pages expose an account `pk` alongside a separate numeric `id`; treating both as account keys made working profiles appear ambiguous. Gather now selects the account key, retains genuine conflicts and exact strings, and accepts the explicitly matched anonymous profile route before hydration. Route URLs, usernames, content views and corroborating fields must agree. Invalid/unscoped data remains technical; unavailable names and profile status remain unknown.
+- Select area shows dotted horizontal/vertical guides across the viewport. Drag and wheel-scroll, use PageDown/PageUp, or hold near a vertical edge to extend the rectangle. Release captures the selected document region. Escape restores your starting position and cancels. Only top-level scrolling is supported.
+- Edit image adds pointer-drawn red arrows, red circles, opaque black redactions and cropping. Precise coordinates and Undo support keyboard use. Save & copy uses the flattened edited PNG. No automatic redaction, face/name detection or interpretation.
+- Auto-copy screenshots is remembered in the popup and defaults on. Select area & copy explicitly copies even when the switch is off. The separate account-ID auto-copy switch keeps your existing preference. Denied clipboard access retains the image and offers explicit Copy retry.
+- Blue actions and white/light neutral surfaces replace green presentation across popup, workspace, panel and image tools. Destructive controls stay red.
+- Review sheets invalidate stale selected images/inclusion before print/export. Source details in single-image print preview are optional and off initially; original pixels are untouched.
 
-Large findings lists now defer offscreen card rendering. In a Linux Chromium fixture with 1,000 notes, clear-filter-to-frame time fell from about 397 ms to 116 ms; reload fell from 855 ms to 300 ms. All records remain in the DOM and searchable. These are single-run measurements, not Edge hardware guarantees.
-
-No features, permissions, dependencies or storage migrations were added. All existing capture/privacy/clipboard fixes remain.
+Existing Instagram extraction, exact ID handling, scan continuity, binary recovery and privacy guards remain. No new permissions, dependency or storage schema. Chrome 116+ and Chromium-based Edge remain the target.
 
 ## Retained capture fixes
 
@@ -29,13 +31,13 @@ The 1.8.1 fixes remain: static service-worker imports and stable 420 px popup si
 
 ## Install or update
 
-1. Extract `Gather-1.8.8-extension.zip` into a permanent directory.
+1. Extract `Gather-1.8.9-extension.zip` into a permanent directory.
 2. Open `chrome://extensions` or `edge://extensions`, enable Developer mode, choose **Load unpacked**, and select **account-id-tool** containing `manifest.json`.
 3. Pin Gather. Open a supported profile → Gather → inspect/copy. Chrome 116+ or compatible Edge is required.
 
-For an existing installation, preserve its folder and optionally back up work before updating. Finish captures and close Gather windows. Replace **all files in the same installed directory**, then Reload on the Extensions page and confirm **1.8.8**. Do not uninstall or clear browser storage. Extension reload/update clears Ephemeral Case session values; durable findings and images remain. If an older startup error prevents backup, preserve the browser profile/storage and update in place.
+For an existing installation, preserve its folder and optionally back up work before updating. Finish captures and close Gather windows. Replace **all files in the same installed directory**, then Reload on the Extensions page and confirm **1.8.9**. Do not uninstall or clear browser storage. Extension reload/update clears Ephemeral Case session values; durable findings and images remain. If an older startup error prevents backup, preserve the browser profile/storage and update in place.
 
-Rollback: retain the preserved 1.8.7 package and its matching pre-update backup. Test the older release in a **separate clean browser profile**, restoring its matching backup. Retain the current profile until recovery is verified. Older versions do not enforce all current clipboard and privacy guards; do not downgrade in place or let 1.7.x rewrite R3 records. Deletion without backup cannot be undone.
+Rollback: retain the preserved 1.8.8 package and its matching pre-update backup. Test the older release in a **separate clean browser profile**, restoring its matching backup. Retain the current profile until recovery is verified. Older versions do not enforce all current clipboard and privacy guards; do not downgrade in place or let 1.7.x rewrite R3 records. Deletion without backup cannot be undone.
 
 ## Workflow and limits
 
@@ -53,20 +55,24 @@ Limits: 4 MiB workspace JSON, 512 MiB capture storage, 192 MiB/capture, 64 MiB/a
 
 ## Validation and development
 
-**154 Node tests, 85 rendered-browser groups (21 capture/UX, 22 toolbar/capture/lookup, 18 case/privacy, 10 stabilization, 7 case clipboard and 7 installed-runner interface groups), and 10 real Chromium service-worker groups passed.** Browser journeys use controlled Chrome API doubles and deterministic fictional data, with real DOM, IndexedDB and applicable canvas/Web Locks/worker lifecycle behavior. Anonymous live Chromium pages for one authorized profile and two official Instagram profiles were inspected and resolved; the actual popup also copied their exact keys in live-DOM replay with API doubles. Real profile observations stay outside public source/packages. Native installed Chrome/Edge testing remains blocked by administrator policy in this runner; signed-in Instagram, other live platforms and native screenshot/save/print permission flows remain unverified. See `docs/TESTING.md` and `docs/LOCAL-ACCEPTANCE.md`.
-
-No runtime dependency install, server or bundler is required. From the development package root:
+From this directory:
 
 ```sh
 node --test tests/*.test.mjs
 node tests/browser-capture.mjs
-node tests/browser-case.mjs
 node tests/browser-toolbar.mjs
+node tests/browser-case.mjs
 node tests/browser-worker.mjs
 node tests/browser-stabilization.mjs
 node tests/browser-case-clipboard.mjs
 node tests/browser-installed-ui.mjs
+node tests/browser-image-tools.mjs
+GATHER_TEST_DPR=2 node tests/browser-image-tools.mjs
 python3 scripts/package.py
 ```
 
-Node 24, Python 3, Playwright 1.62.1 and sandboxed Chromium 151 were used. Packages, checksums, updated handoff and current evidence accompany this release. Earlier versions/checkpoints remain preserved. Source publication remains on `develop/1.8.0-r3`; main is unchanged.
+**165 Node checks, 100 unique rendered groups and 10 actual Chromium worker groups passed**. Fifteen image-tool groups repeated at 2× device scale are not counted twice. Native extension APIs are doubles; canvas, PNG bytes, clipboard, IndexedDB and applicable worker lifecycle are real. No new live-platform lookup was performed in 1.8.9; authorized 1.8.8 Instagram evidence remains historical and private observations stay outside packages.
+
+This cloud Chromium blocks unpacked extension installation by administrator policy. Native Edge screenshots, activeTab invocation, OS application paste/save/print, native zoom and screen readers remain unverified. No universal guarantee or legal compliance certification is implied. [TESTING](docs/TESTING.md) records scope; [LOCAL-ACCEPTANCE](docs/LOCAL-ACCEPTANCE.md) gives the remaining installed-browser steps.
+
+Node 24, Python 3, supplied Playwright 1.62.1 and sandboxed Chromium 151 were used. Versioned packages, checksums and handoff accompany the release. Earlier packages remain immutable. Source publication stays on `develop/1.8.0-r3`; main is unchanged. Quick Parts and older retained goals remain in [PRODUCT-DIRECTION](docs/PRODUCT-DIRECTION.md) / [GOALS-AUDIT](docs/GOALS-AUDIT.md), not silently claimed shipped.

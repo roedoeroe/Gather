@@ -3,7 +3,7 @@ import {updateCaseSession} from './case-session.js';
 // Capture binaries deliberately live outside the 4 MiB workspace JSON.
 export const CAPTURE_DB = 'gather-captures-v1';
 export const CAPTURE_LIMITS = Object.freeze({assetBytes:64*1024*1024,captureBytes:192*1024*1024,totalBytes:512*1024*1024,records:20000});
-const DEFAULTS = {subjectLabel:'Subject',automaticExport:false};
+const DEFAULTS = {subjectLabel:'Subject',automaticExport:false,automaticCopy:true};
 let connection;
 const uid=()=>crypto.randomUUID();
 const fail=message=>{throw new Error(message);};
@@ -31,7 +31,15 @@ async function readOne(store,id){const db=await openCaptureDB();return request(d
 async function readAll(store){const db=await openCaptureDB();return request(db.transaction(store).objectStore(store).getAll());}
 async function writeOne(store,value){const db=await openCaptureDB(),tx=db.transaction(store==='subjects'?['subjects','settings']:store,'readwrite'),done=finish(tx);try{if((store==='subjects'&&value.projectId&&await request(tx.objectStore('settings').get('closed-project:'+value.projectId)))||(store==='settings'&&value.key.startsWith('project-label:')&&await request(tx.objectStore('settings').get('closed-project:'+value.key.slice(14))))||(store==='settings'&&value.key.startsWith('subject:')&&await request(tx.objectStore('settings').get('closed-scan:'+value.key.slice(8)))))fail('This project was closed.');tx.objectStore(store).put(value);}catch(e){tx.abort();await done.catch(()=>{});throw e;}await done;changed();return value;}
 export async function getCaptureSettings(projectId=null){const settings={...DEFAULTS,...(await readOne('settings','preferences'))?.value};if(projectId){captureId(projectId);const label=(await readOne('settings','project-label:'+projectId))?.value;if(label)settings.subjectLabel=label;}return settings;}
-export async function updateCaptureSettings(changes,{projectId=null}={}){if(projectId&&Object.hasOwn(changes,'subjectLabel')){captureId(projectId);const label=cleanText(changes.subjectLabel,30);if(!label)fail('Enter a subject display label.');await writeOne('settings',{key:'project-label:'+projectId,value:label});const rest={...changes};delete rest.subjectLabel;if(Object.keys(rest).length)await updateCaptureSettings(rest);return getCaptureSettings(projectId);}const settings=await getCaptureSettings();if(Object.hasOwn(changes,'automaticExport')){if(typeof changes.automaticExport!=='boolean')fail('Invalid automatic export setting.');settings.automaticExport=changes.automaticExport;}if(Object.hasOwn(changes,'subjectLabel')){settings.subjectLabel=cleanText(changes.subjectLabel,30);if(!settings.subjectLabel)fail('Enter a subject display label.');}await writeOne('settings',{key:'preferences',value:settings});return settings;}
+export async function updateCaptureSettings(changes,{projectId=null}={}){
+  if(projectId&&Object.hasOwn(changes,'subjectLabel')){captureId(projectId);const label=cleanText(changes.subjectLabel,30);if(!label)fail('Enter a subject display label.');await writeOne('settings',{key:'project-label:'+projectId,value:label});const rest={...changes};delete rest.subjectLabel;if(Object.keys(rest).length)await updateCaptureSettings(rest);return getCaptureSettings(projectId);}
+  const approved={};for(const key of ['automaticCopy','automaticExport'])if(Object.hasOwn(changes,key)){if(typeof changes[key]!=='boolean')fail('Invalid capture preference.');approved[key]=changes[key];}
+  if(Object.hasOwn(changes,'subjectLabel')){approved.subjectLabel=cleanText(changes.subjectLabel,30);if(!approved.subjectLabel)fail('Enter a subject display label.');}
+  // Read/merge/write in one transaction: simultaneous preferences cannot erase each other.
+  const db=await openCaptureDB(),tx=db.transaction('settings','readwrite'),done=finish(tx),store=tx.objectStore('settings');let settings;
+  try{settings={...DEFAULTS,...(await request(store.get('preferences')))?.value,...approved};store.put({key:'preferences',value:settings});}catch(e){tx.abort();await done.catch(()=>{});throw e;}
+  await done;changed();return settings;
+}
 export async function listSubjects(projectId){
   const db=await openCaptureDB(),tx=db.transaction('subjects','readwrite'),done=finish(tx),store=tx.objectStore('subjects');
   const subjects=(await request(store.getAll())).filter(s=>s.projectId===projectId).sort((a,b)=>a.createdAt-b.createdAt||a.id.localeCompare(b.id));

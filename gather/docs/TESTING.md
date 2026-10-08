@@ -1,3 +1,27 @@
+# Gather 1.8.9 validation
+
+The latest direct user requests authorize scrolling selection, manual image tools, blue-and-white presentation and screenshot auto-copy. They explicitly exclude automatic redaction and ask to finish the current release before future feature expansion. All new fixtures are fictional.
+
+| Layer | Fresh result | Scope |
+| --- | --- | --- |
+| Node | 165 passed, zero failed/skipped | Existing 154 plus 11 selected-region geometry, high-DPI rounding, bounds, pacing, cancellation, partial/failure and restoration checks. |
+| Rendered interface | 100 unique groups passed | Capture 21, toolbar 22, case/privacy 18, stabilization 10, case clipboard 7, shared workspace UI 7, new image tools 15. Chrome APIs are doubles. |
+| High-DPI repeat | Image tools 15/15 at 2× device scale | Real Chromium screenshot dimensions/canvas/clipboard bytes, wheel/reverse/edge selection and manual edits. Not extra unique groups or native browser zoom. |
+| Actual worker | 10 groups passed | ServiceWorkerGlobalScope, IndexedDB, Web Locks and stop/restart, with controlled extension APIs. |
+| Visual inspection | Actual fictional screenshots inspected | Full-viewport guides, extended selection, desktop/narrow editor, blue toolbar and workspace views. |
+| Native installed Edge/Chrome | Blocked, exit 2, zero native groups | Managed wildcard ExtensionInstallBlocklist detected before launch. No policy/sandbox/TLS workaround. |
+| Live platforms | No new live lookup in 1.8.9 | Prior authorized 1.8.8 anonymous Instagram observations remain separately qualified; other platforms/signed-in access remain unverified. |
+
+The selected rectangle is a document region, not an archived page. Original tiles are preserved; selected pixels are a separate derivative. Capture start freezes project/scan/subject. Scrolling is bounded by the initial extent and acquisition limits: 24 tiles, 48M stitched pixels, 24,000 CSS-pixel height and 60 seconds. Dynamic height/bounds/failures are partial, not complete. Source switches/navigation/zoom invalidate screenshots; cancellation restores the source.
+
+Pixel readback confirms red arrows/circles and opaque black fills in flattened PNG output. Original hashes remain unchanged; no edits occur automatically. Save/copy/print/folder exports use the selected derivative. Tests restore edited binary images and their relationships, retry denied exports, clear stale review sheets/editors, and remove every original/derivative when deleted. Concurrent copy/export preference writes preserve both settings.
+
+Extension APIs, downloads and tab relationships are controlled doubles. Native activeTab permission, screenshot window focus/lifecycle, OS paste/save/print dialogs, native browser zoom and screen-reader behavior are separate remaining checks. No guarantee across every site/browser or legal compliance certification is claimed. Private backup includes unredacted originals; logical deletion does not clear clipboard, browser history, downloads or prior backups.
+
+Run the eight browser scripts in README and all Node tests from `gather`; repeat image tools with `GATHER_TEST_DPR=2`. Verify actual counts and exit status. `node tests/browser-acceptance.mjs` exits 2 for this documented policy restriction, 1 for a test failure and 0 only after an actual installed smoke journey. Package checks validate ZIP CRC, version, hashes, every runtime byte and extracted tests. Evidence: [1.8.9](evidence/1.8.9/README.md).
+
+## Previous 1.8.8 evidence (historical)
+
 # Gather 1.8.8 validation
 
 The requested validation-first run reproduced two concrete issues and fixed them: current Instagram ID namespaces/pre-hydration profile routing, and large findings rendering cost. No new features or permissions. Public fixtures are fictional; actual authorized profile observations and screenshots stay in ignored artifacts outside Git/packages.

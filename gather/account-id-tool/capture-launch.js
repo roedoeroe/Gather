@@ -1,6 +1,6 @@
 import {readWorkspace} from './workspace-store.js';
 import {resolveTabContext} from './tab-context.js';
-import {resolveCaptureDestination,failCapture} from './capture-store.js';
+import {resolveCaptureDestination,failCapture,getCaptureSettings} from './capture-store.js';
 import {pageSelectionOperation} from './capture-selection.js';
 import {pageCaptureOperation} from './capture-engine.js';
 import {context as validateScope} from './workspace-model.js';
@@ -43,7 +43,7 @@ async function launch(message){
     const item=state.items.find(x=>x.id===message[field]&&x.kind===kind&&x.projectId===context.projectId);
     if(!item)throw new Error('Choose a saved observation from this project.');refs[field]=item.id;
   }
-  await chrome.storage.session.set({[key]:{launchId,context,source,mode:message.mode,selectionMethod:message.selectionMethod||'page',afterCapture:message.afterCapture||'none',refs,startedAt:Date.now()}});
+  await chrome.storage.session.set({[key]:{launchId,context,source,mode:message.mode,selectionMethod:message.selectionMethod||'page',afterCapture:message.afterCapture??((await getCaptureSettings()).automaticCopy?'copy':'none'),refs,startedAt:Date.now()}});
   try{
     const window=await chrome.windows.create({url:chrome.runtime.getURL('capture.html?launch='+launchId),type:'popup',focused:false,width:960,height:760});
     await chrome.storage.session.set({[LOCK]:{launchId,windowId:window.id,source}});

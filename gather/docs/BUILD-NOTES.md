@@ -1,3 +1,15 @@
+# Gather 1.8.9 capture checkpoint
+
+On-page selection uses document coordinates and full-viewport dotted guides. Pointer wheel/edge scrolling is bounded to the initial top-level extent; Escape, navigation, visibility change, resize, controller closure and timeout clean the overlay and restore original scroll/focus. Successful release removes the overlay before acquiring pixels. Extended regions use paced validated viewport tiles and a selected crop derivative. Originals/geometry/limitations remain in binary storage. Bounds or changed page extent never claim complete. Horizontal overflow, nested scrollers, animation/lazy loading and pinch zoom retain stated limitations.
+
+Manual editing uses an SVG gesture preview and redraws the binary canvas only on committed operations. Red arrows/circles and black redactions are flattened into PNG pixels; crops apply in order. Undo and numeric controls are available. Changed operations/notes disable Copy until saved; stale editors reject writes. Busy controls prevent edits during encoding/save. Repeated Save & copy without new edits reuses the saved image instead of adding duplicate derivatives. No automatic redaction or analytical classification.
+
+Screenshot auto-copy defaults on and snapshots its preference at launch. The explicit Select area & copy action overrides off deliberately. Preferences merge in one IndexedDB transaction, so simultaneous folder/copy updates cannot erase each other. Existing ID auto-copy is separate and preserved.
+
+Review sheets validate selected asset, inclusion and review state before output and invalidate open sheets on cross-window changes. Single-image source captions default off, outside original pixels. Privacy backups contain all originals; ordinary image output uses the selected derivative. All current permissions, binary/workspace schema and retention behavior remain unchanged. Source is public; real cases/uploads stay out of fixtures and ZIPs.
+
+## Preserved 1.8.6 engineering notes (historical)
+
 # Gather 1.8.6 stabilization
 
 Preserved 1.8.5 source/packages were verified before edits. This run fixes confirmed existing capture failures and adds no product features. Previous architecture notes remain in [history/1.8.5-BUILD-NOTES](history/1.8.5-BUILD-NOTES.md).

@@ -1,0 +1,22 @@
+{
+  "kind": "rendered-browser-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [
+    "Screenshot auto-copy defaults on, can be disabled, persists through toolbar reopen, and an off capture remains saved without copying.",
+    "Real wheel scrolling during pointer selection stitches the extended rectangle, auto-copies its exact dimensions, retains original tiles and Northbridge/Alex after a Southridge switch, and restores scroll/styles.",
+    "Cancelling an extended drag removes guides and restores the initial page position without a saved image.",
+    "Upward scrolling and reverse-direction drags use document coordinates and restore a nonzero starting scroll position.",
+    "Holding a drag near the viewport edge scrolls automatically; PageDown extends an active drag and cleanup restores the page.",
+    "Pointer tools flatten red arrows, red circles and opaque black redactions into actual PNG pixels; Save & copy uses that image while the original hash remains unchanged. No marks appear until manually drawn.",
+    "Replacing an undone edit with a different edit of the same count disables Copy until saved, preventing stale clipboard output.",
+    "Precise keyboard crop, undo and Save & copy preserve sequential edit coordinates and use the cropped dimensions.",
+    "Changing the selected image in another window clears stale review-sheet pixels and disables printing/export until reopened.",
+    "Validated private binary backup retains original images, manual-edit derivatives, hashes, geometry and relationships.",
+    "Deleting an edited capture removes every original/derivative blob, clears the open editor and preserves other captures.",
+    "Restoring the edited capture from private binary backup retains its selected image hash, manual operations and original case/scan relationships.",
+    "Denied folder export retains the edited image; retry exports the current selected derivative after backup restoration.",
+    "Concurrent screenshot-copy and folder-export preference updates persist independently.",
+    "The compact toolbar retains its direct actions and remembered copy preference with blue controls and no horizontal overflow."
+  ],
+  "errors": []
+}

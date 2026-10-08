@@ -27,4 +27,5 @@ async function init(){
     if(!await validatePreview())return;$('status').textContent=count+' page'+(count===1?'':'s')+' ready · '+(record.status==='partial'?'Partial capture':'Selected image');$('print').disabled=false;
   }finally{bitmap.close();}
 }
+document.body.classList.toggle('hide-caption',!$('caption').checked);
 init().catch(error=>invalidate(error.message));

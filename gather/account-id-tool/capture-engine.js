@@ -60,7 +60,7 @@ export function pageCaptureOperation(operation,token,args={}){
   session.timer=setTimeout(()=>restore(session),15000);
   if(operation==='scroll'){
     if(args.hideSticky&&!session.hidden){for(const element of session.sticky){session.styles.push([element,'visibility',element.style.getPropertyValue('visibility'),element.style.getPropertyPriority('visibility')]);element.style.setProperty('visibility','hidden','important');}session.hidden=true;}
-    scrollTo({left:0,top:args.y,behavior:'instant'});
+    scrollTo({left:args.x??0,top:args.y,behavior:'instant'});
   }
   return measure();
 }
@@ -97,12 +97,12 @@ export async function cropImage(blob,rect){
   canvas.getContext('2d').drawImage(bitmap,bounds.x,bounds.y,bounds.width,bounds.height,0,0,bounds.width,bounds.height);bitmap.close();
   return {blob:await canvasBlob(canvas),bounds};
 }
-export async function composeTiles(tiles,{width,height,scale}){
+export async function composeTiles(tiles,{width,height,scale,originY=0}){
   const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
   const context=canvas.getContext('2d');if(!context)throw new Error('The browser cannot allocate the stitched image.');
   let coveredHeight=0;
   for(const tile of tiles){
-    const bitmap=await createImageBitmap(tile.blob),tileY=Math.round(tile.coordinates.y*scale);
+    const bitmap=await createImageBitmap(tile.blob),tileY=Math.round((tile.coordinates.y-originY)*scale);
     // The final scroll is often clamped, overlapping the previous viewport.
     // Keep earlier pixels (including the first header) and append only new rows.
     const destinationY=Math.max(tileY,coveredHeight),sourceY=destinationY-tileY;

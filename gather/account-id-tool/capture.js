@@ -2,6 +2,7 @@ import {captureViewer} from './capture-viewer.js';
 import {workspaceLink} from './workspace-links.js';
 import {captureHistoryLink} from './workspace-links.js';
 import {selectPageArea,selectionPixels} from './capture-selection.js';
+import {acquireRegionCapture} from './capture-region.js';
 import {copyCaptureImage,saveCaptureImage,printCaptureLink,shareImage} from './capture-output.js';
 import {acquireCapture,cropImage,selectionBounds,CaptureStopped} from './capture-engine.js';
 import {beginCapture,completeCapture,failCapture,getAsset,getCapture} from './capture-store.js';
@@ -87,9 +88,10 @@ async function init(){
     status('Drag an area on the source page. Release to capture; Esc cancels.');
     selection=await selectPageArea({source:launch.source,signal:abort.signal,destination:$('destination').textContent,token:launch.launchId});
   }
-  result=await acquireCapture({source:{...launch.source,...(selection?.documentId?{documentId:selection.documentId}:{})},mode:launch.mode,signal:abort.signal,onProgress:status,token:launch.launchId});
+  result=await (selection?.extended?acquireRegionCapture:acquireCapture)({selection,source:{...launch.source,...(selection?.documentId?{documentId:selection.documentId}:{})},mode:launch.mode,signal:abort.signal,onProgress:status,token:launch.launchId});
   if(abort.signal.aborted)throw new CaptureStopped();
-  if(selection){
+  if(selection?.extended){await save(result);
+  }else if(selection){
     const selected=await cropImage(result.assets[0].blob,selectionPixels(selection,result));
     await save({...result,assets:[...result.assets,{blob:selected.blob,role:'derivative',kind:'selection',dimensions:{width:selected.bounds.width,height:selected.bounds.height},crop:selected.bounds}],crop:selected.bounds,dimensions:{width:selected.bounds.width,height:selected.bounds.height},technical:{selectionMethod:'page',cssSelection:selection.rect,selectionViewport:selection.viewport}});
   }else if(launch.mode==='selection'){

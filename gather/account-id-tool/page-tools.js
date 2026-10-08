@@ -1,6 +1,6 @@
 import {request} from './workspace-client.js';
 import {WORKSPACE_KEY,destinationLabel} from './workspace-model.js';
-import {listSubjects,selectedSubject,selectSubject,getCaptureSettings} from './capture-store.js';
+import {listSubjects,selectedSubject,selectSubject,getCaptureSettings,updateCaptureSettings} from './capture-store.js';
 import {workspaceLink,captureHistoryLink} from './workspace-links.js';
 
 const host=document.getElementById('pageTools');
@@ -13,6 +13,7 @@ function controls(){
   const web=available&&subjectAvailable&&/^https?:\/\//.test(snapshot.url||'');
   for(const b of captureButtons())b.disabled=busy||!web;
   $('captureScan').disabled=busy||!state;
+  $('captureAutoCopy').disabled=busy||!state;
   $('toolbarSubject').disabled=busy||!snapshot?.context.projectId;
   $('savePageLink').disabled=busy||!web;
   $('useDefaultScan').disabled=busy||!snapshot;
@@ -39,6 +40,7 @@ async function refresh({reset=false}={}){
   const valid=!frozen.context.scanId||state.scans.some(s=>s.id===frozen.context.scanId&&s.projectId===frozen.context.projectId);
   if(!valid){$('captureScan').append(new Option('Scan unavailable — choose another',frozen.context.scanId));status('This scan is no longer available. Choose where to save.',true);}
   $('captureScan').value=frozen.context.scanId||'';
+  $('captureAutoCopy').checked=settings.automaticCopy;
   $('captureSubjectRow').hidden=!frozen.context.projectId;
   $('captureSubjectLabel').textContent=settings.subjectLabel;
   $('toolbarSubject').replaceChildren(new Option('Unassigned',''),...subjects.map(s=>new Option(s.name===s.roleId?s.roleId:s.name+' · '+s.roleId,s.id)));
@@ -56,6 +58,7 @@ export async function pageToolsContext(){await ready;const chosen=frozen();retur
 async function init(){
   if(!globalThis.chrome?.runtime?.id)return;
   windowId=(await chrome.windows.getCurrent()).id;
+  $('captureAutoCopy').onchange=run(async()=>{const checked=$('captureAutoCopy').checked;try{await updateCaptureSettings({automaticCopy:checked});}catch(error){$('captureAutoCopy').checked=!checked;throw error;}});
   $('captureScan').onchange=run(async()=>{
     const chosen=frozen(),scanId=$('captureScan').value||null;
     try{await request('workspace.assignTab',{tabId:chosen.tabId,scanId});await refresh({reset:true});}
@@ -68,7 +71,7 @@ async function init(){
   });
   for(const b of captureButtons())b.onclick=run(async()=>{
     const chosen=frozen();status('Starting screenshot…');
-    await request('capture.start',{mode:b.dataset.captureMode,selectionMethod:b.dataset.selectionMethod||'page',afterCapture:b.dataset.afterCapture||'none',tabId:chosen.tabId,expectedUrl:chosen.url,destination:chosen.context,subjectId:chosen.subjectId});
+    await request('capture.start',{mode:b.dataset.captureMode,selectionMethod:b.dataset.selectionMethod||'page',...(b.dataset.afterCapture?{afterCapture:b.dataset.afterCapture}:{}),tabId:chosen.tabId,expectedUrl:chosen.url,destination:chosen.context,subjectId:chosen.subjectId});
     window.close();
   });
   $('savePageLink').onclick=run(async()=>{

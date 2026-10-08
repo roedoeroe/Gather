@@ -1,12 +1,12 @@
-# Check Gather 1.8.8 in Chrome or Edge
+# Check Gather 1.8.9 in Chrome or Edge
 
 The cloud tests reproduced and fixed the reported worker exception. This checklist verifies the remaining native behavior on the browser where Gather is installed. Use only disposable fictional cases for the privacy checks.
 
 ## Update without losing storage
 
 1. Preserve the installed folder. Back up work if the current build opens. If 1.8.0 cannot open, keep the browser profile and stored data intact; do not uninstall or clear site data.
-2. Extract `Gather-1.8.8-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include all modules, including `backup-validation.js` and `history-ui.js`.
-3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.8**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
+2. Extract `Gather-1.8.9-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include every module and stylesheet, including `capture-region.js`, `capture-annotations.js` and `capture-edit.css`.
+3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.9**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
 
 ## Workspace acceptance
 
@@ -37,7 +37,7 @@ The cloud tests reproduced and fixed the reported worker exception. This checkli
 
 Privacy acceptance: confirm New case says **Case name** and explains local storage. With a fictional Northbridge case selected, check the red **Delete case…** button in Settings → Data & Privacy. Cancel first; then test the typed-name guard and each backup choice on disposable cases. A denied backup must retain the complete case. Delete without backup must create no new download. Confirm Southridge and its images remain. With popup and full tool open, clear recent lookup history and confirm old results/drafts disappear, saved cases/images remain, and fresh lookup works. Reload Gather and confirm cleared data stays cleared. Browser history, clipboard and old downloaded files intentionally remain outside these controls.
 
-If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.8; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
+If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.9; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
 
 ## New capture acceptance
 
@@ -61,3 +61,11 @@ If opening still fails, the browser Extensions page lists errors for Gather. Rec
 - Preview a fictional role account block: Candidate/Confirmed labels, original dates and exact IDs remain. Change an association or coverage in another Gather window; the stale preview must clear. Changing only the global scan preserves its reviewed scope. Cancel a delayed Copy; nothing copies afterward.
 - Deny a clipboard write: advice appears inside the preview, text is selected for manual copying and Retry remains available. Previously copied text is outside Gather deletion.
 - In a larger fictional findings list, scroll to an offscreen item, review it and reopen its note editor. Filtering must retain all matching records; tab/focus navigation and report export must still work.
+
+## New capture/editor checks
+
+On a disposable fictional page, drag a selection, scroll down while holding, and release. Guides should reach all viewport edges; the copied rectangle should include the extended content and remain in the original scan. Cancel a second extended drag and verify the starting scroll position returns. Try upward/reverse drag and browser zoom/high-DPI. Nested scroll containers remain visible-only.
+
+In Edit image draw a red arrow, red circle and a black redaction, then Save & copy. Paste into your normal document app and inspect the pixels. Crop/Undo/precise coordinates should work; original bytes remain in a private backup. Auto-copy screenshots can be turned off/reopened; Select area & copy still deliberately copies. Toggle account-ID auto-copy separately. Denied clipboard access keeps the image and explicit Copy retries. Single-image print source details start off.
+
+Review sheets must clear stale images if the selected derivative changes in another Gather window. Confirm edited PNG export, denied folder retry, private binary restore and deletion with disposable data. These are native installed-browser checks, not instructions to upload private data or make cases public.

@@ -4,7 +4,7 @@ A local browser extension for fast account lookup and precise screenshots. **Ope
 
 ## Get Gather 1.8.14
 
-[Extension ZIP](releases/1.8.14/Gather-1.8.14-extension.zip) · [Source/test ZIP](releases/1.8.14/Gather-1.8.14-development.zip) · [SHA-256 checksums](releases/1.8.14/Gather-1.8.14-SHA256SUMS.txt) · [Installation and delivery](releases/1.8.14/Gather-1.8.14-DELIVERY.md)
+[Extension ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/74e27a516183993ef05da91286bc7cd2d4ee6133/releases/1.8.14/Gather-1.8.14-extension.zip) · [Source/test ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/74e27a516183993ef05da91286bc7cd2d4ee6133/releases/1.8.14/Gather-1.8.14-development.zip) · [SHA-256 checksums](releases/1.8.14/Gather-1.8.14-SHA256SUMS.txt) · [Installation and delivery](releases/1.8.14/Gather-1.8.14-DELIVERY.md)
 
 This fix addresses first-click Instagram failures that succeeded on a second click. The initial current-page operation now performs the needed public-source check automatically, with no cookies, an exact account binding and document/conflict guards. Current-page retry keeps pasted input closed. Case/SOC and all three screenshot buttons stay in a fixed bottom area while results scroll.
 

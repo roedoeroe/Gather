@@ -34,10 +34,10 @@ test at tests/instagram-route.test.mjs:24:1
 ✖ Instagram pk is the account ID when hydrated data has a separate id (2.854063ms)
   AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
   + actual - expected
-  
+
   + undefined
   - '9007199254740993123'
-  
+
       at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/instagram-route.test.mjs:26:10)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)
@@ -55,10 +55,10 @@ test at tests/instagram-route.test.mjs:30:1
 ✖ matched anonymous profile route resolves before hydration without inventing status (1.039701ms)
   AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
   + actual - expected
-  
+
   + undefined
   - '9007199254740993123'
-  
+
       at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/instagram-route.test.mjs:32:10)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)
@@ -78,10 +78,10 @@ test at tests/instagram-route.test.mjs:37:1
 ✖ route and hydrated pk agree while separate id is excluded from copy (1.440111ms)
   AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
   + actual - expected
-  
+
   + ''
   - '9007199254740993123'
-  
+
       at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/instagram-route.test.mjs:40:10)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)
@@ -101,10 +101,10 @@ test at tests/instagram-route.test.mjs:42:1
 ✖ route parsing preserves long unquoted content and logging IDs (0.605188ms)
   AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
   + actual - expected
-  
+
   + undefined
   - '9007199254740993123'
-  
+
       at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/instagram-route.test.mjs:44:10)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)
@@ -123,9 +123,9 @@ test at tests/instagram-route.test.mjs:42:1
 test at tests/instagram-route.test.mjs:62:1
 ✖ two conflicting content views remain ambiguous (0.412369ms)
   AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Multiple account IDs/. Input:
-  
+
   'No matching account ID found. Try the page-source fallback.'
-  
+
       at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/instagram-route.test.mjs:64:10)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1382:25)

@@ -6,7 +6,7 @@ A local browser extension for fast account lookup, deliberate research and scree
 
 ## Get the current build
 
-**[Download Gather 1.8.8](releases/1.8.8/Gather-1.8.8-extension.zip)** · Development build for Chrome and Edge
+**[Download Gather 1.8.8](https://raw.githubusercontent.com/roedoeroe/Gather/ddcbaa6d909bd3da2c22943ceae25716b776a4e7/releases/1.8.8/Gather-1.8.8-extension.zip)** · Development build for Chrome and Edge
 
 [Source/test package](releases/1.8.8/Gather-1.8.8-development.zip) · [SHA-256 checksums](releases/1.8.8/Gather-1.8.8-SHA256SUMS.txt) · [Delivery notes](releases/1.8.8/Gather-1.8.8-DELIVERY.md)
 

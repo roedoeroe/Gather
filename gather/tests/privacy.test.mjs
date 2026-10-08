@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 let data={},session={},failWrite=false;
 Object.defineProperty(globalThis.navigator,'locks',{value:undefined,configurable:true});
 globalThis.chrome={storage:{local:{async get(key){return structuredClone(key===null?data:{[key]:data[key]});},async set(values){if(failWrite)throw Error('Storage full');Object.assign(data,structuredClone(values));},async remove(key){delete data[key];}},session:{async get(key){return key===null?session:{[key]:session[key]};},async set(values){Object.assign(session,structuredClone(values));},async remove(key){delete session[key];}}}};
-const {saveBatch,loadBatch,saveLookupDraft,historyEpoch,withHistoryLock,scrubLookupArchive}=await import('../account-id-tool/batches.js');
+const {saveBatch,loadBatch,saveLookupDraft,historyEpoch,withHistoryLock,scrubLookupArchive,recentBatches,MAX_BATCHES}=await import('../account-id-tool/batches.js');
 const {clearLookups,importBackup,backup,saveSearchDraft}=await import('../account-id-tool/workspace-store.js');
 const {emptyState}=await import('../account-id-tool/workspace-model.js');
 const batch=(id='fictional',epoch)=>({id,historyEpoch:epoch,entries:[{url:'https://www.instagram.com/alex.example/',id:'9007199254740993123',status:'resolved'}]});
@@ -46,4 +46,36 @@ test('late search drafts and session edits cannot recreate deleted case context'
 });
 test('late quick draft cannot reference a removed batch in the current epoch',async()=>{
  reset();await assert.rejects(saveLookupDraft('gather.quick',{batchId:'removed',input:'fictional'}),/deleted/);assert.equal(data['gather.quick'],undefined);
+});
+
+
+test('Recent retains five newest batches, removes archive copies and blocks late resurrection',async()=>{
+ reset();data['gather.workspace.v1']=emptyState();const workspace=structuredClone(data['gather.workspace.v1']);
+ for(let i=1;i<=5;i++)await saveBatch({...batch('recent-'+i),createdAt:i,updatedAt:i});
+ data['gather.archive.old']={'gather.batch.recent-1':batch('recent-1'),'gather.prefs':{autoCopy:true}};
+ data['gather.quick']={batchId:'recent-1',input:'fictional old input',submittedInput:'fictional'};
+ await saveBatch({...batch('recent-6'),createdAt:6,updatedAt:6});
+ assert.equal(MAX_BATCHES,5);assert.deepEqual((await recentBatches()).map(b=>b.id),[6,5,4,3,2].map(i=>'recent-'+i));
+ assert.equal(await loadBatch('recent-1'),null);assert.deepEqual(data['gather.quick'],{input:'',submittedInput:'',batchId:null});
+ assert.deepEqual(data['gather.archive.old'],{'gather.prefs':{autoCopy:true}});assert.deepEqual(data['gather.workspace.v1'],workspace);
+ await assert.rejects(saveBatch({...batch('recent-1'),createdAt:1,updatedAt:999}),/left Recent/);
+ await assert.rejects(saveLookupDraft('gather.quick',{batchId:'recent-1',input:'late'}),/deleted/);
+});
+test('Recent migrates older storage on read and an unsuccessful trim leaves all contents intact',async()=>{
+ reset();for(let i=1;i<=8;i++)data['gather.batch.migrate-'+i]={...batch('migrate-'+i),createdAt:i,updatedAt:i};
+ const before=structuredClone(data);failWrite=true;await assert.rejects(recentBatches(),/Storage full/);assert.deepEqual(data,before);failWrite=false;
+ assert.deepEqual((await recentBatches()).map(b=>b.id),[8,7,6,5,4].map(i=>'migrate-'+i));
+ for(let i=1;i<=3;i++)assert.equal(await loadBatch('migrate-'+i),null);
+});
+test('Updating an existing batch does not make it newer than a later lookup',async()=>{
+ reset();for(let i=1;i<=5;i++)await saveBatch({...batch('order-'+i),createdAt:i,updatedAt:i});
+ await saveBatch({...batch('order-1'),createdAt:1,updatedAt:100});await saveBatch({...batch('order-6'),createdAt:6,updatedAt:6});
+ assert.equal(await loadBatch('order-1'),null);assert.equal((await recentBatches())[0].id,'order-6');
+});
+
+test('restoring older backups enforces five recent batches in the same storage commit',async()=>{
+ reset();const legacy={};for(let i=1;i<=8;i++)legacy['gather.batch.backup-'+i]={...batch('backup-'+i),createdAt:i,updatedAt:i};
+ await importBackup({format:'gather-backup',schemaVersion:1,createdAt:1,workspace:emptyState(),legacy});
+ assert.equal(Object.entries(data).filter(([k,v])=>k.startsWith('gather.batch.')&&v).length,5);
+ assert.deepEqual((await recentBatches()).map(b=>b.id),[8,7,6,5,4].map(i=>'backup-'+i));
 });

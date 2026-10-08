@@ -1,49 +1,17 @@
-# Cloud environment setup — Gather 1.8.12
+# Cloud environment setup — Gather 1.8.13
 
-Use the existing checkout at `/workspace/Gather`. Each task is already isolated; do not create a new worktree unless explicitly requested. Inspect Git status, instructions, manifest/package versions and the current handoff before changing files. Preserve newer work and all completed release ZIPs.
+Use the existing `/workspace/Gather` checkout. Tasks are already isolated; do not create worktrees or delegate unless explicitly requested. Inspect Git status/newer edits before changing anything. Read `gather/docs/NEXT-RUN-HANDOFF.md`, `R4-WORKFLOW-RECONCILIATION.md` and `TESTING.md`. Preserve source edits and completed release ZIPs. User authorizes development-branch publication, not a main merge or visibility change.
 
-Runtime source is `gather/account-id-tool`. There are no runtime dependencies, install step, bundler, server or case-storage credentials. Node 24 and Python 3 run the existing tests and packaging. From `/workspace/Gather/gather`:
+Runtime is `gather/account-id-tool`, with no dependencies, install script, bundler, server or case-storage credential. Node 24 and Python 3 run tests/package generation. Browser tests use the supplied Playwright 1.62.1 and `/usr/lib/chromium/chromium`, with `chromiumSandbox:true`. In this machine, set `NODE_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules` before browser commands. Test scripts own/close their own servers/profiles. Nothing needs to run between tasks. Full commands/counts are in TESTING.
 
-```sh
-python3 scripts/build-profile-reader.py --check
-node --test tests/*.test.mjs
-node tests/browser-capture.mjs
-node tests/browser-toolbar.mjs
-node tests/browser-case.mjs
-node tests/browser-worker.mjs
-node tests/browser-profile-reader.mjs
-node tests/browser-stabilization.mjs
-node tests/browser-installed-ui.mjs
-node tests/browser-image-tools.mjs
-GATHER_TEST_DPR=2 node tests/browser-image-tools.mjs
-node tests/browser-case-clipboard.mjs
-python3 scripts/package.py
-```
+Run `python3 scripts/build-profile-reader.py --check` and `node --test tests/*.test.mjs` from `/workspace/Gather/gather`. The reader is generated from local tested adapters, not runtime web scripts. Preserve static worker imports, trusted storage/messages, exact IDs, local case data, no automatic query history, frozen filing, original pixels, derivative guards and binary restore journal.
 
-The prepared environment supplies Playwright 1.62.1 and Chromium 151 at `/usr/lib/chromium/chromium`. Browser scripts start/close their own fixture server and temporary profile. No process needs to survive between tasks. `GATHER_BROWSER_ARTIFACTS` chooses output and `GATHER_CHROMIUM_PATH` selects another available browser. Follow TESTING.md if these tools are absent after restoration; do not add extension runtime dependencies or weaken `chromiumSandbox:true`.
+Managed Chromium blocks unpacked extensions (`/etc/chromium/policies/managed/extensions.json`, `ExtensionInstallBlocklist:["*"]`). `node tests/browser-acceptance.mjs` reports blocked and exits 2 with zero native groups. Do not change policy, sandbox or TLS or install an alternative to evade restrictions. Real rendered/worker/isolated tests remain useful; never label API doubles or simulated DPR as installed Edge/native zoom. Source-image and Reference remain behind the R4 native P0 gate.
 
-1.8.12 validation: 191 Node tests; 21 capture/UX + 24 toolbar + 18 case/privacy + 10 stabilization + 7 case clipboard + 9 installed-runner UI + 16 image-tool groups (105 unique rendered total); image tools also pass at 2× device scale; 10 actual ServiceWorkerGlobalScope groups. [Release evidence](evidence/1.8.12/README.md) records their scope; the earlier [restriction diagnosis](evidence/browser-blocker-2026-10-08/README.md) remains historical evidence. Chrome APIs are doubles; actual installed-browser behavior and live-platform reliability remain separate checks.
-
-The current cloud machine has `/etc/chromium/policies/managed/extensions.json` with `ExtensionInstallBlocklist: ["*"]`. Chromium's official policy definition says this blocks **all unpacked extensions**, including allowlisted ones. No Chrome/Edge alternative is installed here. The restriction prevents installing Gather for a native test in this machine; it is not an observed failure of the user's installation. Existing rendered tests use real pages/canvas/IndexedDB/clipboard and controlled extension APIs and remain useful.
-
-`node tests/browser-acceptance.mjs` now checks this policy before launching, records `status: blocked`, zero passed native groups and exits **2**. Failure is exit 1; an actually completed installed-extension smoke journey is exit 0. It uses current controls and a bounded worker wait, not the old + New/Project name UI. The nine shared UI groups passed separately with rendered/API-double fixtures using `node tests/browser-installed-ui.mjs`. Native toolbar invocation, activeTab screenshots and OS dialogs remain outside that smoke test. Never count the blocked run as passed or change policy/sandbox/TLS. Use a permitted test environment or [the short installed-browser check](BROWSER-TEST-BLOCKER.md).
-
-The redesign has four views, optional-intake New case, capture inspection and Settings privacy controls. Preserve frozen filing, exact string IDs, project-free lookup, original images and binary backups. Preserve static worker imports, privacy generations/locks/queues, tombstones, archive scrubbing and late-write guards. Case data stays local; source remains public by the user's choice. Searches/lookups contact chosen sites, exports create separate files. No cloud sync, analytics, passive collection or name-based identity inference.
-
-The maintained branch is `develop/1.8.0-r3` (historical name). Main now contains the user-side merge of 1.8.11 (b0f4735ab4eec201dbc0ad534d5634b7129b27af), observed after packaging. The 1.8.12 checkpoint remains on the development branch. If restoration checks out main without `gather`, check local changes and fetch/switch to the existing development branch; do not reset user edits. Use the supplied Git proxy authentication. Development-branch publication is authorized; merging main or changing visibility is not requested. Versioned delivery assets are tracked in `releases/1.8.12/`; `/dist` also contains local copies. Earlier releases remain immutable. GitHub Release upload endpoints previously returned HTTP 400 Bad Content-Length; Git ZIP mirrors are the working delivery path. Fetch the development branch for later testing-tool/document changes; the release source ZIP is an immutable snapshot.
-
-Update at the same installed directory and Reload, without uninstalling or clearing storage. Reload releases ephemeral session values. Keep the old package and matching backup; validate rollback in a separate clean profile.
+The development branch is `develop/1.8.0-r3` (historical branch name). Main retains the user's independent 1.8.11 merge. Use the existing HTTPS Git proxy; do not request a token merely because GH_TOKEN is absent. Preserve local-only work. Versioned ZIPs/receipts are in `releases/1.8.13`; older releases remain immutable. ZIP raw downloads are the verified delivery route; GitHub Release upload was previously unavailable. No case/reference content goes into public source or fixtures.
 
 ## The setup dialog
 
-Choose **Done** in “Configure setup instructions.” **Install script — Not set** is expected: no runtime dependencies or install script are required. **Start skill** is the saved agent startup guide, not an additional extension to install. If the product then offers **Publish environment**, use it to preserve this prepared cloud workspace for future tasks. These are cloud settings; Gather is separately installed from its extension ZIP on your computer.
+Choose **Done** in “Configure setup instructions.” **Install script — Not set** is expected: Gather has no runtime installation step. **Start skill** is the saved guide for future cloud work, not another extension to install. Review and save updated environment settings, then use **Publish environment** if offered to preserve the prepared cloud snapshot. The saved draft does not execute scripts or publish itself. Cloud publication and installing Gather's extension ZIP on your computer are separate operations.
 
-The `start_skill` configuration draft captures these steps. Saving a draft does not execute startup, publish a cloud snapshot or verify restoration in a fresh task. Environment publication remains a separate user action. The repository draft is corrected from main to the verified development checkout at mount Gather. Network, credentials and the intentionally absent install script are preserved.
-
-Latest behavior: web/image searches launch without retained query/draft/log; old query text is scrubbed while stable legacy references preserve captures. Read SEARCH-AND-LOOKUP-1.8.11.md before changing retention. Full runtime uses 80 packaged files.
-
-Hardening notes: use HARDENING-REVIEW-1.8.12.md in gather/docs. Generated profile-reader.js must match local modules: run python3 scripts/build-profile-reader.py --check before packaging.
-
-The 1.8.12 isolated-world parser gate adds five real Chromium groups with intercepted fictional network. Package/public-source scanners run locally, with no external scanning upload.
-
-Latest direction is R4-WORKFLOW-RECONCILIATION.md. Read it before expanding features; reported Edge Instagram/selection defects precede Reference/source-image work. 1.8.12 is a tested development checkpoint, not an R4-complete release.
+The workspace restoration observed in this run preserved edits and tools. Temporary processes/logs were restarted/rerun. This does not establish restoration of any later unpublished config draft. Network, secret requirements and the absent install script are preserved.

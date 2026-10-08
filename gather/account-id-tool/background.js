@@ -1,7 +1,7 @@
 import {validateMessage,restrictStorageAccess} from './message-boundary.js';
 import {handleWorkspace, readWorkspace, dispatch, updateSaveMenu} from './workspace-store.js';
 import {trackTemporary, untrackTemporary, tabRemoved} from './tab-ownership.js';
-import {saveBatch,saveLookupDraft} from './batches.js';
+import {saveBatch,saveLookupDraft,recentBatches} from './batches.js';
 import {handleQuick} from './quick-worker.js';
 import {patchPreferences} from './preferences.js';
 import {TAB_CONTEXT_KEY, inheritTabContext, removeTabContext, replaceTabContext, pruneTabContexts, resetTabContexts, resolveTabContext} from './tab-context.js';
@@ -19,7 +19,7 @@ async function openFull(batchId) {
 }
 // Reapply on every worker lifecycle, not only installation. Keep a handled
 // promise and refuse worker operations on failure without leaking raw errors.
-const storageReady=restrictStorageAccess().then(()=>null,error=>error);
+const storageReady=restrictStorageAccess().then(async()=>{await recentBatches();return null;}).catch(error=>error);
 chrome.runtime.onMessage.addListener((message,sender,reply)=>{
   const allowed=['index.html','popup.html','workspace.html','capture.html','evidence.html'];
   if(sender.id!==chrome.runtime.id||!allowed.some(p=>sender.url?.split(/[?#]/)[0]===chrome.runtime.getURL(p)))return;
@@ -73,7 +73,6 @@ if(chrome.tabs.query)pruneTabContexts().catch(()=>{});
 chrome.runtime.onInstalled.addListener(()=>{
   chrome.contextMenus.removeAll(()=>{
     chrome.contextMenus.create({id:'gather-save',title:'Save to Gather · Inbox',contexts:['page','link','selection'],documentUrlPatterns:['http://*/*','https://*/*']},()=>{if(!chrome.runtime.lastError)updateSaveMenu().catch(()=>{});});
-    chrome.contextMenus.create({id:'gather-case-selection',title:'Case Start from selected text…',contexts:['selection'],documentUrlPatterns:['http://*/*','https://*/*']});
     chrome.contextMenus.create({id:'gather-screenshot',title:'Capture visible page in Gather',contexts:['page'],documentUrlPatterns:['http://*/*','https://*/*']});
   });
 });
@@ -83,7 +82,6 @@ chrome.storage.onChanged.addListener((changes,area)=>{
 });
 chrome.contextMenus.onClicked.addListener(async(info,tab)=>{
   if(await storageReady){chrome.action.setBadgeText({text:'!'}).catch(()=>{});return;}
-  if(info.menuItemId==='gather-case-selection'){chrome.storage.session.set({'gather.caseSelection':{text:String(info.selectionText||'').slice(0,100000)}}).then(()=>chrome.tabs.create({url:chrome.runtime.getURL('workspace.html')})).catch(()=>{});return;}
   if(info.menuItemId==='gather-screenshot'){launchCapture({mode:'visible',tabId:tab.id}).catch(async error=>{await chrome.storage.session.set({gatherCaptureError:error.message});chrome.action.setBadgeText({text:'!'}).catch(()=>{});});return;}
   if(info.menuItemId!=='gather-save')return;
   // Enqueue the context read immediately, before any tab work.

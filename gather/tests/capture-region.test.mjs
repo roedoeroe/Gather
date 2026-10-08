@@ -20,3 +20,12 @@ test('source movement discards unvalidated tiles and restores page',async()=>{co
 test('failed later screenshot retains only validated selected pixels and labels partial',async()=>{const a=adapter({failAt:2}),r=await acquireRegionCapture({selection,adapter:a});assert.equal(r.status,'partial');assert.equal(r.assets.filter(x=>x.role==='tile').length,1);assert.deepEqual(r.dimensions,{width:520,height:1600});assert.ok(r.limitations.some(x=>x.includes('screenshot failed')));assert.ok(a.restored&&a.disposed);});
 test('changed page height and tile truncation never claim complete',async()=>{for(const a of [adapter({changed:true}),adapter()]){const r=await acquireRegionCapture({selection,adapter:a,limits:{maxTiles:1}});assert.equal(r.status,'partial');assert.equal(r.assets.filter(x=>x.role==='tile').length,1);assert.ok(a.restored);}});
 test('fractional crop bounds include outward-rounded high-DPI edge pixels',async()=>{const a=adapter(),r=await acquireRegionCapture({adapter:a,selection:{...selection,documentRect:{...rect,x:40.25,width:260.5}}});assert.equal(r.dimensions.width,522);assert.equal(a.cropBounds.x,80);});
+test('live selection refuses horizontal clipping instead of silently shrinking width',async()=>{
+ assert.throws(()=>regionPlan(metrics,{...rect,x:900,width:100.5}),/unavailable/);
+ const a=adapter();a.crop=async()=>({blob:new Blob(['wrong']),bounds:{width:500,height:3400}});
+ await assert.rejects(acquireRegionCapture({adapter:a,selection}),/omit selected pixels/);assert.ok(a.restored);
+});
+test('aspect mismatch of several pixels fails even when the old relative tolerance accepted it',async()=>{
+ const a=adapter();a.dimensions=async()=>({width:2000,height:1590});
+ await assert.rejects(acquireRegionCapture({adapter:a,selection}),CaptureStopped);assert.ok(a.restored);
+});

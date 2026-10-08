@@ -1,3 +1,5 @@
+> Current 1.8.13/R4 status: see [R4 reconciliation](R4-WORKFLOW-RECONCILIATION.md). Simple Case/SOC filing, five recents, direct selection and Crop handles are implemented. Native Edge reports remain open. Earlier intake/coverage and communication-composer proposals below are historical and superseded; current Reference direction is exact local retrieval only.
+
 # Gather goals audit — 1.6.1 through 1.8.6
 
 Latest steering: read [R4 workflow reconciliation](R4-WORKFLOW-RECONCILIATION.md) first. It narrows the product to Edge utilities and supersedes older coverage/intake/composer priorities. The signed-in Instagram and horizontal-selection defects reported there remain open; 1.8.12 is a tested development checkpoint, not completion of R4.

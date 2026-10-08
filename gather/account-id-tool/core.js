@@ -222,8 +222,8 @@ function jsonObjects(html) {
     // Known data assignments contain JSON, not executable extraction logic.
     // Read their balanced JSON value without evaluating the surrounding script.
     const marker = /(?:\b(?:var\s+)?ytInitialData\s*=|\bwindow\._sharedData\s*=|\bwindow\.__additionalDataLoaded\s*\(\s*["'][^"']+["']\s*,)\s*/g;
-    const start = marker.exec(body);
-    if (start) {
+    let start;
+    while ((start = marker.exec(body))) {
       const tail = body.slice(start.index + start[0].length);
       let depth = 0, quoted = false, escaped = false;
       for (let i = 0; i < tail.length; i++) {

@@ -33,3 +33,9 @@ test('Facebook profile routes require matching vanity and URL and reject conflic
   assert.equal(extract(route).id,exact);
   for(const patch of [{url:'/southridge'},{url:'https://example.test/northbridge'},{params:{userVanity:'southridge'}},{rootView:{props:{userID:'123'}}}])assert.ok(extract({...route,...patch}).error);
 });
+test('all recognized assignments in one script are inspected, including later profiles and conflicts',()=>{
+ const p=normalizeProfile('instagram.com/northbridge');
+ const script='<script>window._sharedData={"username":"other.example","id":"123"};window.__additionalDataLoaded("/northbridge/",{"username":"northbridge","profile_id":"9007199254740993123"});</script>';
+ assert.equal(extractId(script,p).id,'9007199254740993123');
+ assert.match(extractId(script.replace('other.example','northbridge'),p).error,/Multiple account IDs/);
+});

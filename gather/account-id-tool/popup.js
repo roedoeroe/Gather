@@ -1,3 +1,5 @@
+import {recentBatches} from './batches.js';
+import {clearHistoryDialog} from './history-ui.js';
 import {formerAliasButton} from './account-state-ui.js';
 import {saveAccountButton,captureLookupContext} from './workspace-integration.js';
 import {parseInput, normalizeProfile, formatIds, formatDetails, accountTitle, suppliedIds, idCheck, isCopyableId} from './core.js';
@@ -9,7 +11,7 @@ import {patchPreferences, onPreferencesChanged} from './preferences.js';
 const $ = id => document.getElementById(id);
 // Viewport-relative height feeds back into Chrome's popup auto-sizing. Use the
 // screen instead, leaving space for the browser toolbar on smaller displays.
-document.documentElement.style.setProperty('--panel-limit',Math.max(360,Math.min(580,screen.availHeight-120))+'px');
+document.documentElement.style.setProperty('--panel-limit',Math.max(360,Math.min(580,screen.availHeight-40))+'px');
 let state = {batch:null,busy:false}, submitting=false, initialized=false, requestNumber=0, appliedNumber=0;
 let currentPage='', currentTabId=null, pageRequest=0, checkingPage=false, lastRun=null, messageTimer, inputDirty=false, copying=false, prefsPending=Promise.resolve();
 const entries = () => state.batch?.entries || [];
@@ -28,7 +30,7 @@ function renderInput() {
   $('quickCount').textContent=count?count+' account'+(count===1?'':'s')+(parsed.duplicates?' · duplicates merged':'')+(parsed.invalid.length?' · '+parsed.invalid.length+' items skipped':''): $('quickLinks').value.trim()?'No supported profile links found':'Instagram, Facebook, Threads, TikTok, YouTube';
   renderSummary();
   $('getIds').disabled=!initialized||submitting||state.busy||checkingPage||(!count&&!fromPage);
-  $('getIds').textContent=state.busy?'Finding account IDs…':fromPage?'Find IDs on this page':'Find account IDs';
+  $('getIds').textContent=state.busy?'Finding account IDs…':fromPage?(state.batch?.entries.length?'Retry this page':'Find IDs on this page'):'Find account IDs';
   $('getIds').title=fromPage?'Find account IDs from '+currentPage:'';
   $('quickLinks').readOnly=submitting||state.busy||checkingPage;
   $('usePage').disabled=!initialized||submitting||state.busy||checkingPage||!currentPage;
@@ -39,24 +41,26 @@ function line(className, text) { const el=document.createElement('div');el.class
 function renderSummary() {
   const rows=entries(), n=rows.filter(e=>e.status==='resolved').length;
   const previous=!state.busy&&$('quickLinks').value.trim()!==''&&state.submittedInput!==null&&state.submittedInput!==undefined&&$('quickLinks').value!==state.submittedInput;
+  $('quickSummary').hidden=rows.length===1&&n===1&&!state.busy&&!state.interrupted&&!previous;
   $('quickSummary').textContent=(previous?'Previous results · ':'')+(state.busy?n+' of '+rows.length+' found · Looking up…':accountSummary(rows)+(state.interrupted?' · Interrupted':''));
 }
 function render() {
   document.body.classList.toggle('omit-display-names',$('quickMode').value==='details'&&!$('quickNames').checked);
   renderInput();const rows=entries();
-  $('quickResults').hidden=!rows.length;document.body.classList.toggle('has-results',Boolean(rows.length));
+  $('quickResults').hidden=!rows.length;document.body.classList.toggle('has-results',Boolean(rows.length));document.body.classList.toggle('single-result',rows.length===1&&rows[0].status==='resolved');
   $('stopQuick').hidden=!state.busy;$('stopQuick').disabled=state.stopping||submitting;$('stopQuick').textContent=state.stopping?'Stopping…':'Stop';
   $('retryQuick').hidden=state.busy||!rows.some(e=>!['resolved','gone'].includes(e.status));$('retryQuick').disabled=submitting;
   const ids=$('quickMode').value==='ids';$('quickSeparator').hidden=!ids;
   $('quickNamesOption').hidden=ids;
   $('copyQuick').textContent=ids?'Copy IDs':'Copy list';$('copyQuick').disabled=submitting||state.busy||!rows.length||(ids&&!rows.some(isCopyableId));
-  $('quickSaved').textContent=state.warning||(state.batch?.invalid?.length?state.batch.invalid.length+' items skipped · Review in the full tool.':'Saved in Recent batches · Edit notes in the full tool.');
+  $('quickSaved').textContent=state.warning||(state.batch?.invalid?.length?state.batch.invalid.length+' items skipped · Review in the full tool.':'Kept in your five recent lookups.');
   const list=$('quickList'),scroll=list.scrollTop;list.replaceChildren();
   let goneHeading=false,unknownHeading=false;for(const entry of orderAccounts(rows)) {
     const gone=accountState(entry)==='GONE';if(!state.busy&&accountState(entry)==='UNKNOWN_TECHNICAL'&&!unknownHeading){const heading=document.createElement('li');heading.className='row-issue';heading.textContent='Could not determine — review';list.append(heading);unknownHeading=true;}if(gone&&!goneHeading){const heading=document.createElement('li');heading.className='quiet';heading.textContent='Accounts no longer available';list.append(heading);goneHeading=true;}
     const row=document.createElement('li');row.className='account-row';
     const name=line('account-name','');const caption=document.createElement('span');caption.className='name-caption';caption.textContent='Display name:  ';
     name.append(caption,document.createTextNode(entry.displayName||entry.suppliedName||(entry.status==='loading'?'Finding…':'Unavailable')));row.append(name);
+    if(entry.handle)row.append(line('username-line','Username: @'+entry.handle));
     if(!entry.displayName&&entry.suppliedName)row.append(line('name-note','Supplied · not checked'));
     const annotation=notesInfo(entry),linkLine=line('link-line',''),link=document.createElement('a');
     link.className='account-link';link.textContent=entry.originalUrl||entry.url;link.href=/^https?:\/\//i.test(entry.originalUrl||'')?entry.originalUrl:'https://'+(entry.originalUrl||entry.url.replace(/^https:\/\//,''));link.target='_blank';link.rel='noopener noreferrer';linkLine.append(link);
@@ -95,7 +99,7 @@ async function copyText(text, message) {
   }
 }
 async function copyAll(automatic=false) {
-  const ids=$('quickMode').value==='ids', eligible=entries().filter(isCopyableId);
+  const ids=automatic||$('quickMode').value==='ids', eligible=entries().filter(isCopyableId);
   const count=ids?new Set(eligible.map(e=>e.platform+':'+e.id)).size:entries().length, excluded=entries().length-eligible.length;
   const text=ids?formatIds(entries(),null,$('quickSeparator').value):formatDetails(entries(),null,{includeNames:$('quickNames').checked});
   const batchId=state.batch?.id;
@@ -111,11 +115,11 @@ async function refresh(restore=false) {
     const finished=lastRun===next.batch?.id&&!next.busy&&state.busy;
     const clearCompleted=state.busy&&!next.busy&&state.batch?.id===next.batch?.id&&next.input===''&&$('quickLinks').value===next.submittedInput;
     state=next;
-    if((restore&&!inputDirty)||clearCompleted){$('quickLinks').value=next.input;inputDirty=false;}
+    if((restore&&!inputDirty)||clearCompleted){$('quickLinks').value=next.input;inputDirty=false;if(next.input)$('pasteLinks').open=true;}
     if(next.busy)lastRun=next.batch?.id;
-    initialized=true;render();
-    if(finished)$('quickResults').scrollIntoView({block:'start'});
-    if(clearCompleted&&$('manualCopy').hidden)$('quickLinks').focus();
+    initialized=true;render();if($('quickRecent').open)renderRecent().catch(error=>notice(error.message));
+    if(finished)$('quickResults').scrollIntoView({block:'nearest'});
+    if(clearCompleted&&$('manualCopy').hidden&&!$('copyQuick').disabled)$('copyQuick').focus({preventScroll:true});
     if(!copying&&$('quickAuto').checked&&(next.copyPending||finished)&&!next.interrupted&&!next.stopping&&entries().every(e=>e.status!=='stopped')){
       copying=true;try{await copyAll(true);}finally{copying=false;}
     }
@@ -137,7 +141,7 @@ async function act(message, copyAfter=false) {
     if(state.busy)lastRun=state.batch?.id;render();if(copyAfter&&$('quickAuto').checked)await copyAll(true);
   }
   catch(error){notice(error.message);}
-  finally{submitting=false;render();await refresh();if(['quick.start','quick.retry'].includes(message.type)&&!state.busy&&state.batch)$('quickResults').scrollIntoView({block:'start'});}
+  finally{submitting=false;render();await refresh();if(['quick.start','quick.retry'].includes(message.type)&&!state.busy&&state.batch)$('quickResults').scrollIntoView({block:'nearest'});}
 }
 function saveDraft() {
   inputDirty=true;renderInput();send({type:'quick.draft',historyEpoch:state.historyEpoch,input:$('quickLinks').value}).catch(error=>notice('Draft could not be saved. '+error.message));
@@ -170,14 +174,14 @@ async function updateCurrentPage() {
   if(request===pageRequest){currentPage=url;currentTabId=tab?.id??null;$('usePage').title=hint;renderInput();}
   return request===pageRequest?{url:currentPage,tabId:currentTabId}:null;
 }
-async function runCurrentPage() {
+async function runCurrentPage(automatic=false) {
   if(submitting||state.busy||checkingPage)return;
   checkingPage=true;renderInput();
   try {
     const page=await updateCurrentPage();
     if(!page?.url){notice('This page is not a supported profile. Open a profile or paste its link.');return;}
-    $('quickLinks').readOnly=false;$('quickLinks').focus();$('quickLinks').select();insertText(page.url);
-    await act({type:'quick.start',input:page.url,currentTabId:page.tabId});
+    if(automatic)$('quickLinks').value=page.url;else{$('quickLinks').readOnly=false;$('quickLinks').focus();$('quickLinks').select();insertText(page.url);}
+    await act({type:'quick.start',input:page.url,currentTabId:page.tabId});if(automatic)$('pasteLinks').open=false;
   }catch{notice('Could not read this page. Paste its profile link to continue.');}
   finally{checkingPage=false;renderInput();}
 }
@@ -211,7 +215,7 @@ $('quickNames').addEventListener('change',()=>{render();savePrefs({includeNames:
 $('quickAuto').addEventListener('change',()=>savePrefs({autoCopy:$('quickAuto').checked}));
 onPreferencesChanged(prefs=>{applyPrefs(prefs);render();});
 $('openFull').addEventListener('click',async()=>{try{await send({type:'quick.open',batchId:state.busy?null:state.batch?.id});window.close();}catch(error){notice(error.message);}});
-$('usePage').addEventListener('click',runCurrentPage);
+$('usePage').addEventListener('click',()=>runCurrentPage());
 $('closeManual').addEventListener('click',closeManual);
 async function init() {
   if(!globalThis.chrome?.runtime?.id){notice('Install Gather in Chrome or Edge to use this panel.');return;}
@@ -226,6 +230,15 @@ async function init() {
     chrome.tabs.onActivated.addListener(()=>updateCurrentPage());
     await updateCurrentPage();
   }catch{notice('Settings could not be restored.');}
-  await refresh(true);if($('manualCopy').hidden)(useCurrentPage()&&!$('getIds').disabled?$('getIds'):$('quickLinks')).focus();
+  await refresh(true);if(currentPage&&!state.busy&&!$('quickLinks').value.trim())await runCurrentPage(true);else if($('quickLinks').value.trim())$('pasteLinks').open=true;if($('manualCopy').hidden)(!state.busy&&state.batch?.entries.length&&!$('copyQuick').disabled?$('copyQuick'):useCurrentPage()&&!$('getIds').disabled?$('getIds'):$('pasteLinks').open?$('quickLinks'):$('pasteLinks').querySelector('summary')).focus({preventScroll:true});
 }
+let recentTicket=0;
+async function renderRecent(){
+  const ticket=++recentTicket,batches=await recentBatches();if(ticket!==recentTicket)return;
+  $('recentCount').textContent='· '+batches.length;$('recentList').replaceChildren();
+  for(const batch of batches){const row=document.createElement('li'),button=document.createElement('button'),date=document.createElement('small');button.type='button';button.textContent=batch.entries.length===1?accountTitle(batch.entries[0]):batch.entries.length+' accounts';date.textContent=new Date(batch.createdAt).toLocaleString();button.append(date);button.onclick=async()=>{try{await send({type:'quick.open',batchId:batch.id});window.close();}catch(error){notice(error.message);}};row.append(button);$('recentList').append(row);}
+  if(!batches.length)$('recentList').append(line('quiet','No recent lookups.'));
+}
+$('quickRecent').ontoggle=()=>{if($('quickRecent').open)renderRecent().catch(error=>notice(error.message));};
+$('clearRecent').onclick=()=>clearHistoryDialog().catch(error=>notice(error.message));
 init();

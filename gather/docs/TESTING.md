@@ -1,39 +1,46 @@
-# Gather 1.8.12 validation
+# Gather 1.8.13 validation
 
-All fixtures are fictional. Executed counts describe this build, not arbitrary-site reliability or a security guarantee.
+All test data is fictional. These checks verify specific behavior, not universal platform reliability or legal compliance.
 
-| Layer | Result | Boundary |
+| Layer | Result | Actual scope |
 |---|---|---|
-| Node | 191 passed, zero failed/skipped | All five adapters/exact IDs, context, model, capture, privacy, strict messages, cookie omission, generated-parser parity and seeded package-gate rejections. |
-| Rendered workflows | 105 unique groups passed | Capture 21, toolbar 24, case/privacy 18, stabilization 10, case clipboard 7, shared workspace 9, image tools 16. Real DOM/canvas/clipboard/IndexedDB; controlled Chrome APIs. |
-| Worker | 10 passed | Real Chromium ServiceWorkerGlobalScope/lifecycle; controlled Chrome APIs. |
-| Isolated page reader | 5 passed | Real Chromium isolated world/DOM/fetch, intercepted fictional network. Tests minimal return, name choice, same-origin source, login and ambiguity. |
-| Native installed extension | Blocked, exit 2, zero groups | Administrator blocks unpacked extensions; no policy or sandbox bypass. |
-| Live platforms | Not rerun for 1.8.12 | 1.8.11's single anonymous Instagram observation remains historical and does not establish signed-in Edge reliability. |
-| Visual | Three screenshots inspected | Current-profile popup, settings/privacy and completed selection. Historical screenshot provenance checked, not every old pixel. |
+| Node | **201 passed**, zero failed/skipped | Five adapters/exact strings, later assignments/conflicts, bounded selection, crop geometry, context, case/SOC model, five-recents migration/restore, history locks, privacy and package gate. |
+| Rendered workflows | **110 unique groups passed** | Capture 21, toolbar 27, case/privacy 19, stabilization 10, case clipboard 7, shared workspace 9, image tools 17. Real DOM/canvas/clipboard/IndexedDB; extension API doubles. |
+| Pixel-selection pipeline | **11 groups passed** | Visible/scrolling markers at five simulated DPR values, cancellation/restoration. Browser screenshots are provided by Playwright, not captureVisibleTab. Native zoom/DPI remains untested. |
+| Worker | **10 passed** | Actual Chromium ServiceWorkerGlobalScope and lifecycle; controlled Chrome APIs. |
+| Isolated profile reader | **5 passed** | Actual isolated-world DOM/fetch; intercepted fictional network. Small result, source fallback and account binding. |
+| Repeat at 2× | **17 image-tool groups passed** | Repeated evidence, not 17 additional unique scenarios. |
+| Native installed extension | **Blocked**, exit 2, zero groups | Administrator policy blocks unpacked extensions. No bypass or sandbox change. |
+| Live platform | **Not run for 1.8.13** | Earlier anonymous Instagram observation is historical; it does not validate signed-in Edge. |
+| Visual inspection | Actual generated screenshots inspected | Current-profile popup (including visible Select area), simple case creation, Case/SOC history, crop handles and the unsupported-page toolbar. Fictional content only. |
 
-From the gather directory:
+The pixel fixture uses unique colors at four corners, four edge midpoints and center. Coordinates/dimensions are checked through real selection/crop/stitching. Its five simulated device scales (0.8/1/1.25/1.5/2) are not substitutes for Edge native 80/100/125/150/200% zoom or Windows DPI. See versioned scenario JSON for the exact exercised pipeline. Real Chrome/Edge API invocation, installed toolbar/side panel, activeTab grant, OS application paste/save/print, native zoom and live signed-in platforms remain separate gates.
+
+## Reproduce
+
+From `/workspace/Gather/gather` with Node 24, Python 3, supplied Playwright 1.62.1 and sandboxed Chromium 151:
 
 ```sh
+export NODE_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules
 python3 scripts/build-profile-reader.py --check
 node --test tests/*.test.mjs
 node tests/browser-capture.mjs
 node tests/browser-toolbar.mjs
 node tests/browser-case.mjs
-node tests/browser-worker.mjs
 node tests/browser-stabilization.mjs
 node tests/browser-case-clipboard.mjs
 node tests/browser-installed-ui.mjs
 node tests/browser-image-tools.mjs
-node tests/browser-profile-reader.mjs
 GATHER_TEST_DPR=2 node tests/browser-image-tools.mjs
+node tests/browser-selection-pixels.mjs
+node tests/browser-worker.mjs
+node tests/browser-profile-reader.mjs
+node tests/browser-acceptance.mjs
 python3 scripts/package.py
 ```
 
-Node 24, Python 3, supplied Playwright 1.62.1 and Chromium 151 with chromiumSandbox:true. If needed here, set NODE_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules. GATHER_BROWSER_ARTIFACTS directs ignored outputs; GATHER_CHROMIUM_PATH selects an available permitted browser. No runtime install/server/bundler is required. Editing parser modules requires regeneration with `python3 scripts/build-profile-reader.py`; packaging rejects stale generated code. No runtime eval/import of website scripts.
+No runtime installation, server or bundler. Test scripts own and close fixture servers/profiles. `GATHER_BROWSER_ARTIFACTS` chooses ignored output; `GATHER_CHROMIUM_PATH` selects an available permitted browser. Keep `chromiumSandbox:true`. Do not edit runtime/tests while their suites execute. Capture exit codes and verify current result files; partial/zero-test runs are not passes.
 
-`node tests/browser-acceptance.mjs` exits 2 for a policy block, 1 for failure, 0 for completed installed checks. Never count a blocked/zero-test run as passed. Do not edit runtime/tests while a suite is executing. Preserve exit codes and inspect current result files. [Privacy checks](PRIVACY-ACCEPTANCE.md), [hardening review](HARDENING-REVIEW-1.8.12.md) and [release evidence](evidence/1.8.12/README.md) describe practical limits. Extracted-package/2× results are appended after those gates complete.
+Native runner status: exit 2 = blocked, 1 = failure, 0 = completed installed smoke journey. This machine has `/etc/chromium/policies/managed/extensions.json`, `ExtensionInstallBlocklist:["*"]`. It is a runner restriction, not a diagnosed problem with the user's Edge installation. See [local acceptance](LOCAL-ACCEPTANCE.md) and [R4 status](R4-WORKFLOW-RECONCILIATION.md).
 
-All 16 image-tool groups also passed at 2× device scale; repeat evidence, not additional unique scenarios.
-
-Extracted development-package gate passed 191 Node tests, 24 toolbar groups, 10 real worker groups and 5 real isolated-world groups. Final runtime bytes are compared against that tested extraction in the package receipt; documentation/evidence updates do not change those runtime bytes.
+Versioned scenario records are in [evidence/1.8.13](evidence/1.8.13/README.md). Release receipts outside the source package record extracted-package byte/test checks, SHA-256 and public download verification. Packaging locally scans candidate files/archives for common private-file and credential patterns; this is not general PII detection and uploads nothing to a scanner. Original 1.8.12 artifacts and evidence remain immutable.

@@ -15,6 +15,14 @@ export function selectionBounds(rect,width,height){
   if(right-x<1||bottom-y<1)throw new Error('Select a rectangle with a positive width and height.');
   return {x,y,width:right-x,height:bottom-y};
 }
+// Live page selections must never be silently clipped to a smaller bitmap.
+// Tiny floating-point error is snapped before outward pixel rounding.
+export function exactSelectionBounds(rect,width,height){
+  const epsilon=1e-7;
+  if(![rect.x,rect.y,rect.width,rect.height,width,height].every(Number.isFinite)||rect.width<=0||rect.height<=0||rect.x < -epsilon||rect.y < -epsilon||rect.x+rect.width>width+epsilon||rect.y+rect.height>height+epsilon)throw new Error('The captured image does not contain the entire selected area. Start a new capture.');
+  const x=Math.floor(Math.max(0,rect.x)+epsilon),y=Math.floor(Math.max(0,rect.y)+epsilon);
+  return {x,y,width:Math.ceil(Math.min(width,rect.x+rect.width)-epsilon)-x,height:Math.ceil(Math.min(height,rect.y+rect.height)-epsilon)-y};
+}
 export function fullPagePlan(metrics,limits=CAPTURE_LIMITS){
   const scale=Math.max(0.1,metrics.scale||metrics.devicePixelRatio||1);
   const width=Math.ceil(metrics.width*scale);

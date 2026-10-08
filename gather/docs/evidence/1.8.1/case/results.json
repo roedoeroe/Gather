@@ -1,0 +1,23 @@
+{
+  "kind": "rendered-browser-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [
+    "Actual Case Start review corrects a field, rejects a term, excludes private contact and commits three roles; ephemeral names absent from durable context.",
+    "Editable queued search resolves ephemeral values only for launch; durable search and activity retain tokens and coverage records launch.",
+    "Result opener retains original scan after switching to Southridge; metadata-only save retains role and Evidence ID without image assets.",
+    "Manual search drafts and resolved queries in Ephemeral Case also stay session-only; durable history uses a reviewed seed token.",
+    "Similar account name creates no association; actual review dialog explicitly confirms finding with supporting reason.",
+    "Clipboard account block preview preserves exact permanent string ID and requires deliberate copy.",
+    "Visible-image fixture persists in real IndexedDB with stable Evidence ID, role destination and filenames without friendly labels.",
+    "New captures require explicit inclusion; evidence sheet exports only the selected flattened derivative and a stable Evidence-ID crosswalk, excluding original image bytes/hash.",
+    "Ephemeral friendly-label rename changes session display only; role ID and capture history remain stable.",
+    "Full binary backup excludes ephemeral names; merge restore preserves/remaps role, seed, search, finding, association and capture relationships.",
+    "Simulated browser-session loss releases ephemeral names; durable role evidence survives and searches ask for approved values instead of guessing.",
+    "Close Case refuses a stale backup snapshot after new research is saved.",
+    "Denied backup download leaves the complete project and images intact.",
+    "Retry completes private backup download before project, roles, images and session labels are logically removed; other projects remain.",
+    "After Close Case, Quick Lookup still opens focused and independent of projects.",
+    "Actual popup renders five usable accounts first, one technical review group, and two quiet gone accounts last without empty ID fields."
+  ],
+  "errors": []
+}

@@ -1,0 +1,142 @@
+✖ Instagram pk is the account ID when hydrated data has a separate id (2.854063ms)
+✖ matched anonymous profile route resolves before hydration without inventing status (1.039701ms)
+✖ route and hydrated pk agree while separate id is excluded from copy (1.440111ms)
+✖ route parsing preserves long unquoted content and logging IDs (0.605188ms)
+✔ anonymous route rejects different username (1.130376ms)
+✔ anonymous route rejects different route URL (0.291297ms)
+✔ anonymous route rejects different platform (0.273971ms)
+✔ anonymous route rejects sign-in route (0.241021ms)
+✔ anonymous route rejects different page type (0.232258ms)
+✔ anonymous route rejects missing profile configuration (0.335093ms)
+✔ anonymous route rejects unrelated resource (0.227782ms)
+✔ anonymous route rejects unrelated entry point (0.168733ms)
+✔ anonymous route rejects missing hostable view (0.265037ms)
+✔ anonymous route rejects logging mismatch (0.148864ms)
+✔ anonymous route rejects page ID mismatch (0.169013ms)
+✔ anonymous route rejects unsafe URL (0.119839ms)
+✖ two conflicting content views remain ambiguous (0.412369ms)
+✔ route cannot override a conflicting hydrated account pk (0.139359ms)
+✔ matching pk values in separate observations cannot hide a conflicting profile_id (0.177286ms)
+✔ logging fields and recommendations alone cannot identify an account (0.122113ms)
+✔ Threads does not inherit Instagram-specific pk semantics (0.19299ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 16
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 73.226917
+
+✖ failing tests:
+
+test at tests/instagram-route.test.mjs:24:1
+✖ Instagram pk is the account ID when hydrated data has a separate id (2.854063ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + undefined
+  - '9007199254740993123'
+
+      at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/instagram-route.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '9007199254740993123',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/instagram-route.test.mjs:30:1
+✖ matched anonymous profile route resolves before hydration without inventing status (1.039701ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + undefined
+  - '9007199254740993123'
+
+      at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/instagram-route.test.mjs:32:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '9007199254740993123',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/instagram-route.test.mjs:37:1
+✖ route and hydrated pk agree while separate id is excluded from copy (1.440111ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + ''
+  - '9007199254740993123'
+
+      at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/instagram-route.test.mjs:40:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: '9007199254740993123',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/instagram-route.test.mjs:42:1
+✖ route parsing preserves long unquoted content and logging IDs (0.605188ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + undefined
+  - '9007199254740993123'
+
+      at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/instagram-route.test.mjs:44:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '9007199254740993123',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/instagram-route.test.mjs:62:1
+✖ two conflicting content views remain ambiguous (0.412369ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Multiple account IDs/. Input:
+
+  'No matching account ID found. Try the page-source fallback.'
+
+      at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/instagram-route.test.mjs:64:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'No matching account ID found. Try the page-source fallback.',
+    expected: /Multiple account IDs/,
+    operator: 'match',
+    diff: 'simple'
+  }

@@ -1,0 +1,22 @@
+{
+  "tabs-current.json": {
+    "url": "https://raw.githubusercontent.com/chromium/chromium/main/chrome/common/extensions/api/tabs.json",
+    "sha256": "5380b79db1c0078e99ca5f97f55bde46d357e07d76d3afcf886020c69a8c4b23",
+    "checked": "2026-10-06"
+  },
+  "storage-current.json": {
+    "url": "https://raw.githubusercontent.com/chromium/chromium/main/extensions/common/api/storage.json",
+    "sha256": "54a24ce3f49d14121b8df9aaac18ad72ce3d88dd5ff8b748c483577a706c3a9e",
+    "checked": "2026-10-06"
+  },
+  "active-tab-current.cc": {
+    "url": "https://raw.githubusercontent.com/chromium/chromium/main/extensions/browser/permissions/active_tab_permission_granter.cc",
+    "sha256": "2332e57e002de317bcd4372a3d3a9ae0a145c1bfd2e50210a5cde930cc0bf088",
+    "checked": "2026-10-06"
+  },
+  "downloads-current.webidl": {
+    "url": "https://raw.githubusercontent.com/chromium/chromium/main/chrome/common/extensions/api/downloads.webidl",
+    "sha256": "d62d30d1ab4407bdea1d1c600d076313183fe3aa82bf3641d4e5a426018cbb13",
+    "checked": "2026-10-06"
+  }
+}

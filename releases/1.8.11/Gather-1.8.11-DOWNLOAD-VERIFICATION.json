@@ -1,0 +1,23 @@
+{
+  "commit": "29dd714087235820d389996d85b9178fa5ee2f15",
+  "downloads": [
+    {
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/29dd714087235820d389996d85b9178fa5ee2f15/releases/1.8.11/Gather-1.8.11-development.zip",
+      "httpStatus": 200,
+      "file": "Gather-1.8.11-development.zip",
+      "bytes": 13718601,
+      "sha256": "7a1c94c90d010bbd83b1b1b7c53f0a380be27dde671dcbbf0335658fd2c94ddb",
+      "crc": "passed",
+      "runtimeFilesMatch": 77
+    },
+    {
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/29dd714087235820d389996d85b9178fa5ee2f15/releases/1.8.11/Gather-1.8.11-extension.zip",
+      "httpStatus": 200,
+      "file": "Gather-1.8.11-extension.zip",
+      "bytes": 187214,
+      "sha256": "485ab230b2b12ea69dc31c38586bb4a76912b68d5543314291f9c2ee8b824ad4",
+      "crc": "passed",
+      "runtimeFilesMatch": 77
+    }
+  ]
+}

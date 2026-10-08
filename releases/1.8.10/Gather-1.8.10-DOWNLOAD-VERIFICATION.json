@@ -1,0 +1,28 @@
+{
+  "version": "1.8.10",
+  "sourcePackageCommit": "11cbb43173d72ba6194227d665e183b4a5584604",
+  "publicDownloads": [
+    {
+      "file": "Gather-1.8.10-extension.zip",
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/11cbb43173d72ba6194227d665e183b4a5584604/releases/1.8.10/Gather-1.8.10-extension.zip",
+      "httpStatus": 200,
+      "bytes": 182836,
+      "sha256": "9aa8dae94b786ea3979bcc5d4707bfe0d9fcb401cc8f1263838e8ee4922de9d3",
+      "crc": "passed",
+      "runtimeFiles": 74,
+      "runtimeBytesMatch": true
+    },
+    {
+      "file": "Gather-1.8.10-development.zip",
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/11cbb43173d72ba6194227d665e183b4a5584604/releases/1.8.10/Gather-1.8.10-development.zip",
+      "httpStatus": 200,
+      "bytes": 13409556,
+      "sha256": "5c219a792f78c2764ebab5d899a123a9f9f9cee39f2090bdb2eb5bad3605755a",
+      "crc": "passed",
+      "runtimeFiles": 74,
+      "runtimeBytesMatch": true
+    }
+  ],
+  "caseDataPublished": false,
+  "mainChangedByThisTask": false
+}

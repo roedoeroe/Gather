@@ -1,0 +1,28 @@
+{
+  "version": "1.8.7",
+  "sourcePackageCommit": "dbbb6bc329387287377b3020519a5a96e2b8f50f",
+  "userDate": "2026-10-07",
+  "userTimezone": "America/Los_Angeles",
+  "downloads": [
+    {
+      "file": "Gather-1.8.7-extension.zip",
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/dbbb6bc329387287377b3020519a5a96e2b8f50f/releases/1.8.7/Gather-1.8.7-extension.zip",
+      "httpStatus": 200,
+      "bytes": 173565,
+      "sha256": "b5c2f520faee2da41271f32ae6cd9b8ebf5fae878add87640d991e69664b2e59",
+      "zipCRC": "passed",
+      "version": "1.8.7",
+      "runtimeFileHashes": "passed"
+    },
+    {
+      "file": "Gather-1.8.7-development.zip",
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/dbbb6bc329387287377b3020519a5a96e2b8f50f/releases/1.8.7/Gather-1.8.7-development.zip",
+      "httpStatus": 200,
+      "bytes": 12172434,
+      "sha256": "7474f7f1a55fcbff99cdb104919078eb2409e9ed08e81a59c6573b2f8d19d54b",
+      "zipCRC": "passed",
+      "version": "1.8.7",
+      "runtimeFileHashes": "passed"
+    }
+  ]
+}

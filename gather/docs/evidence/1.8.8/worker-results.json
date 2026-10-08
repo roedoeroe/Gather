@@ -1,0 +1,22 @@
+{
+  "kind": "real-service-worker-with-chrome-api-doubles",
+  "nativeExtension": false,
+  "environment": {
+    "generation": "c56d9b04-5610-4822-8c1d-4d43d67e6371",
+    "scope": "ServiceWorkerGlobalScope",
+    "hasDocument": false,
+    "hasIndexedDB": true
+  },
+  "passed": [
+    "Actual background message router opens workspace state from popup, panel, full tool and evidence in ServiceWorkerGlobalScope with real IndexedDB.",
+    "Project-free quick lookup runs through the actual background handler and Web Lock, preserves an exact long fictional ID, and completes without live network.",
+    "Case creation, queued/manual search and reopen work in the worker; friendly names resolve for launch but stay out of durable queries.",
+    "Tab context preserves Northbridge/role after Southridge switch; metadata save, capture launch/finish, negative coverage and explicit rejection work in the real worker.",
+    "Worker-owned controller-close cleanup uses the frozen source/token, ignores unrelated windows and removes the session lock/seed; scripting remains an API double.",
+    "Binary image backup validation/import and workspace journal complete inside the real worker, preserving original bytes and remapped relationships.",
+    "Actual Chromium service-worker stop/restart replays a pending workspace journal once, retaining images and session context through controlled storage APIs.",
+    "Clear recent history stops delayed quick work, rejects stale full-tool flush and preserves case records, original image hashes and relationships in the real worker.",
+    "A fresh lookup works after clearing; deleting its case stops delayed work and rejects late case-linked saves without recreating case data.",
+    "Guarded Close Case reaches binary purge and session/context cleanup in ServiceWorkerGlobalScope while preserving other projects and restored images."
+  ]
+}

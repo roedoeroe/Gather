@@ -1,0 +1,46 @@
+✔ capture start freezes the displayed destination even if default and tab assignment change before worker work (5.239147ms)
+✔ capture start rejects stale cross-project displayed context before creating a window (0.875414ms)
+✔ side-panel capture without page invocation fails with activeTab guidance and no launch (0.59921ms)
+✔ capture cannot target an inactive tab (0.304758ms)
+✔ capture lock survives worker-style session state and prevents overlapping controllers (0.910828ms)
+✔ navigation after toolbar opens rejects the displayed URL before launching or reading the page (0.462374ms)
+✔ selection-and-copy is frozen into the controller seed and unsupported actions do not launch (0.621253ms)
+✖ a controller finishing before windows.create resolves cannot leave a stale capture lock (1.674524ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 89.871565
+
+✖ failing tests:
+
+test at tests/capture-launch.test.mjs:17:1
+✖ a controller finishing before windows.create resolves cannot leave a stale capture lock (1.674524ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + {
+  +   launchId: 'b3ff4a57-0384-401c-9bde-09e3a738cbfd',
+  +   source: {
+  +     tabId: 10,
+  +     title: 'Alex Example',
+  +     url: 'https://example.test/fixture',
+  +     windowId: 1
+  +   },
+  +   windowId: 2
+  + }
+  - undefined
+
+      at TestContext.<anonymous> (file:///workspace/Gather/gather/tests/capture-launch.test.mjs:20:55)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { launchId: 'b3ff4a57-0384-401c-9bde-09e3a738cbfd', windowId: 2, source: { tabId: 10, windowId: 1, url: 'https://example.test/fixture', title: 'Alex Example' } },
+    expected: undefined,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

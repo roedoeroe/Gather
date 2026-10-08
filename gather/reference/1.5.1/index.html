@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light">
+<title>Gather — Account IDs</title><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><img src="icon.svg" width="30" height="30" alt=""><span>Gather</span><span class="brand-detail">Account IDs</span></div>
+  <nav aria-label="Tools"><button id="recentButton" class="text-button">Recent batches</button><button id="helpButton" class="help-button" aria-label="Help and settings">?</button></nav>
+</header>
+<main>
+  <p id="previewNotice" class="notice" hidden>Preview · Install the extension for live lookup. Sorting, source import, and local batches work here.</p>
+  <section id="inputView" class="input-view" aria-labelledby="inputTitle">
+    <h1 id="inputTitle">Paste your links.</h1>
+    <p class="intro">Instagram, Facebook, Threads, TikTok, YouTube. Any mix.</p>
+    <label for="links" class="sr-only">Account links, or a finished list with names, IDs and notes</label>
+    <textarea id="links" spellcheck="false" maxlength="100000" placeholder="instagram.com/username&#10;facebook.com/username&#10;tiktok.com/@username&#10;youtube.com/@channel"></textarea>
+    <div class="input-meta"><span id="inputCount">Commas, spaces, or new lines</span><span>100 accounts max</span></div>
+    <details id="invalidDetails" class="invalid-details" hidden><summary id="invalidSummary"></summary><ul id="invalidList"></ul></details>
+    <div class="input-actions"><button id="uploadButton" class="text-button">Upload a list</button><input id="uploadFile" type="file" accept=".txt,.csv,.tsv,text/plain,text/csv" hidden><button id="start" class="primary-button" disabled>Find accounts <span aria-hidden="true">→</span></button></div>
+    <p class="input-hint quiet">Paste links, a finished list, or a messy conversation. We’ll pull out the accounts and check their IDs.</p>
+    <p id="draftStatus" class="quiet"></p>
+  </section>
+  <section id="resultsView" class="results-view" hidden aria-label="Account results">
+    <div class="batch-heading">
+      <div class="batch-title-wrap"><label class="sr-only" for="batchTitle">Optional batch or SST project name</label><input id="batchTitle" maxlength="80" placeholder="Name this batch (optional)" aria-describedby="batchDate"><p id="batchDate" class="quiet"></p></div>
+      <button id="newBatch" class="secondary-button">New batch</button>
+    </div>
+    <div class="results-toolbar">
+      <div class="copy-options"><label for="copyMode" class="sr-only">Copy format</label><select id="copyMode"><option value="details">Account details</option><option value="ids">IDs only</option></select><label for="separator" class="sr-only">Separate IDs with</label><select id="separator" hidden><option value="newline">New lines</option><option value="comma">Commas</option><option value="space">Spaces</option></select><label id="namesOption" class="auto-label names-option" title="Show and include display names when copying or saving account details"><input id="includeNames" type="checkbox" role="switch" checked>Display names</label><button id="copyAll" class="primary-button">Copy list</button></div>
+      <label class="auto-label"><input id="autoCopy" type="checkbox" role="switch">Auto-copy</label>
+    </div>
+    <div class="result-status"><p id="summary" aria-live="polite"></p><div class="run-actions"><button id="retry" class="text-button" hidden>Retry unfinished</button><button id="recheck" class="text-button" hidden>Recheck</button><button id="stop" class="text-button" hidden>Stop</button></div></div>
+    <button id="issuesButton" class="issue-button" hidden></button>
+    <ul id="accountList" class="account-list" aria-label="Accounts"></ul>
+    <div class="results-footer"><p id="saveStatus" role="status">Saving locally…</p><button id="download" class="text-button">Save list as text</button></div>
+  </section>
+</main>
+<div id="toast" class="toast" role="status" hidden></div>
+<dialog id="recentDialog">
+  <form method="dialog" class="dialog-close"><button aria-label="Close recent batches" class="close-button">×</button></form>
+  <h2>Recent batches</h2><p class="dialog-intro">Pick up where you left off.</p>
+  <div id="historyList" class="history-list"></div>
+  <p class="quiet">Saved in this browser. Multiple batches can share a project name. Up to 50 batches; nothing is removed automatically.</p>
+</dialog>
+<dialog id="helpDialog">
+  <form method="dialog" class="dialog-close"><button aria-label="Close help" class="close-button">×</button></form>
+  <h2>Paste. Find. Copy.</h2>
+  <p>Each result keeps the display name, your original link, and user ID together. Missing names stay marked as unavailable. Imported names are marked as supplied until checked.</p>
+  <p><strong>Account details</strong> keeps the account, supplied ID, and notes together. Message headers, timestamps, and unrelated text are ignored. IDs immediately after a link stay with that account; ambiguous numbers are listed for review.</p>
+  <p>Use <strong>Display names</strong> beside Account details to show or omit the name line in the preview, copied text, and text downloads. Names stay saved with the batch. This choice is remembered and shared with the toolbar panel.</p>
+  <p>From the toolbar panel, <strong>Run on this page</strong> grabs your current profile link and starts immediately. It reads the open page first and follows your Auto-copy setting. The button is greyed out on non-profile pages or while a page is loading.</p>
+  <p>Clear profile data adds <strong>(PRIV)</strong> or <strong>(EMPTY)</strong> beside the link. EMPTY means an explicit zero public-post or upload count. Private, hidden, or unavailable content is never assumed empty. <strong>POSS is always yours</strong>; an existing POSS combines as (POSS/PRIV) or (POSS/EMPTY).</p>
+  <p><strong>Notes</strong> lets you edit your annotations or turn off automatic status for an account. Changes to an older PRIV/EMPTY note are shown, and the original note stays in the saved record. If the site provides no clear evidence, supplied status remains marked as unverified.</p>
+  <p>Supplied IDs are checked against the profile. Mismatches show both IDs; choose <strong>Use found ID</strong> to accept a correction. <strong>IDs only</strong> excludes unchecked or conflicting supplied IDs and removes repeated IDs within each platform. A saved check reflects its lookup time; use Recheck for a fresh check.</p>
+  <div class="option-row"><div><label for="browserFallback">Use signed-in pages</label><p>Try temporary background tabs if needed.</p></div><input id="browserFallback" type="checkbox" role="switch" checked></div>
+  <p>Batches save automatically as results arrive. Reopen them from Recent batches; use Recheck when you need fresh results. A name is optional and can be reused across batches.</p>
+  <p class="quiet">Profile and channel links only. If a site asks for sign-in, open the link and finish that step yourself. Source lets you paste profile HTML. No Gather server, tracking, or stored page HTML. History is local to this browser; save important lists as text before uninstalling.</p>
+</dialog>
+<dialog id="sourceDialog">
+  <form method="dialog" class="dialog-close"><button aria-label="Close source import" class="close-button">×</button></form>
+  <h2>Read the profile source</h2><p>Open the account, choose View page source (Ctrl+U on Windows), and paste its HTML below.</p>
+  <a id="sourceLink" target="_blank" rel="noopener noreferrer"></a>
+  <label for="sourceText" class="sr-only">Profile page source HTML</label><textarea id="sourceText" spellcheck="false" placeholder="Paste profile HTML…"></textarea>
+  <p id="sourceMessage" class="source-message" role="status"></p><button id="extractSource" class="primary-button">Extract account</button>
+</dialog>
+<dialog id="notesDialog">
+  <form method="dialog" class="dialog-close"><button aria-label="Close notes" class="close-button">×</button></form>
+  <h2>Account notes</h2><p id="notesProfile" class="quiet"></p>
+  <label for="notesText" class="notes-label">Your notes</label><input id="notesText" maxlength="500" placeholder="(POSS)" autocomplete="off">
+  <p class="quiet">POSS is your decision. Other notes are kept as written.</p>
+  <div class="option-row"><label for="usePageStatus">Update PRIV / EMPTY from the page</label><input id="usePageStatus" type="checkbox" role="switch" checked></div>
+  <p id="notesDetected"></p><button id="saveNotes" class="primary-button">Save notes</button>
+</dialog>
+<dialog id="issuesDialog"><form method="dialog" class="dialog-close"><button aria-label="Close skipped links" class="close-button">×</button></form><h2>Skipped items</h2><p>These items need attention. Put an unassigned ID directly below its account link.</p><ul id="issuesList"></ul></dialog>
+<dialog id="copyDialog">
+  <form method="dialog" class="dialog-close"><button aria-label="Close manual copy" class="close-button">×</button></form>
+  <h2>Copy your list</h2><p>Your browser blocked automatic clipboard access. The text is selected—press Ctrl+C or Command+C to copy it.</p>
+  <label class="sr-only" for="copyText">Formatted output to copy</label><textarea id="copyText" readonly spellcheck="false"></textarea>
+</dialog>
+<script type="module" src="app.js"></script>
+</body></html>

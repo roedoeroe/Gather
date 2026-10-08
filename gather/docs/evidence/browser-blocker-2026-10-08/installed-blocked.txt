@@ -1,0 +1,3 @@
+BLOCKED: This machine administrator blocks loading unpacked test extensions.
+/etc/chromium/policies/managed/extensions.json
+Run in an environment whose administrator permits test extensions. Keep this machine policy intact.

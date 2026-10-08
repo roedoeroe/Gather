@@ -1,0 +1,44 @@
+FAIL Restoring a binary backup made during folder export keeps its image and permits an immediate retry. · Expected values to be strictly equal:
++ actual - expected
+
++ 'exporting'
+- 'failed'
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   {
++     error: 'Expected values to be strictly equal:\n' +
++       '+ actual - expected\n' +
++       '\n' +
++       "+ 'exporting'\n" +
++       "- 'failed'\n",
++     name: 'Restoring a binary backup made during folder export keeps its image and permits an immediate retry.'
++   }
++ ]
+- []
+
+    at file:///workspace/Gather/gather/tests/browser-stabilization.mjs:104:317 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [
+    {
+      name: 'Restoring a binary backup made during folder export keeps its image and permits an immediate retry.',
+      error: 'Expected values to be strictly equal:\n' +
+        '+ actual - expected\n' +
+        '\n' +
+        "+ 'exporting'\n" +
+        "- 'failed'\n"
+    }
+  ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

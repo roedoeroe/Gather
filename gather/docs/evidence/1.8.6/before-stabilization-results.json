@@ -1,0 +1,44 @@
+{
+  "kind": "rendered-browser-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [],
+  "failures": [
+    {
+      "name": "An open print preview removes stale pixels and disables printing after redaction or deletion.",
+      "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+    },
+    {
+      "name": "Two documents cannot export the same capture concurrently; the rejected attempt leaves the active export intact.",
+      "error": "The input did not match the regular expression /already|running|finish/i. Input:\n\n'exported'\n"
+    },
+    {
+      "name": "Editing and case deletion reject a pending folder export without losing the image; editing works once export finishes.",
+      "error": "The input did not match the regular expression /export|finish/i. Input:\n\n'saved'\n"
+    },
+    {
+      "name": "Deleting a case during its pending folder export is rejected atomically.",
+      "error": "The input did not match the regular expression /export|finish/i. Input:\n\n'deleted'\n"
+    },
+    {
+      "name": "A stale editor cannot replace a newer redaction with pixels from its older image.",
+      "error": "The input did not match the regular expression /changed|reopen|newer/i. Input:\n\n'Saved derivative in Gather. Folder export now uses this image. Unredacted originals remain in all-work backups.'\n"
+    },
+    {
+      "name": "An interrupted old export cannot overwrite the status of its successful retry.",
+      "error": "Old attempt must fail"
+    },
+    {
+      "name": "Clipboard conversion rejects bytes when the selected image changes during PNG preparation.",
+      "error": "The input did not match the regular expression /changed/i. Input:\n\n''\n"
+    },
+    {
+      "name": "A durable screenshot releases its capture lock even when preview loading fails; focus restores the preview.",
+      "error": "Expected values to be strictly equal:\n+ actual - expected\n\n+ {\n+   launchId: '3106f905-5aa8-43de-b6b0-4b6fc79359e0',\n+   source: {\n+     tabId: 10,\n+     title: 'Northbridge fictional page',\n+     url: 'http://127.0.0.1:40045/fixture',\n+     windowId: 1\n+   },\n+   windowId: 2\n+ }\n- undefined\n"
+    },
+    {
+      "name": "A delayed clipboard failure after deletion keeps completion actions disabled and reports that the capture was deleted.",
+      "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+    }
+  ],
+  "errors": []
+}

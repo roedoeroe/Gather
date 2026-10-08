@@ -1,0 +1,38 @@
+{
+  "version": "1.8.9",
+  "packages": [
+    {
+      "file": "Gather-1.8.9-extension.zip",
+      "bytes": 182382,
+      "sha256": "4426d6cad92088f99b0cd13523e065bd86cb1fb0bfc58d7203e3914e709f7f08",
+      "crc": "passed",
+      "runtimeFiles": 74,
+      "runtimeBytesMatch": true,
+      "privateArtifactExclusion": "passed"
+    },
+    {
+      "file": "Gather-1.8.9-development.zip",
+      "bytes": 13135964,
+      "sha256": "7df10a5fb92b22a68eac66edbc1687d91c92ad795d8b82244e3ccd07a00da4ef",
+      "crc": "passed",
+      "runtimeFiles": 74,
+      "runtimeBytesMatch": true,
+      "privateArtifactExclusion": "passed"
+    }
+  ],
+  "permissionsUnchanged": true,
+  "nativeExtension": "blocked",
+  "checks": {
+    "sourceNode": 165,
+    "uniqueRendered": 100,
+    "actualWorker": 10,
+    "hiDpiRepeated": 15
+  },
+  "extractedChecks": {
+    "node": 165,
+    "imageTools": 15,
+    "workspaceUI": 7,
+    "errors": 0,
+    "runtimeBytesMatchFinalPackages": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "kind": "rendered-native-runner-ui-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [
+    "Current workspace starts in Inbox with four task tabs and a worker/storage response.",
+    "Current New case and Link or excerpt controls create scoped local work.",
+    "Task creation and completion persist through current controls.",
+    "Search launch/review and case switching preserve original findings.",
+    "Actual file download contains only the selected scan; reload retains work.",
+    "Settings exposes both destructive actions; cancelling preserves the case.",
+    "Workspace reflows at 400px without horizontal overflow or page errors."
+  ],
+  "errors": []
+}

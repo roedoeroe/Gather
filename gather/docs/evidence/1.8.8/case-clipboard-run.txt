@@ -1,0 +1,8 @@
+PASS: Copied role observations preserve Candidate/Confirmed, check date and exact IDs; rejected accounts stay omitted.
+PASS: A clipboard denial is visible inside the preview and selects the text for manual copy.
+PASS: Changing an analyst association clears the old preview and blocks stale copying.
+PASS: Switching the global case during preview keeps the originally reviewed Northbridge block.
+PASS: Cancel while freshness validation is delayed does not write to the clipboard afterwards.
+PASS: An updated coverage result invalidates its open clipboard preview too.
+PASS: Deleting the case in another workspace releases preview text and disables Copy.
+PASS: 7 case clipboard groups.

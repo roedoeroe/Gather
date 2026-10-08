@@ -1,0 +1,19 @@
+PASS rendered Chromium journey with Chrome API doubles
+1. Search→browser-opener double→result retains originating scan/search.
+2. Actual controller selection/crop + IDB preserves Northbridge/Alex after Southridge switch; original and derivative hashes saved.
+3. Denied Downloads double → Retry succeeds; original IndexedDB bytes remain.
+4. Same-name subject folder collision avoided; rename preserves IDs and history.
+5. Stitching trims clamped bottom-tile overlap; previously captured header/pixels are not overwritten.
+6. Full-page engine uses actual rendered Chromium screenshots and canvas stitching through API doubles; original tiles retained, sticky styles and scroll restored.
+7. Cancel full-page after its first real tile restores source scroll and temporary styles.
+8. Redaction editor creates opaque flattened derivative with caption; original hash unchanged and default share export excludes original pixels.
+9. Binary backup validates and merge-restores all images, subjects and remapped project/scan/search links.
+10. Corrupt backup image rejected before mutation.
+11. Image backup restores into separate empty browser-origin storage with original record IDs and relationships intact.
+12. Two same-name subject captures have distinct folders; aborted IndexedDB write leaves no partial assets, active capture is protected, abandoned capture recovers as interrupted.
+13. Interrupted binary-restore journal finishes the exact workspace write once and clears itself.
+14. Missing image produces explicit recovery error without silently substituting another image.
+15. Actual full workspace DOM renders without horizontal overflow at 400px; captured screenshots.
+16. After reload, selected-scan report includes only the correct capture, with honest unreviewed label and derivative hash.
+17. Actual panel document renders compactly; native sidePanel API remains unverified.
+18. Actual popup document preserves focused quick lookup, with Capture collapsed and no horizontal overflow; native toolbar opening remains unverified.

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Gather — Workspace</title><link rel="icon" href="icon.svg"><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="capture-ui.css"><link rel="stylesheet" href="case-ui.css"><link rel="stylesheet" href="workspace-layout.css"><link rel="stylesheet" href="capture-viewer.css"></head>
+<body>
+<header class="bar"><a class="brand" href="workspace.html"><img src="icon.svg" width="28" height="28" alt="">Gather<span>Workspace</span></a><nav><button id="openCaseStart">New case</button><a href="index.html" target="_blank">Quick lookup ↗</a><button id="expand" class="subtle" hidden>Open full workspace ↗</button></nav></header>
+<div class="layout" inert>
+<aside>
+  <button id="libraryToggle" aria-expanded="false" aria-controls="libraryContents">Library ▾</button>
+  <div id="libraryContents">
+  <p class="eyebrow">LIBRARY</p>
+  <button id="inbox" class="destination">Inbox <span id="inboxCount">0</span></button>
+  <div class="section-heading"><h2>Cases</h2></div>
+  <nav id="projects" aria-label="Cases and scans"></nav>
+  <div class="aside-foot"><span class="local-dot"></span>Saved in this browser<p>Your data stays on this device.</p></div>
+</div></aside>
+<main>
+  <section id="tabContext" class="tab-context" aria-label="Current tab destination" hidden>
+    <p class="eyebrow">CURRENT TAB</p><p id="tabDestination" class="context-label">Reading destination…</p>
+    <p id="tabContextHelp" class="micro"></p>
+    <details><summary>Change tab destination</summary><div class="context-controls"><label class="sr-only" for="tabScan">Assign this tab to</label><select id="tabScan"></select><button id="assignTab">Assign</button><button id="detachTab" class="subtle">Detach</button></div></details>
+  </section>
+  <div class="heading"><div><p id="projectName" class="eyebrow">YOUR LIBRARY</p><h1 id="scanName">Inbox</h1><p id="scanHelp" class="quiet">A place for findings before you add them to a case.</p></div></div>
+  <div id="message" class="message" role="status" hidden></div>
+  <div id="undoNotice" class="message undo-notice" hidden><span id="undoLabel">Change saved.</span><button id="undoAction" type="button">Undo</button></div>
+  <div id="workspaceStatus"></div>
+  <section id="captureTools" aria-label="Selected subject"></section>
+  <div id="workspaceNav" class="workspace-nav" role="tablist" aria-label="Workspace sections">
+    <button id="tab-research" type="button" role="tab" data-section="research" aria-controls="view-research" aria-selected="true">Research</button>
+    <button id="tab-captures" type="button" role="tab" data-section="captures" aria-controls="view-captures" aria-selected="false" tabindex="-1">Captures</button>
+    <button id="tab-case" type="button" role="tab" data-section="case" aria-controls="view-case" aria-selected="false" tabindex="-1">Case</button>
+    <button id="tab-settings" type="button" role="tab" data-section="settings" aria-controls="view-settings" aria-selected="false" tabindex="-1">Settings</button>
+  </div>
+  <section id="view-research" class="workspace-view" role="tabpanel" aria-labelledby="tab-research" tabindex="0">
+  <section class="composer" aria-label="Search and save">
+    <div class="section-heading"><div class="search-modes" role="group" aria-label="Search type"><button id="webSearchMode" type="button" aria-pressed="true">Search the web</button><button id="imageSearchMode" type="button" aria-pressed="false">Reverse image</button></div><span id="saveDestination" class="quiet">Destination: Inbox</span></div>
+    <form id="searchForm" class="search-form" autocomplete="off"><div id="queryField" class="search-field"><label for="query">Search query</label><input id="query" placeholder='e.g. "alex.example" site:instagram.com' maxlength="2000" required spellcheck="false"></div><div class="provider-field"><label for="provider">Search provider</label><select id="provider"><option value="google">Google</option><option value="bing">Bing</option><option value="instagram">Instagram · Google</option><option value="facebook">Facebook · Google</option><option value="tiktok">TikTok · Google</option><option value="threads">Threads · Google</option><option value="youtube">YouTube</option><option value="x">X search</option></select></div><button id="launchSearch" class="primary" type="submit">Search ↗</button></form>
+    <div class="add-actions"><button id="savePage">Save current page</button><details class="add-menu"><summary>Add to this scan</summary><div><button id="addSource">Link or excerpt</button><button id="addNote">Note</button><button id="addTask">Task</button></div></details></div>
+    <p id="searchHelp" class="micro">Opens a new tab. Gather does not save your query or search history. Your browser and the search service may keep their own history.</p>
+  </section>
+  <div class="tabs" role="navigation" aria-label="Workspace views"><button data-view="items" class="selected">Saved findings</button><button data-view="tasks">Tasks <span id="taskCount" class="count"></span></button><button data-view="activity">Changes</button></div>
+  <div class="list-tools"><button data-filter="attention" id="reviewShortcut" class="subtle" hidden><span id="reviewCount"></span> to review</button><label class="sr-only" for="localSearch">Find in current scan</label><input id="localSearch" type="search" placeholder="Find saved items…"><label class="sr-only" for="filter">Filter saved items</label><select id="filter"><option value="all">All items</option><option value="attention">Needs review</option><option value="account">Accounts</option><option value="source">Sources</option><option value="note">Notes</option><option value="excluded">Excluded</option></select></div>
+  <section id="items" class="cards" aria-live="polite" aria-label="Saved items"></section>
+  <h2 id="panelNextActions" class="panel-next" hidden>Tasks</h2>
+  <section id="tasks" class="cards" aria-live="polite" aria-label="Next actions" hidden></section>
+  <section id="activity" class="cards" aria-live="polite" aria-label="Gather activity" hidden></section>
+  <details id="reportTools" class="report-tools"><summary>Export this scan</summary><div class="export-actions"><label class="sr-only" for="reportFormat">Report format</label><select id="reportFormat"><option value="md">Readable report</option><option value="json">Structured JSON</option></select><button id="exportReport">Export report</button></div><p class="micro">Includes the findings and capture records selected for this scan. Image files are exported from Captures.</p></details>
+  </section>
+  <section id="view-captures" class="workspace-view" role="tabpanel" aria-labelledby="tab-captures" tabindex="0" hidden>
+    <section id="captureLibrary" aria-label="Saved captures"></section>
+  </section>
+  <section id="view-case" class="workspace-view" role="tabpanel" aria-labelledby="tab-case" tabindex="0" hidden>
+    <div class="section-heading"><h2>Case details</h2><div class="case-actions"><button id="renameContext" class="subtle" hidden>Rename</button><button id="newScan" hidden>New scan</button></div></div>
+    <section id="subjectManagement" aria-label="Manage subjects"><h3>Subjects</h3><p class="quiet">Choose a subject above. Names never create account associations automatically.</p></section>
+    <section id="caseTools" aria-label="Search plan and coverage"></section>
+  </section>
+  <section id="view-settings" class="workspace-view" role="tabpanel" aria-labelledby="tab-settings" tabindex="0" hidden>
+    <h2>Settings</h2>
+    <section id="privacyTools"></section>
+    <section class="settings-section" aria-labelledby="backupHeading"><h3 id="backupHeading">Backup & restore</h3><p class="quiet">Keep a separate copy of all cases and images. Backups include unredacted originals.</p><div class="export-actions"><button id="backup">Back up all work</button><button id="restore">Restore backup</button><input id="restoreFile" type="file" accept=".gather,.json,application/json,application/octet-stream" hidden></div></section>
+    <section id="capturePreferences" class="settings-section" aria-label="Capture export preferences"></section>
+    <details class="storage-details"><summary>Storage details</summary><p id="storageUsage" class="micro"></p></details>
+  </section>
+</main>
+</div>
+<dialog id="editor"><form id="editorForm"><h2 id="editorTitle"></h2><p id="editorDestination" class="quiet"></p><div id="fields"></div><div class="dialog-actions"><button type="button" id="cancelEdit">Cancel</button><button type="submit" id="submitEdit" class="primary">Save</button></div><p id="editorError" role="alert"></p></form></dialog>
+<dialog id="historyDialog"><h2>Account observations</h2><p class="quiet">Same platform account ID in this project. These records do not establish who operates the account.</p><div id="historyContent"></div><button id="closeHistory">Close</button></dialog>
+<script type="module" src="workspace.js"></script>
+<script type="module" src="capture-ui.js"></script>
+<script type="module" src="case-ui.js"></script>
+</body></html>

@@ -1,0 +1,35 @@
+{
+  "verifiedAt": "2026-10-08T05:18:01.072740+00:00",
+  "version": "1.8.9",
+  "sourcePackageCommit": "ea2fad943f9e49aeaac386efeaf12c65c7c327c5",
+  "packages": [
+    {
+      "file": "Gather-1.8.9-extension.zip",
+      "bytes": 182382,
+      "sha256": "4426d6cad92088f99b0cd13523e065bd86cb1fb0bfc58d7203e3914e709f7f08",
+      "crc": "passed",
+      "runtimeFiles": 74,
+      "runtimeBytesMatch": true,
+      "privateArtifactExclusion": "passed",
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/ea2fad943f9e49aeaac386efeaf12c65c7c327c5/releases/1.8.9/Gather-1.8.9-extension.zip",
+      "httpStatus": 200,
+      "downloadHashVerified": true,
+      "publicRuntimeBytesMatch": true
+    },
+    {
+      "file": "Gather-1.8.9-development.zip",
+      "bytes": 13135964,
+      "sha256": "7df10a5fb92b22a68eac66edbc1687d91c92ad795d8b82244e3ccd07a00da4ef",
+      "crc": "passed",
+      "runtimeFiles": 74,
+      "runtimeBytesMatch": true,
+      "privateArtifactExclusion": "passed",
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/ea2fad943f9e49aeaac386efeaf12c65c7c327c5/releases/1.8.9/Gather-1.8.9-development.zip",
+      "httpStatus": 200,
+      "downloadHashVerified": true,
+      "publicRuntimeBytesMatch": true
+    }
+  ],
+  "publicChecksumFileMatches": true,
+  "nativeExtension": "blocked; not claimed tested"
+}

@@ -1,0 +1,36 @@
+{
+  "kind": "rendered-browser-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [],
+  "failures": [
+    {
+      "name": "Copied role observations preserve Candidate/Confirmed, check date and exact IDs; rejected accounts stay omitted.",
+      "error": "The input did not match the regular expression /Candidate.*9007199254740993123/. Input:\n\n'instagram · @fictional_candidate · https://www.instagram.com/fictional_candidate/ · Available · ID: 9007199254740993123\\n' +\n  'instagram · @fictional_confirmed · https://www.instagram.com/fictional_confirmed/ · Available · ID: 9007199254740993124'\n"
+    },
+    {
+      "name": "A clipboard denial is visible inside the preview and selects the text for manual copy.",
+      "error": "locator.waitFor: Timeout 7000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog').locator('[role=\"alert\"]').filter({ hasText: /copy.*blocked|could not copy/i }) to be visible\u001b[22m\n"
+    },
+    {
+      "name": "Changing an analyst association clears the old preview and blocks stale copying.",
+      "error": "page.waitForFunction: Timeout 7000ms exceeded."
+    },
+    {
+      "name": "Switching the global case during preview keeps the originally reviewed Northbridge block.",
+      "error": "The input did not match the regular expression /Northbridge/. Input:\n\n'instagram · @fictional_candidate · https://www.instagram.com/fictional_candidate/ · Available · ID: 9007199254740993123\\n' +\n  'instagram · @fictional_confirmed · https://www.instagram.com/fictional_confirmed/ · Available · ID: 9007199254740993124'\n"
+    },
+    {
+      "name": "Cancel while freshness validation is delayed does not write to the clipboard afterwards.",
+      "error": "page.waitForFunction: Timeout 7000ms exceeded."
+    },
+    {
+      "name": "An updated coverage result invalidates its open clipboard preview too.",
+      "error": "page.waitForFunction: Timeout 7000ms exceeded."
+    },
+    {
+      "name": "Deleting the case in another workspace releases preview text and disables Copy.",
+      "error": "page.waitForFunction: Timeout 7000ms exceeded."
+    }
+  ],
+  "errors": []
+}

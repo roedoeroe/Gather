@@ -1,0 +1,54 @@
+{
+  "version": "1.8.7",
+  "userDate": "2026-10-07",
+  "userTimezone": "America/Los_Angeles",
+  "nodePassed": 132,
+  "renderedGroupsPassed": 85,
+  "workerGroupsPassed": 10,
+  "runs": {
+    "capture": {
+      "passed": 21,
+      "kind": "rendered-browser-with-extension-api-doubles",
+      "nativeExtension": false
+    },
+    "toolbar": {
+      "passed": 22,
+      "kind": "rendered-browser-with-extension-api-doubles",
+      "nativeExtension": false
+    },
+    "case": {
+      "passed": 18,
+      "kind": "rendered-browser-with-extension-api-doubles",
+      "nativeExtension": false
+    },
+    "stabilization": {
+      "passed": 10,
+      "kind": "rendered-browser-with-extension-api-doubles",
+      "nativeExtension": false
+    },
+    "worker": {
+      "passed": 10,
+      "kind": "real-service-worker-with-chrome-api-doubles",
+      "nativeExtension": false
+    },
+    "clipboard": {
+      "passed": 7,
+      "kind": "rendered-browser-with-extension-api-doubles",
+      "nativeExtension": false
+    },
+    "installed-ui": {
+      "passed": 7,
+      "kind": "rendered-native-runner-ui-with-extension-api-doubles",
+      "nativeExtension": false
+    }
+  },
+  "newClipboardBeforeFixFailures": 7,
+  "nativeInstalledGroupsPassed": 0,
+  "nativeInstalledStatus": "not-run: known unchanged managed unpacked-extension policy",
+  "livePlatforms": "not-tested",
+  "visualInspection": [
+    "clipboard-denied.png",
+    "clipboard-denied-narrow.png",
+    "deleted-case-preview.png"
+  ]
+}

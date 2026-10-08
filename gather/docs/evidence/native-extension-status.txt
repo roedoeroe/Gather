@@ -1,0 +1,6 @@
+Observed 2026-10-06 in an isolated Chromium 151 profile.
+Chromium launched with chromiumSandbox:true through approved execution outside the tool filesystem sandbox. No --no-sandbox or TLS bypass was used.
+Unpacked extension launch produced no worker. Supported DevTools Extensions.loadUnpacked diagnostic returned:
+Protocol error (Extensions.loadUnpacked): Loading of unpacked extensions is disabled by the administrator.
+No administrator policy was modified. Native extension acceptance is BLOCKED, not passed.
+Separately, Playwright browser download received 403 Domain forbidden from cdn.playwright.dev.

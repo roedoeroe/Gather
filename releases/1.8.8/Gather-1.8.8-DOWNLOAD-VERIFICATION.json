@@ -1,0 +1,25 @@
+{
+  "checkedAtUTC": "2026-10-08T04:36:40.504166+00:00",
+  "sourcePackageCommit": "ddcbaa6d909bd3da2c22943ceae25716b776a4e7",
+  "packages": [
+    {
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/ddcbaa6d909bd3da2c22943ceae25716b776a4e7/releases/1.8.8/Gather-1.8.8-extension.zip",
+      "httpStatus": 200,
+      "bytes": 174800,
+      "sha256": "dac048292f7c916c0db8016d304c69091db94d56f5474ebc92d6101f6d832a35",
+      "zipCrc": "passed",
+      "version": "1.8.8",
+      "runtimeFilesMatched": 71
+    },
+    {
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/ddcbaa6d909bd3da2c22943ceae25716b776a4e7/releases/1.8.8/Gather-1.8.8-development.zip",
+      "httpStatus": 200,
+      "bytes": 12687095,
+      "sha256": "d0d18b759c29bcbea4e21d8ffb224847ca9a2cb2925a1e9e528f50fd5f576ded",
+      "zipCrc": "passed",
+      "version": "1.8.8",
+      "runtimeFilesMatched": 71
+    }
+  ],
+  "nativeExtensionTest": false
+}

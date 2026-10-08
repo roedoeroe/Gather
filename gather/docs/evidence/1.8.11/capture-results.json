@@ -1,0 +1,28 @@
+{
+  "kind": "rendered-browser-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [
+    "Empty Inbox puts findings above the fold; four stable keyboard tabs expose one panel, reload preserves view, query/filter survive navigation and cancelled creation writes nothing.",
+    "Search→browser-opener double→result retains originating scan without a saved query.",
+    "Actual controller selection/crop + IDB preserves Northbridge/Alex after Southridge switch; original and derivative hashes saved.",
+    "Denied Downloads double → Retry succeeds; original IndexedDB bytes remain.",
+    "Same-name subject folder collision avoided; rename preserves IDs and history.",
+    "Stitching trims clamped bottom-tile overlap; previously captured header/pixels are not overwritten.",
+    "Full-page engine uses actual rendered Chromium screenshots and canvas stitching through API doubles; original tiles retained, sticky styles and scroll restored.",
+    "Cancel full-page after its first real tile restores source scroll and temporary styles.",
+    "Redaction editor creates opaque flattened derivative with caption; original hash unchanged and default share export excludes original pixels.",
+    "Binary backup validates and merge-restores all images, subjects and remapped project/scan/search links.",
+    "Corrupt backup image rejected before mutation.",
+    "Image backup restores into separate empty browser-origin storage with original record IDs and relationships intact.",
+    "Two same-name subject captures have distinct folders; aborted IndexedDB write leaves no partial assets, active capture is protected, abandoned capture recovers as interrupted.",
+    "Interrupted binary-restore journal finishes the exact workspace write once and clears itself.",
+    "Missing image produces explicit recovery error without silently substituting another image.",
+    "Actual full workspace DOM renders without horizontal overflow at 400px; captured screenshots.",
+    "Capture inspector preserves review on open and restores focus; denied export stays visible and Retry preserves the image. Settings is one tab away; Add → Note works, live review refresh retains focus, captures retain their view across case changes and narrow Library collapses. CSS 200% zoom has no overflow (not native browser zoom).",
+    "After reload, selected-scan report includes only the correct capture, with honest unreviewed label and derivative hash.",
+    "Actual panel document renders compactly; native sidePanel API remains unverified.",
+    "Popup requests a stable 420px width even from a 160px initial viewport; viewport-relative shrink feedback is prevented.",
+    "Actual popup preserves focused quick lookup with four direct screenshot actions, a visible destination and no horizontal overflow; native toolbar opening remains unverified."
+  ],
+  "errors": []
+}

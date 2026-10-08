@@ -1,0 +1,23 @@
+{
+  "sourcePackageCommit": "8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa",
+  "verifiedDownloads": [
+    {
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa/releases/1.8.12/Gather-1.8.12-extension.zip",
+      "httpStatus": 200,
+      "bytes": 204091,
+      "sha256": "af0b537315649edda6af3ea36759c6ce8c7b9725edb54a33708f3367b5ef1183",
+      "crc": "passed",
+      "runtimeFilesMatched": 80
+    },
+    {
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa/releases/1.8.12/Gather-1.8.12-development.zip",
+      "httpStatus": 200,
+      "bytes": 13964169,
+      "sha256": "53710765805ce2653d3f964076281ad73385ad6790d61132f41c798186ddac8c",
+      "crc": "passed",
+      "runtimeFilesMatched": 80
+    }
+  ],
+  "nativeEdgeStatus": "unverified; managed cloud blocks unpacked extensions",
+  "releaseStatus": "development checkpoint; R4 follow-through pending"
+}

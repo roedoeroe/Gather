@@ -29,3 +29,7 @@ Keep the 1.8.11 package and its matching pre-update backup. Validate rollback in
 No case upload, sync or analytics. Search/profile services still receive explicit user requests; reverse-image providers receive images only if the analyst uploads on their sites. Case storage and .gather backups are not application-encrypted. Backups include original pixels. Deletion is logical: downloaded/shared files, browser/provider history and clipboard history remain outside Gather. Manual redaction only. Full-page bounds and unsupported nested scrollers/custom roots remain documented.
 
 Next priority: permitted installed Edge checks, followed by organization-specific access/retention/distribution review. Existing Quick Parts and research backlog are retained; no new feature expansion in this hardening release.
+
+Verified source/package commit: `8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa`.
+
+[Extension ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa/releases/1.8.12/Gather-1.8.12-extension.zip) · [Development ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa/releases/1.8.12/Gather-1.8.12-development.zip) · [Checksums](https://raw.githubusercontent.com/roedoeroe/Gather/8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa/releases/1.8.12/Gather-1.8.12-SHA256SUMS.txt). Both public downloads returned HTTP 200 and matched size, SHA-256, CRC and all 80 tested runtime files.

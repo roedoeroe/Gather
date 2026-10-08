@@ -14,7 +14,7 @@ The new [Edge-first R4 review](gather/docs/R4-WORKFLOW-RECONCILIATION.md) record
 
 Choose `Gather-1.8.12-extension.zip`, extract it to a permanent folder, and load its **account-id-tool** directory from your browser's Extensions page with Developer mode enabled. For an update, replace all files at the same installed path and Reload; do not uninstall or clear storage. See the [installation and rollback guide](gather/README.md#install-or-update).
 
-The development source is maintained on **develop/1.8.0-r3**; the branch name is historical, while the current extension version is **1.8.12**. Delivery notes pin release ZIPs to their source/package commit. Main is unchanged.
+The development source is maintained on **develop/1.8.0-r3**; the branch name is historical, while the current extension version is **1.8.12**. Delivery notes pin release ZIPs to their source/package commit. Main now contains 1.8.11; this 1.8.12 checkpoint is on the development branch.
 
 1.8.12 preserves the search/capture improvements and tightens privacy boundaries: anonymous profile fetches, ID parsing inside the requested page, stricter storage/messages, clear unencrypted-backup wording and a package check for accidental private files. No new permissions or cloud endpoint. See the [hardening review](gather/docs/HARDENING-REVIEW-1.8.12.md).
 

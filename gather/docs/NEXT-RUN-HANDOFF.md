@@ -2,7 +2,7 @@
 
 Latest steering: read [R4 workflow reconciliation](R4-WORKFLOW-RECONCILIATION.md) first. It narrows the product to Edge utilities and supersedes older coverage/intake/composer priorities. The signed-in Instagram and horizontal-selection defects reported there remain open; 1.8.12 is a tested development checkpoint, not completion of R4.
 
-Use /workspace/Gather, existing develop/1.8.0-r3 branch. Preserve user edits and immutable earlier packages. Main is unchanged. Development-branch publication is already authorized. Source public; case data stays local. No agent delegation unless directly requested. Read README, TESTING, HARDENING-REVIEW-1.8.12, PRIVACY-DATA-FLOW, THREAT-MODEL and LEGAL-REVIEW-QUESTIONS before more work.
+Use /workspace/Gather, existing develop/1.8.0-r3 branch. Preserve user edits and immutable earlier packages. Main was independently updated during this run to the merge of 1.8.11 (b0f4735ab4eec201dbc0ad534d5634b7129b27af). Do not reset or overwrite that merge. 1.8.12 remains on the development branch. Development-branch publication is already authorized. Source public; case data stays local. No agent delegation unless directly requested. Read README, TESTING, HARDENING-REVIEW-1.8.12, PRIVACY-DATA-FLOW, THREAT-MODEL and LEGAL-REVIEW-QUESTIONS before more work.
 
 ## Completed in this continuation
 

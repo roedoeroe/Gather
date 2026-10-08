@@ -2,7 +2,7 @@
 
 **Development checkpoint; R4/native Edge verification is pending.** The newly supplied R4 reports signed-in Instagram and selection-width issues not reproduced in this cloud. This package preserves tested hardening and does not claim those issues or the R4 redesign are complete. See gather/docs/R4-WORKFLOW-RECONCILIATION.md.
 
-Use **Gather-1.8.12-extension.zip** for the runnable extension. The development ZIP contains source/tests/docs, not case data. Source remains public on develop/1.8.0-r3; main is unchanged. 1.8.11 remains an immutable tested checkpoint. Downloads are pinned to the source/package commit in the follow-up verification receipt.
+Use **Gather-1.8.12-extension.zip** for the runnable extension. The development ZIP contains source/tests/docs, not case data. Source remains public on develop/1.8.0-r3; main was independently updated to the 1.8.11 merge during this run and has not been changed by this checkpoint. 1.8.11 remains an immutable tested checkpoint. Downloads are pinned to the source/package commit in the follow-up verification receipt.
 
 ## Changes
 
@@ -33,3 +33,5 @@ Next priority: permitted installed Edge checks, followed by organization-specifi
 Verified source/package commit: `8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa`.
 
 [Extension ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa/releases/1.8.12/Gather-1.8.12-extension.zip) · [Development ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa/releases/1.8.12/Gather-1.8.12-development.zip) · [Checksums](https://raw.githubusercontent.com/roedoeroe/Gather/8e1c0a9a9dd357b5b59f6eae2f74bab4740fd9fa/releases/1.8.12/Gather-1.8.12-SHA256SUMS.txt). Both public downloads returned HTTP 200 and matched size, SHA-256, CRC and all 80 tested runtime files.
+
+Repository observation after package publication: main advanced to b0f4735 (merge of 1.8.11). Its tree equals bd02c15. Development continues separately; ZIPs remain immutable snapshots. Current branch documentation includes this later observation.

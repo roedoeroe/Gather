@@ -4,7 +4,7 @@ The newly supplied R4 document was read completely on 2026-10-08, including its 
 
 ## Current facts
 
-- Development branch: develop/1.8.0-r3. Main remains unchanged. 1.8.11 is the published prior checkpoint; 1.8.12 contains narrow tested hardening, not the R4 redesign.
+- Development branch: develop/1.8.0-r3. Main now contains the independently completed 1.8.11 merge (b0f4735). 1.8.11 is the published prior checkpoint; 1.8.12 contains narrow tested hardening, not the R4 redesign.
 - Edge Stable on Windows is the user's primary environment. This cloud only provides managed Chromium, whose policy blocks unpacked extensions. No native Edge sample was run here. A permitted Edge environment/current sanitized structural fixture is required to investigate signed-in Instagram reliably. Do not weaken policy or guess IDs.
 - R4 reports Instagram lookup failure and missing horizontal capture content in real Edge. Treat these as open reported defects. The anonymous 1.8.11 Instagram observation and fictional passing tests do not disprove them.
 - Code inspection confirms a large top-centered selector panel can intercept selection starts. Current Crop uses drag selection, not Word-style handles. Recent batches are capped at 50, not R4's five. Intake/coverage controls still exist. These are known mismatches, not completed fixes.

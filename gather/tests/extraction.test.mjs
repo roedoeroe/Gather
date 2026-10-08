@@ -13,3 +13,23 @@ test('redirected profile and invalid JSON cannot yield a guessed ID',()=>{assert
 test('baseline direct URL IDs still work with no workspace project',()=>{const p=parseInput('https://www.facebook.com/profile.php?id='+exact);assert.equal(p.entries[0].id,exact);assert.equal(formatIds(p.entries),exact);});
 test('mismatched supplied ID stays out of copy output',()=>{const entry=parseInput('https://instagram.com/northbridge/\nUser ID: 123').entries[0];applyLookup(entry,{id:exact,verifiedAt:1780000000000});assert.equal(formatIds([entry]),'');});
 test('synthetic matching samples cover all five supported adapters',()=>{for(const [url,json,id] of [['https://www.threads.com/@northbridge',{username:'northbridge',id:'1234'},'1234'],['https://www.tiktok.com/@northbridge',{uniqueId:'northbridge',id:'5678'},'5678'],['https://www.facebook.com/northbridge',{username:'northbridge',id:'9876'},'9876'],['https://www.youtube.com/@northbridge',{channelMetadataRenderer:{externalId:'UCabcdefghijklmnopqrstuv',ownerUrls:['https://www.youtube.com/@northbridge']}},'UCabcdefghijklmnopqrstuv']]){const p=normalizeProfile(url);assert.equal(extractId(JSON.stringify(json),p).id,id);}});
+test('Instagram profile_id in assigned page-source JSON resolves without evaluating page code',()=>{
+  for(const wrapper of ['window._sharedData = DATA;', 'window.__additionalDataLoaded("/northbridge/", DATA);']){
+    const json='{"user":{"username":"northbridge","profile_id":'+exact+'}}';
+    assert.equal(extractId('<script>'+wrapper.replace('DATA',json)+'</script>',profile).id,exact);
+    assert.ok(extractId('<script>'+wrapper.replace('DATA',json.replace('northbridge','southridge'))+'</script>',profile).error);
+  }
+});
+test('Facebook userVanity binds only its own userID, including unquoted large integers',()=>{
+  const p=normalizeProfile('facebook.com/northbridge');
+  assert.equal(extractId('<script>{"userVanity":"northbridge","userID":'+exact+',"recommendations":[{"id":"123"}]}</script>',p).id,exact);
+  assert.ok(extractId('<script>{"userVanity":"northbridge","recommendations":[{"userID":"123"}]}</script>',p).error);
+  assert.match(extractId('<script>{"userVanity":"northbridge","userID":"123","id":"456"}</script>',p).error,/Multiple account IDs/);
+});
+test('Facebook profile routes require matching vanity and URL and reject conflicting views',()=>{
+  const p=normalizeProfile('facebook.com/northbridge');
+  const route={params:{userVanity:'northbridge'},url:'/northbridge',rootView:{props:{userID:exact}},hostableView:{props:{userID:exact}}};
+  const extract=route=>extractId(JSON.stringify({initialRouteInfo:{route}}),p);
+  assert.equal(extract(route).id,exact);
+  for(const patch of [{url:'/southridge'},{url:'https://example.test/northbridge'},{params:{userVanity:'southridge'}},{rootView:{props:{userID:'123'}}}])assert.ok(extract({...route,...patch}).error);
+});

@@ -28,7 +28,7 @@ let list,filterMode,filterSubject,autoExport,usage,libraryCaption,moreButton,sub
 function dialog(title,fields,onSave){
   const returnFocus=document.activeElement;const d=el('dialog'),form=el('form'),heading=el('h2',title),err=el('p','','capture-error'),buttons=el('div',undefined,'dialog-actions'),cancel=button('Cancel',()=>d.close()),save=el('button','Save','primary');save.type='submit';buttons.append(cancel,save);form.append(heading,...fields,err,buttons);d.append(form);document.body.append(d);heading.id='subject-dialog-title';d.setAttribute('aria-labelledby',heading.id);d.onclose=()=>{d.remove();if(returnFocus?.isConnected)returnFocus.focus();};form.onsubmit=async event=>{event.preventDefault();save.disabled=true;try{await onSave(new FormData(form));d.close();await refresh();}catch(e){err.textContent=e.message;}finally{save.disabled=false;}};d.showModal();form.querySelector('input,select,textarea')?.focus();
 }
-function field(caption,name,value='',max=100){const label=el('label',caption,'capture-field'),input=el('input');input.name=name;input.value=value;input.maxLength=max;input.required=true;label.append(input);return label;}
+function field(caption,name,value='',max=100){const label=el('label',caption,'capture-field'),input=el('input');input.name=name;input.value=value;input.placeholder=name==='name'?'e.g. Alex Example':'e.g. Subject or SOC';input.maxLength=max;input.required=true;label.append(input);return label;}
 async function editSubject(rename=false){const frozen={...scope},current=subjects.find(s=>s.id===subjectSelect.value);if(rename&&!current)throw new Error('Choose a subject first.');dialog(rename?'Rename '+settings.subjectLabel:'New '+settings.subjectLabel,[field('Name','name',current?.name||'')],async data=>{const subject=rename?await renameSubject(current.id,data.get('name')):await createSubject({projectId:frozen.projectId,name:data.get('name')});await selectSubject(frozen.scanId,subject.id,frozen.projectId);});}
 if(!compact){
   subjectManage=el('div',undefined,'capture-controls');document.getElementById('subjectManagement').append(subjectManage);
@@ -93,11 +93,12 @@ async function renderLibrary(){
   filterScan.replaceChildren(new Option('All scans','all'),...(scanIds.has(null)?[new Option('Inbox','inbox')]:[]),...state.scans.filter(s=>scanIds.has(s.id)).map(s=>new Option(browse==='all'&&caseFilter==='all'?destinationLabel(state,s.id):s.name,s.id)));filterScan.value=scanFilter;filterScan.hidden=browse==='scan';filterScan.parentElement.hidden=filterScan.hidden;
   const records=filterCaptureHistory(all,{scope:browse,...frozen,subjectId:subjectFilter,caseFilter,scanFilter,status:statusFilter,query:searchText,label:filing});
   const ids=new Set(records.map(r=>r.id));for(const id of selectedCaptures.keys())if(!ids.has(id))selectedCaptures.delete(id);updateSelection();
-  const restoreFocus=retainFocus(list);try{
-    for(const url of urls)URL.revokeObjectURL(url);urls=[];list.replaceChildren();libraryCaption.textContent=records.length+' capture'+(records.length===1?'':'s')+' · '+(browse==='scan'?destinationLabel(state,frozen.scanId):browse==='all'?'All cases':browse==='case'?state.projects.find(p=>p.id===frozen.projectId)?.name||'Inbox':'Selected subject across this case');moreButton.hidden=records.length<=shown;
-    if(!records.length){const empty=el('div',undefined,'empty');empty.append(el('strong',searchText||statusFilter!=='saved'?'No matching captures':'No captures here yet'),el('span','Use Gather on a page to capture its image, or choose another view.'));list.append(empty);return;}
+  const fragment=document.createDocumentFragment(),nextUrls=[];let ready=false;list.setAttribute('aria-busy','true');
+  try{
+    libraryCaption.textContent=records.length+' capture'+(records.length===1?'':'s')+' · '+(browse==='scan'?destinationLabel(state,frozen.scanId):browse==='all'?'All cases':browse==='case'?state.projects.find(p=>p.id===frozen.projectId)?.name||'Inbox':'Selected subject across this case');moreButton.hidden=records.length<=shown;
+    if(!records.length){const empty=el('div',undefined,'empty');empty.append(el('strong',searchText||statusFilter!=='saved'?'No matching captures':'No captures here yet'),el('span','Use Gather on a page to capture its image, or choose another view.'));fragment.append(empty);}
     for(const group of captureHistoryGroups(records.slice(0,shown))){
-      const section=el('section',undefined,'capture-group'),grid=el('div',undefined,'capture-grid');section.append(el('h3',destinationLabel(state,group.scanId),'capture-group-title'),grid);list.append(section);
+      const section=el('section',undefined,'capture-group'),grid=el('div',undefined,'capture-grid');section.append(el('h3',destinationLabel(state,group.scanId),'capture-group-title'),grid);fragment.append(section);
       for(const record of group.records){
         const card=el('article',undefined,'capture-card');card.dataset.captureId=record.id;card.dataset.focusKey=record.id;const open=button('',()=>openCapture(record.id));open.className='capture-open';open.setAttribute('aria-label','Open capture '+(record.source.title||captureHost(record)));const figure=el('div',undefined,'capture-image'),info=el('div',undefined,'capture-card-info');
         info.append(el('h3',record.source.title||captureHost(record)),el('p',captureHost(record)+' · '+new Date(record.startedAt).toLocaleString()),el('p',historySubjects.get(record.subjectId)?.name||record.context.subjectName||'Unassigned','capture-subject'),el('span',record.review==='reviewed'?'Reviewed':record.review==='excluded'?'Excluded':record.review==='follow-up'?'Needs follow-up':'Unreviewed','capture-review'));open.append(figure,info);
@@ -105,11 +106,22 @@ async function renderLibrary(){
         if(record.status!=='complete')card.append(el('p',record.status+(record.error?' · '+record.error:''),'capture-error'));if(record.export?.status==='failed')card.append(el('p',record.export.error||'Open capture to retry export.','capture-error'));
         if(record.savedState==='saved'){
           const image=el('img');image.alt='';image.loading='lazy';figure.append(image);
-          try{const asset=await getAsset(preferredCaptureAsset(record)?.id,{verify:true});if(token!==librarySerial)return;const url=URL.createObjectURL(asset.blob);urls.push(url);image.src=url;}catch(e){figure.replaceChildren(el('span','Image unavailable','quiet'));card.append(el('p',e.message,'capture-error'));}
+          try{const asset=await getAsset(preferredCaptureAsset(record)?.id,{verify:true});if(token!==librarySerial)return;const url=URL.createObjectURL(asset.blob);nextUrls.push(url);image.src=url;}catch(e){figure.replaceChildren(el('span','Image unavailable','quiet'));card.append(el('p',e.message,'capture-error'));}
         }else figure.append(el('span','Image unavailable','quiet'));
       }
     }
-  }finally{restoreFocus();}
+    ready=true;
+  }finally{
+    if(ready&&token===librarySerial){
+      // Publish one complete list, retaining focus at the moment of replacement.
+      const restoreFocus=retainFocus(list),previousUrls=urls;
+      for(const checkbox of fragment.querySelectorAll('.capture-select'))checkbox.checked=selectedCaptures.has(checkbox.closest('[data-capture-id]').dataset.captureId);
+      list.replaceChildren(fragment);urls=nextUrls;
+      for(const url of previousUrls)URL.revokeObjectURL(url);
+      restoreFocus();
+    }else for(const url of nextUrls)URL.revokeObjectURL(url);
+    if(token===librarySerial)list.removeAttribute('aria-busy');
+  }
 }
 async function refresh(){
   const ticket=++serial,nextState=(await request('workspace.state')).state;if(ticket!==serial)return;state=nextState;let scanId=state.activeScanId,nextSearchId=null;

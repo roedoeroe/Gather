@@ -189,7 +189,7 @@ export function validateWorkspace(value) {
     }else fail('Invalid item kind.');
   }
   for(const task of s.tasks){verifyScope(task);text(task.title,500,true);if(!['open','done','dismissed'].includes(task.status))fail('Invalid task state.');}
-  for(const search of s.searches){verifyScope(search);if(search.url!==searchUrl(search.provider,search.query)||!['prepared','opened','reviewed','failed'].includes(search.status))fail('Invalid search.');for(const field of ['openedAt','lastOpenedAt','reviewedAt'])if(search[field]!==undefined&&(!Number.isFinite(search[field])||search[field]<=0))fail('Invalid search timestamp.');}
+  for(const search of s.searches){verifyScope(search);if((search.queryRetained===false?search.query!==''||search.url!==''||!Object.hasOwn(PROVIDERS,search.provider):search.url!==searchUrl(search.provider,search.query))||!['prepared','opened','reviewed','failed'].includes(search.status))fail('Invalid search.');for(const field of ['openedAt','lastOpenedAt','reviewedAt'])if(search[field]!==undefined&&(!Number.isFinite(search[field])||search[field]<=0))fail('Invalid search timestamp.');}
   for(const a of s.activity){verifyScope(a);text(a.label,2500);text(a.kind,100,true);if(a.change)validateChange(s,a.change);if(a.undoneAt!==undefined&&(!Number.isFinite(a.undoneAt)||a.undoneAt<=0))fail('Invalid undo date.');}
   for(const key of ['items','tasks'])for(const x of s[key])if(x.editVersion!==undefined&&(!Number.isInteger(x.editVersion)||x.editVersion<0))fail('Invalid edit version.');
   for(const key of ['projects','scans','items','tasks','searches'])for(const x of s[key])if(!Number.isFinite(x.createdAt)||x.createdAt<=0)fail('Invalid record date.');
@@ -208,7 +208,7 @@ export function mergeWorkspace(current,incoming,{idMap=new Map()}={}) {
 }
 export function report(state,scanId) {
   context(state,scanId);
-  return {format:'gather-report',schemaVersion:SCHEMA,exportedAt:Date.now(),destination:destinationLabel(state,scanId),scope:context(state,scanId),items:state.items.filter(x=>x.scanId===scanId&&x.included&&x.review!=='excluded'),tasks:state.tasks.filter(x=>x.scanId===scanId),searches:state.searches.filter(x=>x.scanId===scanId),notice:'Account matches describe page data, not who operates the account. Saved links and excerpts are not archived pages. Unreviewed included items remain labeled.'};
+  return {format:'gather-report',schemaVersion:SCHEMA,exportedAt:Date.now(),destination:destinationLabel(state,scanId),scope:context(state,scanId),items:state.items.filter(x=>x.scanId===scanId&&x.included&&x.review!=='excluded'),tasks:state.tasks.filter(x=>x.scanId===scanId),searches:[],notice:'Account matches describe page data, not who operates the account. Saved links and excerpts are not archived pages. Unreviewed included items remain labeled.'};
 }
 export function reportMarkdown(data){
   const escape=value=>String(value??'').replace(/[\\`*_{}[\]<>#|]/g,'\\$&');
@@ -224,7 +224,7 @@ export function reportMarkdown(data){
     if(item.annotation)lines.push('Analyst note: '+escape(item.annotation),'');
   }
   lines.push('## Next actions','');for(const t of data.tasks)lines.push('- '+escape(t.title)+' — '+t.status);
-  lines.push('','## Search log','');for(const s of data.searches)lines.push('- '+escape(PROVIDERS[s.provider]+': '+s.query)+' — '+s.status+' · '+(s.openedAt?'Opened: '+time(s.openedAt):'Prepared: '+time(s.createdAt)),'  URL: '+escape(s.url));
+  lines.push('','Web searches are not retained by Gather.');
   return lines.join('\n')+'\n';
 }
 export function itemChecks(state,item){

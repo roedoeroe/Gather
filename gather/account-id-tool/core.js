@@ -219,7 +219,9 @@ function jsonObjects(html) {
   for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) {
     const body = match[1].trim();
     if (/^[{[]/.test(body)) { try { roots.push(parseJson(body)); } catch {} }
-    const marker = /(?:var\s+)?ytInitialData\s*=\s*/g;
+    // Known data assignments contain JSON, not executable extraction logic.
+    // Read their balanced JSON value without evaluating the surrounding script.
+    const marker = /(?:\b(?:var\s+)?ytInitialData\s*=|\bwindow\._sharedData\s*=|\bwindow\.__additionalDataLoaded\s*\(\s*["'][^"']+["']\s*,)\s*/g;
     const start = marker.exec(body);
     if (start) {
       const tail = body.slice(start.index + start[0].length);
@@ -325,7 +327,15 @@ export function extractId(html, profile, pageUrl = profile.url) {
       }
     } else if (profile.platform === 'facebook') {
       if (matching(obj.username || obj.vanity || obj.userVanity) || [obj.url, obj.profile_url].some(sameUrl)) {
-        add(obj.profile_id || obj.id, 'Matched Facebook profile data', obj.name);
+        for(const field of ['profile_id','id','userID'])if(obj[field])add(obj[field], 'Matched Facebook profile data · '+field, obj.name);
+      }
+      // Facebook's initial profile route binds vanity and URL to userID in
+      // that route's own views. Never search nearby text or recommendation IDs.
+      if(key==='initialRouteInfo'&&matching(obj.route?.params?.userVanity)){
+        const route=obj.route;let routeMatches=false;
+        try{routeMatches=sameUrl(new URL(route.url,profile.url).href);}catch{}
+        if(routeMatches)for(const view of [route.rootView,route.hostableView])
+          if(view?.props?.userID)add(view.props.userID,'Matched Facebook profile route');
       }
       if (profile.directId && asId(obj.id) === profile.directId && /^(User|Page)$/.test(obj.__typename)) add(obj.id, 'Matched Facebook account ID', obj.name);
       if (/^(profile_owner|profileOwner)$/.test(key)) {
@@ -360,7 +370,7 @@ export function extractId(html, profile, pageUrl = profile.url) {
   if (candidates.size > 1) return {error: 'Multiple account IDs found. Open the profile and check its source.'};
   const accessIssue=pageAccessIssue(html,pageUrl,roots);if(accessIssue)return {error:accessIssue};
   const gone=confirmedGone(roots,profile,current);if(gone)return gone;
-  return {error: 'No matching account ID found. Try the page-source fallback.'};
+  return {error: 'No matching account ID was exposed by this page. Let the profile finish loading, then retry.'};
 }
 
 export function cleanName(value) {

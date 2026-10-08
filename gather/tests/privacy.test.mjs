@@ -40,9 +40,9 @@ test('archive recursion is bounded and excessive nesting leaves clear atomic',as
 });
 
 test('late search drafts and session edits cannot recreate deleted case context',async()=>{
- reset();data['gather.workspace.v1']=emptyState();await assert.rejects(saveSearchDraft('deleted-scan',{query:'fictional late query',provider:'google'}),/deleted/);
+ reset();data['gather.workspace.v1']=emptyState();assert.equal((await saveSearchDraft('deleted-scan',{query:'fictional late query',provider:'google'})).retained,false);
  const {updateCaseSession}=await import('../account-id-tool/case-session.js');await assert.rejects(updateCaseSession('deleted',()=>({names:{role:'Fictional name'}})),/closed/);assert.deepEqual(session,{});assert.equal(data['gather.search-draft.deleted-scan'],undefined);
- await saveSearchDraft(null,{query:'new fictional query',provider:'google'});assert.equal(data['gather.search-draft.inbox'].query,'new fictional query');
+ await saveSearchDraft(null,{query:'new fictional query',provider:'google'});assert.equal(data['gather.search-draft.inbox'],undefined);
 });
 test('late quick draft cannot reference a removed batch in the current epoch',async()=>{
  reset();await assert.rejects(saveLookupDraft('gather.quick',{batchId:'removed',input:'fictional'}),/deleted/);assert.equal(data['gather.quick'],undefined);

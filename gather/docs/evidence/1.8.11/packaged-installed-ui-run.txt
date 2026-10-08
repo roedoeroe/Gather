@@ -1,0 +1,1 @@
+PASS: 9 current installed-runner UI groups validated through rendered fixtures; native extension not loaded.

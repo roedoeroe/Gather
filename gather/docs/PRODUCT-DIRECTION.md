@@ -19,3 +19,9 @@ Case data stays local. Source is public by the user's choice. Red deletion/histo
 7. Defer broader workflow packs, text/highlight/advanced annotation, encrypted resume capsules and optional AI. None is necessary for the first excellent retrieval/composition workflow. Paid distribution and collaboration are longer-term possibilities, not current release commitments.
 
 Pack content remains separate from cases and public source. An absent real corpus does not block generic engineering, but it cannot establish a real taxonomy or approval. Search and composition run offline after import. No passive collection, cloud case storage, name-based merging, automated identity/relationship conclusions, threat scoring or email sending. X stays search-only.
+
+## 1.8.11 accepted correction — launch-only search
+
+The user’s latest instruction supersedes automatic search logging and draft retention from earlier milestones. Search the web opens a new tab, and reverse-image search opens the chosen provider; neither creates search records or saves the entered query. Session-only project/scan assignments preserve filing. Existing legacy query text is removed without breaking saved evidence references. Deliberate case intake/plans and saved findings remain distinct. Gray placeholder examples now support persistent labels. Missing hydrated IDs trigger a bounded automatic same-document source read, with exact-account guards. Capture history now refreshes atomically. See [the release implementation note](SEARCH-AND-LOOKUP-1.8.11.md).
+
+Retained priorities remain selected-result saving, local generic Quick Parts, confirmed-identifier scan carry-forward and provenance. User-owned query recipes must obey launch-only query privacy. Do not reintroduce automatic search history, require manual page source for normal lookup, add automatic redaction, or replace the extension with a hosted product.

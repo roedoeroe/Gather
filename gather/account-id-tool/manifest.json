@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Gather",
-  "version": "1.8.10",
+  "version": "1.8.11",
   "description": "Local research with exact account IDs, reviewed Case Start, roles, scan continuity, capture and evidence export.",
   "minimum_chrome_version": "116",
   "permissions": [
@@ -41,7 +41,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'"
   },
-  "version_name": "1.8.10",
+  "version_name": "1.8.11",
   "side_panel": {
     "default_path": "workspace.html?panel=1"
   }

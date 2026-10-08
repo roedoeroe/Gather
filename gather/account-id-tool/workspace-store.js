@@ -6,12 +6,28 @@ import {bindTabContext, detachTabContext, resolveTabContext, removeTabContext, r
 // statically, including recovery, image restore and case closure paths.
 import {readCaptureSetting,removeCaptureSetting,listSubjects,selectedSubject,snapshotCaptureBundle,importCaptureBundle,purgeProjectAssets,hashBytes} from './capture-store.js';
 import {validateCaptureBundle} from './capture-backup.js';
+import {forgetSearchText,forgetSearchDrafts} from './search-privacy.js';
+import {imageSearchUrl} from './image-search.js';
 import {prepareCase,resolveQuery} from './case-model.js';
-import {updateCaseSession} from './case-session.js';
 import {withoutProject,projectSignature} from './case-close.js';
 import {withHistoryLock,clearHistoryRecords,historySummary,HISTORY_EPOCH_KEY,scrubLookupArchive} from './batches.js';
 let queue=Promise.resolve();
-export async function readWorkspace(){await recoverBinaryRestore();const state=(await chrome.storage.local.get(WORKSPACE_KEY))[WORKSPACE_KEY];if(state&&state.schemaVersion!==SCHEMA)throw new Error('This workspace needs a different Gather version. Your data has not been changed.');return state||emptyState();}
+let privacyReady;
+async function removeLegacySearchData(){
+  if(privacyReady)return privacyReady;
+  privacyReady=(async()=>{
+    const all=await chrome.storage.local.get(null),writes={};
+    if(all[WORKSPACE_KEY]&&all[WORKSPACE_KEY].schemaVersion!==SCHEMA)throw new Error('This workspace needs a different Gather version. Your data has not been changed.');
+    if(all[WORKSPACE_KEY]){const clean=forgetSearchText(all[WORKSPACE_KEY]);if(clean!==all[WORKSPACE_KEY])writes[WORKSPACE_KEY]=clean;}
+    for(const [key,value] of Object.entries(forgetSearchDrafts(all)))if(key.startsWith('gather.archive.')&&JSON.stringify(value)!==JSON.stringify(all[key]))writes[key]=value;
+    if(Object.keys(writes).length)await chrome.storage.local.set(writes);
+    for(const area of [chrome.storage.local,chrome.storage.session]){
+      const values=await area.get(null),keys=Object.keys(values).filter(key=>key.startsWith('gather.search-draft.'));
+      if(keys.length)await area.remove(keys);
+    }
+  })();try{await privacyReady;}catch(error){privacyReady=null;throw error;}
+}
+export async function readWorkspace(){await recoverBinaryRestore();await removeLegacySearchData();const state=(await chrome.storage.local.get(WORKSPACE_KEY))[WORKSPACE_KEY];if(state&&state.schemaVersion!==SCHEMA)throw new Error('This workspace needs a different Gather version. Your data has not been changed.');return state||emptyState();}
 let recovering=null;
 async function recoverBinaryRestore(){
   if(!globalThis.indexedDB)return;
@@ -28,6 +44,7 @@ async function recoverBinaryRestore(){
 }
 // All workspace writes run in this service worker queue. A failed write does not poison later actions.
 export function dispatch(action){
+  if(action.type.startsWith('search.'))return Promise.reject(new Error('Searches open without a saved log. Launch a new search.'));
   const operation=queue.catch(()=>{}).then(async()=>{
     const previous=await readWorkspace();if(['research.coverage','research.associate'].includes(action.type)&&action.subjectId){const projectId=action.type==='research.coverage'?previous.scans.find(s=>s.id===action.scanId)?.projectId:previous.items.find(i=>i.id===action.itemId)?.projectId;if(!(await listSubjects(projectId)).some(s=>s.id===action.subjectId))throw new Error('Choose a role in this project.');}
     const {state,result}=reduceWorkspace(previous,action);
@@ -35,35 +52,29 @@ export function dispatch(action){
   });queue=operation;return operation;
 }
 export async function openSearch(action){
-  const before=await readWorkspace(),projectId=before.scans.find(s=>s.id===action.scanId)?.projectId;
-  if(!action.queueId&&before.projects.find(p=>p.id===projectId)?.mode==='ephemeral'){
-    if(typeof action.query!=='string'||!action.query.trim()||action.query.length>2000)throw new Error('Enter a search under 2000 characters.');
-    const prepared=await dispatch({type:'research.manual',scanId:action.scanId,provider:action.provider});await updateCaseSession(projectId,session=>({...session,values:{...session.values,[prepared.result.seedId]:action.query}}));return launchQueued(prepared.result.id);
-  }
-  const saved=await dispatch({...action,type:'search.prepare'}),id=saved.result.id;
-  const search=saved.state.searches.find(x=>x.id===id);
-  try {await launchSearchTab(search);}
-  catch(error){await dispatch({type:'search.status',id,status:'failed'});throw new Error('Search was saved but could not open. Retry from Search history.');}
-  // The search carries its original context even if another window switches scans while opening.
-  const response=await dispatch({type:'search.status',id,status:'opened'});response.result.id=id;return response;
+  const state=await readWorkspace(),scope=context(state,action.scanId);
+  // Build the URL in memory only. Neither the query nor a launch event is stored.
+  const url=searchUrl(action.provider,action.query);
+  await launchSearchTab(scope,url);
+  return {state:await readWorkspace(),result:{opened:true}};
 }
-export async function reopenSearch(id){
-  const s=await readWorkspace(),search=s.searches.find(x=>x.id===id);if(!search)throw new Error('Search no longer available.');
-  await launchSearchTab(search);return dispatch({type:'search.status',id,status:'opened'});
+export async function openImageSearch(action){
+  const state=await readWorkspace(),scope=context(state,action.scanId);
+  await launchSearchTab(scope,imageSearchUrl(action.provider));
+  return {state:await readWorkspace(),result:{opened:true}};
 }
-async function launchSearchTab(search){
-  // Bind a blank inactive tab before navigating. Its result tabs cannot outrun
-  // the assignment write, and no URL/timing heuristic is needed.
-  let url=search.url;
-  if(search.queueId){const state=await readWorkspace(),row=state.research?.queue.find(q=>q.id===search.queueId);if(!row)throw new Error('Search context unavailable.');const session=(await chrome.storage.session.get('gather.case.'+row.projectId))['gather.case.'+row.projectId]||{};url=searchUrl(search.provider,resolveQuery(state,{...row,tokenizedQuery:search.query},session));}
-  const tab=await chrome.tabs.create({url:'about:blank',active:false});
+export async function reopenSearch(){throw new Error('Search text is no longer retained. Enter a new search.');}
+async function launchSearchTab(scope,url){
+  // Only filing context is kept in session storage, never a query or URL.
+  // Bind before navigating so browser-related result tabs inherit this scan.
+  let tab;
   try {
-    await bindTabContext(tab.id,{scanId:search.scanId,projectId:search.projectId,originatingSearchId:search.id},'search');
+    tab=await chrome.tabs.create({url:'about:blank',active:false});
+    await bindTabContext(tab.id,scope,'search');
     await chrome.tabs.update(tab.id,{url,active:true});
   } catch(error) {
-    await removeTabContext(tab.id).catch(()=>{});
-    await chrome.tabs.remove(tab.id).catch(()=>{});
-    throw error;
+    if(tab){await removeTabContext(tab.id).catch(()=>{});await chrome.tabs.remove(tab.id).catch(()=>{});}
+    throw new Error('The search could not open. Your text is still here; try again.');
   }
 }
 export async function capturePage(scanId,tabId,options={}){
@@ -84,7 +95,7 @@ export async function capturePage(scanId,tabId,options={}){
 }
 export async function backup(){
   await queue.catch(()=>{});
-  await recoverBinaryRestore();
+  await readWorkspace();
   const all=await chrome.storage.local.get(null),legacy={};
   for(const [key,value] of Object.entries(all))if(key.startsWith('gather.')&&key!==WORKSPACE_KEY&&key!==HISTORY_EPOCH_KEY&&value!==null)legacy[key]=value;
   return {format:'gather-backup',schemaVersion:1,createdAt:Date.now(),workspace:all[WORKSPACE_KEY]||emptyState(),legacy};
@@ -92,11 +103,11 @@ export async function backup(){
 export function importBackup(value,stageId=null){
   validateBackup(value);
   const operation=queue.catch(()=>{}).then(()=>withHistoryLock(async()=>{
-    await recoverBinaryRestore();
+    await readWorkspace();
     const all=await chrome.storage.local.get(null),idMap=new Map();
     if(stageId){const bundle=(await readCaptureSetting('restore-stage:'+stageId))?.value?.bundle,current=await snapshotCaptureBundle();for(const subject of bundle?.subjects||[])if(current.subjects.some(s=>s.id===subject.id)||all[WORKSPACE_KEY]?.projects?.length)idMap.set(subject.id,crypto.randomUUID());}
-    const state=mergeWorkspace(all[WORKSPACE_KEY]||emptyState(),value.workspace,{idMap}),writes={[WORKSPACE_KEY]:state},conflicts={};
-    for(const [key,original] of Object.entries(value.legacy)){
+    const state=mergeWorkspace(all[WORKSPACE_KEY]||emptyState(),forgetSearchText(value.workspace),{idMap}),writes={[WORKSPACE_KEY]:state},conflicts={};
+    for(const [key,original] of Object.entries(forgetSearchDrafts(value.legacy))){
       if(key===HISTORY_EPOCH_KEY)continue;
       const v=structuredClone(original);
       if(key.startsWith('gather.batch.')&&v){delete v.historyEpoch;if(all[HISTORY_EPOCH_KEY])v.historyEpoch=all[HISTORY_EPOCH_KEY];}
@@ -154,16 +165,12 @@ export function closeProject(projectId,guard={}){
 export async function launchQueued(id){
   const state=await readWorkspace(),row=state.research?.queue.find(q=>q.id===id);if(!row)throw new Error('Queued search is unavailable.');
   const session=(await chrome.storage.session.get('gather.case.'+row.projectId))['gather.case.'+row.projectId]||{};
-  resolveQuery(state,row,session); // Fail before logging when ephemeral values are absent.
-  const result=await openSearch({scanId:row.scanId,provider:row.provider,query:row.tokenizedQuery,queueId:row.id});
-  await dispatch({type:'research.queue',id,status:'launched',searchId:result.result.id});if(!state.research.coverage.some(c=>c.scanId===row.scanId&&c.subjectId===row.subjectId&&c.family===row.provider))await dispatch({type:'research.coverage',scanId:row.scanId,subjectId:row.subjectId,family:row.provider==='bing'?'google':row.provider,status:'Search launched'});return {state:await readWorkspace()};
+  const query=resolveQuery(state,row,session);
+  await openSearch({scanId:row.scanId,provider:row.provider,query});
+  await dispatch({type:'research.queue',id,status:'launched'});if(!state.research.coverage.some(c=>c.scanId===row.scanId&&c.subjectId===row.subjectId&&c.family===row.provider))await dispatch({type:'research.coverage',scanId:row.scanId,subjectId:row.subjectId,family:row.provider==='bing'?'google':row.provider,status:'Search launched'});return {state:await readWorkspace()};
 }
-export function saveSearchDraft(scanId,value){
-  const operation=queue.catch(()=>{}).then(async()=>{const state=await readWorkspace(),scan=state.scans.find(s=>s.id===scanId);if(scanId&&!scan)throw new Error('This scan was deleted.');
-    if(!value||typeof value.query!=='string'||value.query.length>2000||!['google','bing','instagram','facebook','tiktok','threads','youtube','x'].includes(value.provider))throw new Error('Invalid search draft.');
-    const area=state.projects.find(p=>p.id===scan?.projectId)?.mode==='ephemeral'?chrome.storage.session:chrome.storage.local;
-    await area.set({['gather.search-draft.'+(scanId||'inbox')]:{query:value.query,provider:value.provider}});return {ok:true};});queue=operation;return operation;
-}
+// Old open pages may still send this message after an update. Never retain it.
+export async function saveSearchDraft(){return {ok:true,retained:false};}
 export function clearLookups(){
   const operation=queue.catch(()=>{}).then(async()=>{await recoverBinaryRestore();return withHistoryLock(async()=>{const result=await clearHistoryRecords();await chrome.storage.session.remove('quickRun');return {result};});});queue=operation;return operation;
 }
@@ -178,6 +185,7 @@ export async function handleWorkspace(message){
     case 'workspace.state': await queue.catch(()=>{});return {state:await readWorkspace()};
     case 'workspace.action': return dispatch(message.action);
     case 'workspace.search': return openSearch(message.action);
+    case 'workspace.imageSearch': return openImageSearch(message.action);
     case 'workspace.reopenSearch': return reopenSearch(message.id);
     case 'workspace.capture': return capturePage(message.scanId,message.tabId,{subjectId:message.subjectId,destination:message.destination,expectedUrl:message.expectedUrl});
     case 'workspace.tabContext': return resolveTabContext(await readWorkspace(),message.tabId);

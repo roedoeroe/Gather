@@ -1,12 +1,12 @@
-# Check Gather 1.8.10 in Chrome or Edge
+# Check Gather 1.8.11 in Chrome or Edge
 
 The cloud tests reproduced and fixed the reported worker exception. This checklist verifies the remaining native behavior on the browser where Gather is installed. Use only disposable fictional cases for the privacy checks.
 
 ## Update without losing storage
 
 1. Preserve the installed folder. Back up work if the current build opens. If 1.8.0 cannot open, keep the browser profile and stored data intact; do not uninstall or clear site data.
-2. Extract `Gather-1.8.10-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include every module and stylesheet, including `capture-region.js`, `capture-annotations.js` and `capture-edit.css`.
-3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.10**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
+2. Extract `Gather-1.8.11-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include every module and stylesheet, including `capture-region.js`, `capture-annotations.js` and `capture-edit.css`.
+3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.11**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
 
 ## Workspace acceptance
 
@@ -37,7 +37,7 @@ The cloud tests reproduced and fixed the reported worker exception. This checkli
 
 Privacy acceptance: confirm New case says **Case name** and explains local storage. With a fictional Northbridge case selected, check the red **Delete case…** button in Settings → Data & Privacy. Cancel first; then test the typed-name guard and each backup choice on disposable cases. A denied backup must retain the complete case. Delete without backup must create no new download. Confirm Southridge and its images remain. With popup and full tool open, clear recent lookup history and confirm old results/drafts disappear, saved cases/images remain, and fresh lookup works. Reload Gather and confirm cleared data stays cleared. Browser history, clipboard and old downloaded files intentionally remain outside these controls.
 
-If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.10; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
+If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.11; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
 
 ## New capture acceptance
 
@@ -73,3 +73,10 @@ Review sheets must clear stale images if the selected derivative changes in anot
 ## Usability checkpoint
 
 With a supported profile open and no pasted input, Find IDs on this page should be enabled. A pasted link takes priority. Opening the popup alone must not start a lookup. Filter Findings, switch to Tasks/History, then return; each view should keep its own filter. A scan change clears them. Draw a manual mark or edit a caption, choose Close, then Cancel; the edits must remain. Save edits, then Close without a discard prompt. Check the browser's native tab-close/reload prompt separately with unsaved work.
+
+## Search and source-read changes
+
+- Type a fictional query in Search the web. Its gray example disappears, the label remains, Enter opens a new provider tab, and the query clears. Reload before submitting a different draft: it must be gone. Browser/provider history is separate.
+- Switch to Reverse image. Select TinEye (or another provider), Open image search, and choose an image yourself there. Gather must not upload/read any image or clipboard content automatically. Confirm the result tab keeps the original scan after a workspace switch.
+- Open a supported profile, then Find IDs on this page. If hydrated data is missing, Gather should read source automatically. Check the final exact ID against that profile; test navigation/cancellation and login-required recovery. No automatic extractor can guarantee every platform’s markup/access state.
+- Confirm old search text/drafts are absent after update and old-backup restore, with saved findings/captures preserved. Check only fictional data. Query-free legacy references remain internal; older releases may reject them, so do not downgrade the active profile in place.

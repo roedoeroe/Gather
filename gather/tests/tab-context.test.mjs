@@ -38,7 +38,7 @@ test('browser replacement transfers explicit context without inspecting a URL',a
 });
 test('search is assigned before navigating and immediate result tabs retain origin',async()=>{
   const f=fixture();navigate=async(id,options)=>{assert.equal(tabs.get(id).url,'about:blank');assert.equal(tabs.get(id).active,false);assert.equal((await tc.resolveTabContext(await store.readWorkspace(),id)).context.scanId,f.a);await tc.inheritTabContext({id:99,openerTabId:id});};
-  await store.openSearch({scanId:f.a,provider:'google',query:'Alex Example'});const r=await tc.resolveTabContext(await store.readWorkspace(),99);assert.equal(r.context.scanId,f.a);assert.equal(r.context.originatingSearchId,(await store.readWorkspace()).searches.at(-1).id);
+  await store.openSearch({scanId:f.a,provider:'google',query:'Alex Example'});const r=await tc.resolveTabContext(await store.readWorkspace(),99);assert.equal(r.context.scanId,f.a);assert.equal(r.context.originatingSearchId,null);assert.equal((await store.readWorkspace()).searches.length,1,'Only the legacy record remains; new searches do not create records');
 });
 test('page save uses frozen tab context despite delayed read, reassignment and active switch',async()=>{
   const f=fixture();await bind(f);let release;const oldGet=chrome.tabs.get;chrome.tabs.get=id=>new Promise(resolve=>release=()=>resolve({id,url:'https://example.test/report',title:'Fictional report'}));

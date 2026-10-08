@@ -1,4 +1,5 @@
 import {extractId, normalizeProfile, pageAccessIssue} from './core.js';
+import {readProfileSource} from './read-profile-source.js';
 
 export const isExtension = Boolean(globalThis.chrome?.runtime?.id && globalThis.chrome?.scripting);
 const ownedTabs = new Set();
@@ -102,11 +103,24 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
       if(snapshot){
         const result=extractId(snapshot.html,profile,snapshot.url);
         if(result.id||result.accountState==='GONE')return {...result,method:'Current page · '+result.method};
-        return result;
+        // Authentication, conflicting IDs and a different profile are explicit
+        // failures. Only missing hydrated data triggers an automatic source read.
+        if(!result.error?.startsWith('No matching account ID'))return result;
+        onStage?.('Reading profile source automatically…');
+        const documentId=results[0]?.documentId;
+        const sourceResults=await chrome.scripting.executeScript({target:{tabId:currentTabId,...(documentId?{documentIds:[documentId]}:{})},func:readProfileSource});
+        check(signal);
+        const latest=await chrome.tabs.get(currentTabId);
+        if(normalizeProfile(latest.url).key!==profile.key)return {error:'The page changed during lookup. Open the intended profile and retry.'};
+        const source=sourceResults[0]?.result;
+        if(source?.error)return source;
+        if(!source)return {error:'The profile returned no readable source. Reload it, then retry.'};
+        const found=extractId(source.html,profile,source.url);
+        return found.id||found.accountState==='GONE'?{...found,method:'Current profile source · '+found.method}:found;
       }
       return {error:'The current page returned no readable source. Reload the profile, then retry.'};
     }catch{check(signal);return {error:'Gather could not read this tab. Reopen Gather using its toolbar button on the profile, then retry.'};}
-    // This explicit current-page operation never substitutes a fetched or new tab.
+    // This explicit operation reads source in the same authorized tab/document.
     // The existing user tab is never tracked as temporary or closed by Gather.
   }
   onStage?.('Fetching profile…');
@@ -114,5 +128,5 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
   check(signal);
   if (direct.id || direct.accountState==='GONE' || !browserFallback) return fallbackId(direct);
   try { return fallbackId(await readBrowserPage(profile, signal, onStage, tabOwner)); }
-  catch (error) { check(signal); return fallbackId({error: 'Could not read the browser page. Open it and try the page-source fallback.'}); }
+  catch (error) { check(signal); return fallbackId({error: 'Could not read the browser page. Open the profile, then choose Find IDs on this page.'}); }
 }

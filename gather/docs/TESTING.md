@@ -1,30 +1,24 @@
-# Gather 1.8.10 validation
+# Gather 1.8.11 validation
 
 All public fixtures use deterministic fictional data. Counts describe executed checks, not guarantees about arbitrary websites or installed Edge behavior.
 
 | Layer | Fresh result | Scope |
 | --- | --- | --- |
-| Node | 165 passed, zero failed/skipped | Exact IDs, five adapter fixtures, account states, context continuity, capture geometry/storage/recovery, privacy and output guards. |
-| Rendered interface | 104 unique groups passed | Capture 21, toolbar 24, case/privacy 18, stabilization 10, case clipboard 7, shared workspace UI 8, image tools 16. Chrome extension APIs are controlled doubles. |
+| Node | 178 passed, zero failed/skipped | Exact IDs, five adapter fixtures, account states, context continuity, capture geometry/storage/recovery, privacy and output guards. |
+| Rendered interface | 105 unique groups passed | Capture 21, toolbar 24, case/privacy 18, stabilization 10, case clipboard 7, shared workspace UI 9, image tools 16. Chrome extension APIs are controlled doubles. |
 | Worker | 10 actual ServiceWorkerGlobalScope groups passed | Real Chromium worker lifecycle with controlled Chrome APIs; static imports/restart/context behavior. |
 | Higher device scale | 16 image-tool groups repeated at 2× | Repeated evidence, not extra unique groups. Native browser zoom is a separate check. |
 | Visual inspection | Fictional screenshots inspected | Current-profile popup, desktop workspace and narrow editor. The layout check verifies the primary lookup action is above the actual popup clipping boundary. |
 | Native extension | Blocked; zero groups passed | Preflight exits 2 before browser launch because administrator policy blocks unpacked extensions. No policy workaround. |
-| Live platforms | No new live lookup in 1.8.10 | Prior authorized 1.8.8 observations remain historical and separately qualified; real observations stay outside public source/packages. |
+| Live platforms | One authorized anonymous Instagram source read succeeded | HTTP200, matched route, exact string ID. No raw source or real identifiers retained/published; signed-in Edge and other live platforms unverified. |
 
 DOM, canvas, PNG pixels, clipboard, IndexedDB, BroadcastChannel and applicable locks/worker lifecycle are real in the rendered tests. Tabs, scripting, screenshot invocation and Downloads APIs are doubles. Ordinary browser confirmation/window closure is exercised; native extension invocation, OS clipboard paste/save/print, browser tab-close/reload prompts, actual zoom and screen readers remain unverified.
 
-## Usability regression evidence
+## Changed-behavior checks
 
-The baseline reproduced two problems: the main lookup button was disabled on a supported profile, and a findings filter hid an existing task. The current journeys check:
+[Release evidence](evidence/1.8.11/README.md) describes the current checks and their limits. Searches no longer create records or drafts; legacy query cleanup and backup import preserve deliberate evidence links. Reverse-image launch sends no image. Automatic current-document source fallback is covered with separate hydrated/source API doubles and real bounded-reader tests. Captures, privacy controls, editor state and recovery regressions remain.
 
-- Explicit current-profile lookup with no case requirement or passive run; exact long ID; keyboard activation and visible main action.
-- Pasted input/Enter taking priority, invalid input staying invalid, and active-tab revalidation without replacing previous results.
-- Independent Findings/Tasks filters, truthful no-match text and filter reset in a new scan.
-- Unsaved marks/caption protection, Cancel retaining edits, deliberate discard closing once, delayed image encoding disabling Close, a saved image clearing the unload guard, and missing/deleted editors remaining closable.
-- Stale editor controls being disabled and a deliberately forced save attempt still failing without changing the newer selected image.
-
-The workspace fixture waits for the save dialog to close before typing into Research, matching the usable interaction rather than editing a modal-blocked field. The older stale-editor test was updated for the now-disabled controls; its storage-guard assertion remains. Failed intermediate runs are not counted as passing checks.
+A failing capture-history timing check exposed incremental list rendering. Publishing the complete replacement now avoids the visible gap; an observer assertion verifies it. Saved-search/draft expectations were updated because the user withdrew that behavior, not to hide runtime failures.
 
 ## Running the checks
 
@@ -48,6 +42,6 @@ Node 24, Python 3, supplied Playwright 1.62.1 and sandboxed Chromium 151 were us
 
 `node tests/browser-acceptance.mjs` exits 2 for the managed policy block, 1 for failure, and 0 only after actual installed smoke checks. This machine has `/etc/chromium/policies/managed/extensions.json` with wildcard `ExtensionInstallBlocklist`. Keep it intact. [The installed-browser checklist](LOCAL-ACCEPTANCE.md) covers the remaining acceptance work.
 
-Current evidence: [1.8.10](evidence/1.8.10/README.md). The release receipt records ZIP CRC, SHA-256, every runtime byte, unchanged permissions/storage versions and extracted-package gates. Package reruns do not increase unique counts. Historical evidence remains under `evidence/1.8.9`, `evidence/1.8.8` and prior versions.
+Current evidence: [1.8.11](evidence/1.8.11/README.md). The release receipt records ZIP CRC, SHA-256, every runtime byte, unchanged permissions/storage versions and extracted-package gates. Package reruns do not increase unique counts. Historical evidence remains under `evidence/1.8.9`, `evidence/1.8.8` and prior versions.
 
-The extracted development package passed 165 Node checks plus all 24 toolbar, 8 shared workspace and 16 image-tool groups. Final-package runtime bytes match those exercised in the extracted gate.
+The extracted development package passed 178 Node checks plus all 24 toolbar, 9 shared workspace and 16 image-tool groups. Final-package runtime bytes match those exercised in the extracted gate.

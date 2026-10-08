@@ -1,3 +1,4 @@
+import {IMAGE_PROVIDERS} from './image-search.js';
 import {getCapture} from './capture-store.js';
 import {retainFocus} from './workspace-focus.js';
 import {initNavigation,selectSection,setCaseAvailable} from './workspace-navigation.js';
@@ -13,7 +14,7 @@ let tabContext=null,tabId=null,tabRefresh=0;
 const currentScan=()=>isPanel&&tabContext?tabContext.context.scanId:state.activeScanId;
 document.body.classList.toggle('panel',isPanel);
 const initialSection=location.hash.slice(1);initNavigation();
-let state=null,view='items',draftQueue=Promise.resolve(),editorSave=null,lastScan,windowId=null,undoId=null;
+let state=null,view='items',searchMode='web',editorSave=null,lastScan,windowId=null,undoId=null;
 const viewQueries=new Map();let filterScanId;
 const formatTime=t=>new Date(t).toLocaleString();
 const label=id=>destinationLabel(state,id);
@@ -21,7 +22,7 @@ const rows=key=>state[key].filter(x=>x.scanId===currentScan());
 const make=(tag,cls,content)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(content!==undefined)el.textContent=content;return el;};
 function message(content,error=false){$('message').textContent=content;$('message').className='message'+(error?' error':'');$('message').hidden=false;}
 async function safely(fn){try{return await fn();}catch(error){message(error.message,true);return null;}}
-function update(next){if(!state||next.revision>=state.revision){const changed=lastScan!==next.activeScanId;state=next;lastScan=next.activeScanId;render();if(changed)restoreDraft(currentScan());}}
+function update(next){if(!state||next.revision>=state.revision){const changed=lastScan!==next.activeScanId;state=next;lastScan=next.activeScanId;render();if(changed)clearSearchInput();}}
 async function action(payload){const response=await act(payload);update(response.state);if(response.result.undoId){undoId=response.result.undoId;$('undoLabel').textContent='Change saved. You can undo it.';$('undoNotice').hidden=false;}return response.result;}
 function button(title,fn,cls=''){const b=make('button',cls,title);b.type='button';b.addEventListener('click',()=>safely(fn));return b;}
 function empty(target,title,description){const el=make('div','empty');el.append(make('strong','',title),make('span','',description));target.append(el);}
@@ -32,7 +33,7 @@ function render(){
   const scan=state.scans.find(x=>x.id===currentScan()),project=state.projects.find(x=>x.id===scan?.projectId);
   $('projectName').textContent=project?.name||'YOUR LIBRARY';$('scanName').textContent=scan?.name||'Inbox';
   $('scanHelp').textContent=scan?'Research saved to this scan.':'Save findings here. A case is optional.';
-  $('saveDestination').textContent='In '+label(currentScan());$('savePage').textContent='Save page to '+label(currentScan());if(isPanel)renderTabContext();$('newScan').hidden=!scan;$('renameContext').hidden=!scan;
+  $('saveDestination').textContent='Destination: '+label(currentScan());$('savePage').textContent='Save page to '+label(currentScan());if(isPanel)renderTabContext();$('newScan').hidden=!scan;$('renameContext').hidden=!scan;
   setCaseAvailable(Boolean(project));
   $('libraryToggle').textContent='Library · '+(project?.name||'Inbox')+' ▾';
   $('inboxCount').textContent=state.items.filter(x=>x.scanId===null).length;$('inboxCount').hidden=Number($('inboxCount').textContent)===0;$('inbox').classList.toggle('selected',state.activeScanId===null);
@@ -41,9 +42,8 @@ function render(){
   if(!state.projects.length)$('projects').append(make('p','quiet','No cases yet. Use New case when you need one.'));
   $('reviewCount').textContent=rows('items').filter(x=>['unreviewed','follow-up'].includes(x.review)).length;
   $('taskCount').textContent=rows('tasks').filter(x=>x.status==='open').length;
-  $('searchCount').textContent=rows('searches').filter(x=>x.status!=='reviewed').length;
   $('reviewShortcut').hidden=Number($('reviewCount').textContent)===0;
-  for(const id of ['taskCount','searchCount'])$(id).hidden=Number($(id).textContent)===0;
+  for(const id of ['taskCount'])$(id).hidden=Number($(id).textContent)===0;
   const used=new TextEncoder().encode(JSON.stringify(state)).length;
   $('storageUsage').textContent='Workspace: '+(used/1024).toFixed(0)+' KB / '+(MAX_BYTES/1024/1024)+' MB'+(used>MAX_BYTES*.8?' · Approaching capacity. Back up your work.':'');
   renderViews();restoreFocus();restoreLibraryFocus();
@@ -51,13 +51,11 @@ function render(){
 function renderViews(){
   if(isPanel)view='tasks';
   if(filterScanId!==currentScan()){filterScanId=currentScan();viewQueries.clear();$('localSearch').value='';$('filter').value='all';}
-  for(const name of ['items','tasks','searches','activity'])$(name).hidden=name!==view;
-  for(const tab of document.querySelectorAll('.tabs [data-view]')){tab.classList.toggle('selected',(tab.dataset.view===view||(tab.dataset.view==='searches'&&view==='activity')));tab.setAttribute('aria-current',(tab.dataset.view===view||(tab.dataset.view==='searches'&&view==='activity'))?'page':'false');}
-  $('historyKindLabel').hidden=!['searches','activity'].includes(view);
-  if(['searches','activity'].includes(view))$('historyKind').value=view;
+  for(const name of ['items','tasks','activity'])$(name).hidden=name!==view;
+  for(const tab of document.querySelectorAll('.tabs [data-view]')){tab.classList.toggle('selected',(tab.dataset.view===view));tab.setAttribute('aria-current',(tab.dataset.view===view)?'page':'false');}
   $('filter').hidden=view!=='items';$('reviewShortcut').hidden=view!=='items'||Number($('reviewCount').textContent)===0;
-  $('localSearch').placeholder={items:'Find saved items…',tasks:'Find tasks…',searches:'Find searches…',activity:'Find activity…'}[view];
-  ({items:renderItems,tasks:renderTasks,searches:renderSearches,activity:renderActivity}[view])();
+  $('localSearch').placeholder={items:'Find saved items…',tasks:'Find tasks…',activity:'Find activity…'}[view];
+  ({items:renderItems,tasks:renderTasks,activity:renderActivity}[view])();
 }
 function cardMeta(card,kind,date){const meta=make('div','meta');meta.append(make('span','badge',kind),make('span','',formatTime(date)));card.append(meta);}
 function addLink(card,url,title=url){const a=make('a','url',title);a.href=url;a.target='_blank';a.rel='noopener noreferrer';card.append(a);}
@@ -93,18 +91,14 @@ function renderTasks(){
   if(!tasks.length){const filtered=!isPanel&&rows('tasks').length;empty(target,filtered?'No matching tasks':'No tasks yet',filtered?'Try another search.':'Add a task for something you want to follow up.');}
   for(const task of (isPanel?tasks.slice(0,3):tasks)){const card=make('article','card');card.dataset.focusKey=task.id;cardMeta(card,task.status,task.createdAt);card.append(make('h3','',task.title));const controls=make('div','card-controls');for(const [status,title] of (task.status==='open'?[['done','Mark done'],['dismissed','Dismiss']]:[['open','Reopen']]))controls.append(button(title,()=>action({type:'task.status',id:task.id,status})));card.append(controls);target.append(card);}
 }
-function renderSearches(){
-  const target=$('searches');target.replaceChildren();const searches=rows('searches').filter(matches).slice().reverse();
-  if(!searches.length)empty(target,rows('searches').length?'No matching searches':'No searches yet',rows('searches').length?'Try another search.':'Searches you launch from Gather appear here. They do not imply complete coverage.');
-  for(const search of searches){const card=make('article','card');card.dataset.focusKey=search.id;cardMeta(card,search.status,search.createdAt);card.append(make('h3','',search.query),make('p','quiet',PROVIDERS[search.provider]));const controls=make('div','card-controls');controls.append(button('Open search ↗',async()=>{const r=await request('workspace.reopenSearch',{id:search.id});update(r.state);}));if(search.status==='opened')controls.append(button('Mark reviewed',()=>action({type:'search.status',id:search.id,status:'reviewed'})));card.append(controls);target.append(card);}
-}
-function renderActivity(){const target=$('activity');target.replaceChildren();const events=rows('activity').filter(matches).slice().reverse();if(!events.length)empty(target,rows('activity').length?'No matching activity':'No activity yet',rows('activity').length?'Try another search.':'Your saves, reviews and searches appear here. Browsing history is not collected.');for(const event of events){const card=make('article','card');cardMeta(card,event.kind.replaceAll('.',' · '),event.at);card.append(make('p','',event.label));target.append(card);}}
+function renderActivity(){const target=$('activity');target.replaceChildren();const events=rows('activity').filter(matches).slice().reverse();if(!events.length)empty(target,rows('activity').length?'No matching activity':'No activity yet',rows('activity').length?'Try another search.':'Changes to findings and tasks you deliberately save appear here. Web searches are not recorded.');for(const event of events){const card=make('article','card');cardMeta(card,event.kind.replaceAll('.',' · '),event.at);card.append(make('p','',event.label));target.append(card);}}
 async function selectScan(id){await action({type:'context.select',scanId:id});$('localSearch').value='';$('filter').value='all';setView('items');document.body.classList.remove('library-open');$('libraryToggle').setAttribute('aria-expanded','false');}
 function openEditor(title,fields,save,destination=currentScan(),submit='Save'){
   editorSave=save;$('editorTitle').textContent=title;$('editorDestination').textContent='Destination: '+label(destination);$('submitEdit').textContent=submit;$('fields').replaceChildren();$('editorError').textContent='';
   for(const spec of fields){const label=make('label','',spec.label),input=make(spec.type==='textarea'?'textarea':spec.type==='select'?'select':'input');input.name=spec.name;
     if(spec.type==='select')for(const o of spec.options)input.append(new Option(o.label,o.value));
     else{if(input.tagName==='INPUT')input.type=spec.type||'text';input.maxLength=spec.max||500;input.required=spec.required!==false;}
+    if(input.tagName!=='SELECT')input.placeholder=spec.placeholder||({url:'https://example.test/profile',title:'e.g. October review notes',body:'e.g. What you observed and what needs checking',annotation:'e.g. Why this finding matters to the scan',excerpt:'e.g. A short passage from the source',name:'e.g. November review',projectName:'e.g. Northbridge',scanName:'e.g. October review'}[spec.name]||'');
     input.value=spec.value||'';label.append(input);$('fields').append(label);
   }
   $('editor').showModal();$('fields').querySelector('input,select,textarea')?.focus();
@@ -121,19 +115,32 @@ $('newScan').onclick=()=>{const projectId=state.scans.find(s=>s.id===state.activ
 $('inbox').onclick=()=>safely(()=>selectScan(null));
 $('addSource').onclick=()=>{const scanId=currentScan();openEditor('Save a source',[{name:'url',label:'Source URL',type:'url',max:4096},{name:'title',label:'Title',required:false},{name:'excerpt',label:'Selected excerpt (optional)',type:'textarea',max:20000,required:false}],v=>action({type:'item.save',kind:'source',scanId,...v}),scanId);};
 $('addNote').onclick=()=>{const scanId=currentScan();openEditor('Add a note',[{name:'title',label:'Title',value:'Note'},{name:'body',label:'Your note',type:'textarea',max:20000}],v=>action({type:'item.save',kind:'note',scanId,...v}),scanId);};
-$('addTask').onclick=()=>{const scanId=currentScan();openEditor('New task',[{name:'title',label:'What needs to happen?'}],v=>action({type:'task.create',scanId,...v}),scanId);};
+$('addTask').onclick=()=>{const scanId=currentScan();openEditor('New task',[{name:'title',label:'What needs to happen?',placeholder:'e.g. Review the saved profile tomorrow'}],v=>action({type:'task.create',scanId,...v}),scanId);};
 $('savePage').onclick=()=>safely(async()=>{const scanId=currentScan(),sourceTabId=tabId;if(!sourceTabId)throw new Error('Open a web page and use the Gather toolbar button.');const response=await request('workspace.capture',{scanId,tabId:sourceTabId});update(response.state);message('Page saved to '+(response.result?.destinationLabel||label(response.result?.scanId??scanId))+'.');});
-$('searchForm').addEventListener('submit',event=>{event.preventDefault();const scanId=currentScan(),query=$('query').value,provider=$('provider').value,submit=event.submitter;submit.disabled=true;safely(async()=>{const r=await request('workspace.search',{action:{scanId,query,provider}});update(r.state);message('Search opened for '+label(scanId)+'. Mark it reviewed when you finish.');setView('searches',{clearFilter:true});}).finally(()=>submit.disabled=false);});
-function draftKey(scanId){return 'gather.search-draft.'+(scanId||'inbox');}
-function draftStorage(scanId){const projectId=state.scans.find(s=>s.id===scanId)?.projectId;return state.projects.find(p=>p.id===projectId)?.mode==='ephemeral'?chrome.storage.session:chrome.storage.local;}
-function saveDraft(){const scanId=currentScan(),value={query:$('query').value,provider:$('provider').value};draftQueue=draftQueue.catch(()=>{}).then(()=>request('workspace.searchDraft',{scanId,value})).catch(error=>message('Search draft could not be saved. '+error.message,true));}
-async function restoreDraft(scanId){await draftQueue.catch(()=>{});const key=draftKey(scanId),draft=(await draftStorage(scanId).get(key))[key];if(currentScan()!==scanId)return;$('query').value=draft?.query||'';$('provider').value=draft?.provider||'google';}
+function clearSearchInput(){$('query').value='';}
+function setSearchMode(mode){
+  searchMode=mode;const image=mode==='image';
+  $('webSearchMode').setAttribute('aria-pressed',String(!image));$('imageSearchMode').setAttribute('aria-pressed',String(image));
+  $('queryField').hidden=image;$('query').disabled=image;$('query').required=!image;
+  $('provider').replaceChildren(...Object.entries(image?IMAGE_PROVIDERS:PROVIDERS).map(([id,value])=>new Option(image?value.name:value,id)));
+  $('launchSearch').textContent=image?'Open image search ↗':'Search ↗';
+  $('searchHelp').textContent=image?'Opens the provider’s website. Use its camera or upload button to choose an image there. Gather does not upload images or save image-search history.':'Opens a new tab. Gather does not save your query or search history. Your browser and the search service may keep their own history.';
+  (image?$('provider'):$('query')).focus();
+}
+$('webSearchMode').onclick=()=>setSearchMode('web');$('imageSearchMode').onclick=()=>setSearchMode('image');
+$('searchForm').addEventListener('submit',event=>{
+  event.preventDefault();const scanId=currentScan(),query=$('query').value,provider=$('provider').value,image=searchMode==='image',submit=$('launchSearch');
+  if(submit.disabled)return;submit.disabled=true;
+  safely(async()=>{
+    const r=await request(image?'workspace.imageSearch':'workspace.search',{action:{scanId,provider,...(image?{}:{query})}});update(r.state);
+    if(!image&&$('query').value===query)clearSearchInput();
+    message(image?'Image search opened. Choose an image on the provider’s website.':'Search opened. Query not saved in Gather.');
+  }).finally(()=>submit.disabled=false);
+});
 document.querySelector('.add-menu').addEventListener('click',event=>{if(event.target.closest('button'))event.currentTarget.open=false;});
-$('query').oninput=saveDraft;$('provider').onchange=saveDraft;
 $('libraryToggle').onclick=()=>{const open=document.body.classList.toggle('library-open');$('libraryToggle').setAttribute('aria-expanded',String(open));};
-$('historyKind').onchange=()=>setView($('historyKind').value);
 $('localSearch').oninput=renderViews;$('filter').onchange=renderViews;
-for(const el of document.querySelectorAll('[data-view]'))el.onclick=()=>setView(el.dataset.view==='searches'?$('historyKind').value:el.dataset.view);
+for(const el of document.querySelectorAll('[data-view]'))el.onclick=()=>setView(el.dataset.view);
 for(const el of document.querySelectorAll('[data-filter]'))el.onclick=()=>{$('filter').value=el.dataset.filter;setView('items');};
 $('exportReport').onclick=()=>safely(async()=>{const scanId=state.activeScanId,data=report(state,scanId);data.captures=await scanCaptureReport(scanId);const readable=$('reportFormat').value==='md';downloadFile('Gather-report-'+new Date().toISOString().slice(0,10)+(readable?'.md':'.json'),readable?reportMarkdown(data)+captureReportMarkdown(data.captures):data,readable?'text/markdown':'application/json');message('Report exported: '+data.items.length+' included findings and '+data.captures.length+' capture records. Images can be exported from Captures.');});
 $('backup').onclick=()=>safely(async()=>{const r=await request('workspace.backup'),blob=await createFullBackup(r.backup);const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Gather-all-work-'+new Date().toISOString().slice(0,10)+'.gather';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);message('All-work backup downloaded, including unredacted originals, subjects, relationships and legacy batches. Keep it private.');});
@@ -151,7 +158,7 @@ async function refreshTabContext(){
   if(!isPanel)return;const serial=++tabRefresh,[tab]=await chrome.tabs.query({active:true,windowId});
   if(!tab?.id){tabId=null;tabContext=null;if(state)render();return;}
   const next=await request('workspace.tabContext',{tabId:tab.id});if(serial!==tabRefresh)return;
-  const previous=state?currentScan():null;tabId=tab.id;tabContext=next;if(state){render();if(previous!==currentScan())restoreDraft(currentScan());}
+  const previous=state?currentScan():null;tabId=tab.id;tabContext=next;if(state){render();if(previous!==currentScan())clearSearchInput();}
 }
 $('assignTab').onclick=()=>safely(async()=>{const assignedTab=tabId;await request('workspace.assignTab',{tabId:assignedTab,scanId:$('tabScan').value||null});await refreshTabContext();message('Tab destination assigned. Research context does not prove how a source was found.');});
 $('detachTab').onclick=()=>safely(async()=>{await request('workspace.detachTab',{tabId});await refreshTabContext();message('Tab detached. It now uses the default destination.');});

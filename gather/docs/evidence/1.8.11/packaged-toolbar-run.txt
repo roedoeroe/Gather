@@ -1,0 +1,25 @@
+PASS rendered toolbar journey with Chrome API doubles
+1. Four direct screenshot actions and one Save to selector are visible; focused lookup and optional subject retained; a default switch leaves the displayed SEO 6 destination unchanged.
+2. Full page launches directly from the popup into the real controller, stitches real fixture screenshots and saves SEO 6/Alex despite SD 73 being active; width/whole-image viewing works.
+3. View in scan selects the captured scan and opens that exact image, even when another case was active during workspace initialization.
+4. Changing Save to assigns this tab without moving the workspace default; Save page link files only metadata to SD 73; explicit default action detaches the assignment.
+5. Visible area is a single toolbar action; the saved original has the actual viewport dimensions.
+6. On-page pointer drag saves immediately on release, removes the overlay before acquisition, and retains the original plus cropped derivative.
+7. Select area & copy uses the real image clipboard; exact cropped dimensions/pixels contain no overlay. A delayed default switch retains SEO 6/Alex and local history.
+8. Denied image clipboard access retains the stored screenshot; explicit Copy retries successfully.
+9. Save image requests the native save dialog with safe PNG/JPEG filenames and collision protection; converted dimensions match and folder-export state remains separate.
+10. Image copy uses the current flattened redaction while original SHA-256 remains unchanged.
+11. Actual local print preview contains only the selected redacted pixels; optional source caption is outside the image. Native print/PDF dialog is unverified.
+12. Escape and controller closure clean the on-page selector without retaining a screenshot.
+13. A browser-provided source-tab activation change cancels page selection and removes its overlay before any screenshot can be acquired.
+14. Keyboard-only page selection supports precise coordinates and Enter to capture; modal cleanup succeeds.
+15. Capture history groups all screenshots and cancelled attempts by exact case/scan; filters/search and reload work without changing the active destination.
+16. Red selected-capture deletion is scoped and cancellable. Stale snapshots reject; filters clear selection; confirmed deletion atomically removes all original/derivative blobs, preserves other cases and cannot be resurrected by a late failure write.
+17. Validated binary backup retains on-page geometry and original/redacted bytes. Deliberate asset restore remaps a conflicting subject link, clears the deletion tombstone, verifies the selected image hash and preserves the original capture/scan IDs.
+18. Denied scripting access produces actionable toolbar guidance and creates no image or controller.
+19. Restricted pages disable screenshots while project-free pasted lookup remains available.
+20. The main lookup action explicitly runs the supported current profile and copies its exact long fictional Instagram pk without passive lookup, a case requirement or a fetched substitute.
+21. Pasted links take priority over the open profile; Enter runs them, while invalid typed text never silently falls back to the current page.
+22. The main page action rechecks the actual active tab at invocation and keeps previous results when the page has changed to an unsupported destination.
+23. Automatic same-document source fallback recovers the exact ID on Retry while retaining row/batch and scan; two source API-double reads and no live network.
+24. Observed sign-in text produces specific advice; missing markup never claims Gone or identity.

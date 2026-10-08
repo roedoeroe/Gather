@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-08",
+  "scope": "One anonymous source GET of the user-authorized Instagram profile",
+  "httpStatus": 200,
+  "bytes": 736280,
+  "matched": true,
+  "method": "Matched Instagram profile route",
+  "exactStringId": true,
+  "nativeExtension": false,
+  "rawSourceRetained": false,
+  "accountIdentifiersPublished": false
+}

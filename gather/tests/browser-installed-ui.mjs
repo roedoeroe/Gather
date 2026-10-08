@@ -25,7 +25,7 @@ try{
   await page.close();
   const {workspaceJourney}=await import('./fixtures/installed-workspace-journey.mjs');
   const passed=await workspaceJourney(context,origin,artifacts);
-  assert.equal(passed.length,8);
+  assert.equal(passed.length,9);
   const results={kind:'rendered-native-runner-ui-with-extension-api-doubles',nativeExtension:false,passed,errors:[]};
   await fs.writeFile(path.join(artifacts,'results.json'),JSON.stringify(results,null,2)+'\n');
   console.log('PASS: '+passed.length+' current installed-runner UI groups validated through rendered fixtures; native extension not loaded.');

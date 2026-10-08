@@ -13,13 +13,25 @@ test('observed sign-in text, structured errors and known redirect screens have s
   assert.match(pageAccessIssue('','https://www.instagram.com/challenge/'),/opened a security check/);
   assert.doesNotMatch(extractId('',profile,'https://www.instagram.com/').error,/sign in|security check/);
 });
-let source={url:profile.url,html:''},reads=0,fetches=0,denied=false;
-globalThis.chrome={runtime:{id:'fictional'},tabs:{async get(){return {url:profile.url};}},scripting:{async executeScript(){reads++;if(denied)throw new Error('denied');return [{result:source}];}}};
-globalThis.fetch=async()=>{fetches++;throw new Error('No live network in fixture');};
+let source={url:profile.url,html:''},fetched={url:profile.url,html:''},reads=[],denied=false,tabUrl=profile.url,afterSource;
+globalThis.chrome={runtime:{id:'fictional'},tabs:{async get(){return {url:tabUrl};}},scripting:{async executeScript(options){reads.push(options);if(denied)throw new Error('denied');const isSource=options.func.name==='readProfileSource';if(isSource)afterSource?.();return [{documentId:'document-one',result:isSource?fetched:source}];}}};
+globalThis.fetch=async()=>{throw new Error('No live network in fixture');};
 const {resolveProfile}=await import('../account-id-tool/resolver.js');
-test('explicit current-page lookup reports the observed result without silently fetching or opening a different page',async()=>{
-  const missing=await resolveProfile(profile,{currentTabId:10});assert.match(missing.error,/No matching account ID/);assert.equal(fetches,0);
-  denied=true;const inaccessible=await resolveProfile(profile,{currentTabId:10});assert.match(inaccessible.error,/toolbar button/);assert.equal(fetches,0);
-  denied=false;source.html='<script type="application/json">{"username":"alex.example","id":"9007199254740993123"}</script>';
-  const retry=await resolveProfile(profile,{currentTabId:10});assert.equal(retry.id,'9007199254740993123');assert.equal(reads,3);assert.equal(fetches,0);
+const html='<script type="application/json">{"username":"alex.example","profile_id":"9007199254740993123"}</script>';
+function reset(){reads=[];denied=false;tabUrl=profile.url;source={url:profile.url,html:''};fetched={url:profile.url,html};afterSource=null;}
+test('missing hydrated ID automatically reads source in the same document and preserves exact ID',async()=>{
+ reset();const result=await resolveProfile(profile,{currentTabId:10});assert.equal(result.id,'9007199254740993123');assert.match(result.method,/Current profile source/);assert.equal(reads.length,2);assert.deepEqual(reads[1].target,{tabId:10,documentIds:['document-one']});
+});
+test('hydrated success is fast: no second source request',async()=>{
+ reset();source.html=html;assert.equal((await resolveProfile(profile,{currentTabId:10})).id,'9007199254740993123');assert.equal(reads.length,1);
+});
+test('sign-in, security check and ambiguous IDs do not trigger repeated source requests',async()=>{
+ for(const body of ['<p>Log in to Instagram</p>','<p>Verify you are human</p>','<script>[{"username":"alex.example","id":"123"},{"username":"alex.example","id":"456"}]</script>']){reset();source.html=body;assert.ok((await resolveProfile(profile,{currentTabId:10})).error);assert.equal(reads.length,1);}
+});
+test('navigation, wrong-source profile, denied source and cancellation never return a guessed ID',async()=>{
+ reset();afterSource=()=>tabUrl='https://www.instagram.com/southridge/';assert.match((await resolveProfile(profile,{currentTabId:10})).error,/changed/);
+ reset();fetched.url='https://www.instagram.com/southridge/';assert.match((await resolveProfile(profile,{currentTabId:10})).error,/different profile/);
+ reset();denied=true;assert.match((await resolveProfile(profile,{currentTabId:10})).error,/toolbar button/);assert.equal(reads.length,1);
+ reset();const controller=new AbortController();afterSource=()=>controller.abort();await assert.rejects(resolveProfile(profile,{currentTabId:10,signal:controller.signal}),{name:'AbortError'});
+ reset();fetched={error:'Source timed out'};assert.match((await resolveProfile(profile,{currentTabId:10})).error,/timed out/);
 });

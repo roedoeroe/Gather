@@ -1,0 +1,35 @@
+{
+  "version": "1.8.11",
+  "packages": [
+    {
+      "file": "Gather-1.8.11-development.zip",
+      "bytes": 13718601,
+      "sha256": "7a1c94c90d010bbd83b1b1b7c53f0a380be27dde671dcbbf0335658fd2c94ddb",
+      "crc": "passed",
+      "runtimeFilesMatch": 77
+    },
+    {
+      "file": "Gather-1.8.11-extension.zip",
+      "bytes": 187214,
+      "sha256": "485ab230b2b12ea69dc31c38586bb4a76912b68d5543314291f9c2ee8b824ad4",
+      "crc": "passed",
+      "runtimeFilesMatch": 77
+    }
+  ],
+  "sourceTests": {
+    "node": 178,
+    "renderedUnique": 105,
+    "worker": 10,
+    "imageTools2xRepeated": 16
+  },
+  "extractedGates": {
+    "node": 178,
+    "toolbar": 24,
+    "workspace": 9,
+    "imageTools": 16
+  },
+  "permissionsChanged": false,
+  "previousReleaseUnchanged": true,
+  "nativeAcceptance": "blocked by managed policy; zero groups",
+  "privacyReview": "Intended source/evidence only; no private artifact paths, raw live source or known credential markers in package. This review is not proof of absence of all sensitive data."
+}

@@ -1,4 +1,16 @@
-# Gather usability audit — 1.8.10
+# Gather usability audit — 1.8.11
+
+## 1.8.11 corrections from direct user testing
+
+- Web searches open a new tab without saving the query, a draft or a launch log. Related tabs keep only their filing context for the browser session.
+- Reverse image search sits beside Search the web: Google Lens, Lenso.ai, Bing, Yandex, Baidu, Sogou, TinEye and Shutterstock. Choose/upload the image on the provider’s website; Gather uploads nothing automatically.
+- Find IDs on this page reads the same authorized profile’s source automatically when rendered account data is missing. Instagram `profile_id` and Facebook `userVanity`/`userID` remain bound to the requested account; unrelated/conflicting IDs are rejected.
+- Short gray examples in empty fields supplement persistent labels. They disappear as you type and never become saved values.
+- Saved findings / Tasks / Changes clarifies what you deliberately keep. Capture history refreshes as one complete list, avoiding empty/partial flicker while thumbnails load.
+
+Search privacy cleanup runs on update/first workspace use. Older automatic query text, search URLs, search activity and search drafts (including archived drafts) are removed from Gather. Query-free legacy reference IDs/timestamps remain so existing findings/captures and backups keep valid relationships. No new search records are created. Older backup imports receive the same cleanup. Deliberately saved case fields, search plans, account observations, tasks, findings and images are preserved. Browser/provider history, clipboard and previously exported files are separate and cannot be cleared by this update. Previously exported backups can still contain old search text.
+
+The earlier 1.8.10 table below is historical: its saved-search/reopen behavior is superseded. Current Research views are Saved findings, Tasks and Changes; Capture history remains independent. The [implementation note](SEARCH-AND-LOOKUP-1.8.11.md) records retention, source reading and provider evidence.
 
 The goal is a shorter, predictable working day: open a profile, look up or capture, confirm where the result went, and copy what is needed. A case stays optional. More controls are useful only when they remove a repeated decision or prevent a demonstrated mistake.
 

@@ -59,9 +59,10 @@ try {
   await send({type:'workspace.search',action:{scanId:sid,provider:'google',query:'Additional Fictional Alias'}});
   assert.ok((await call('tabs')).some(t=>t.url.includes('Alex%20Example')));
   const searches=(await send({type:'workspace.state'})).state.searches;
-  await send({type:'workspace.reopenSearch',id:searches[0].id});
+  assert.deepEqual(searches,[]);
+  await assert.rejects(send({type:'workspace.reopenSearch',id:'old'}),/no longer retained/);
   assert.doesNotMatch(JSON.stringify(searches),/Alex Example|Additional Fictional Alias/);
-  passed.push('Case creation, queued/manual search and reopen work in the worker; friendly names resolve for launch but stay out of durable queries.');
+  passed.push('Case creation and queued/manual searches work in the worker without query logs; retired reopen returns clear advice.');
   await send({type:'workspace.assignTab',tabId:10,scanId:sid});
   const other=await send({type:'workspace.action',action:{type:'project.create',name:'Southridge',scanName:'Intake'}});
   const saved=await send({type:'workspace.capture',tabId:10},'popup.html');

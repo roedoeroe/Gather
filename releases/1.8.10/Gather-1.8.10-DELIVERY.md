@@ -41,3 +41,13 @@ The [whole-workflow audit](../../gather/docs/USABILITY-AUDIT.md) records useful 
 ```
 
 Runtime ZIP: 182,836 bytes. Development ZIP: 13,409,556 bytes. Versioned Git ZIP mirrors are the delivery route; no GitHub Release object is claimed. Pinned download verification is recorded after publication.
+
+## Pinned source and downloads
+
+Source/package commit: `11cbb43173d72ba6194227d665e183b4a5584604`.
+
+- [Extension ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/11cbb43173d72ba6194227d665e183b4a5584604/releases/1.8.10/Gather-1.8.10-extension.zip)
+- [Development ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/11cbb43173d72ba6194227d665e183b4a5584604/releases/1.8.10/Gather-1.8.10-development.zip)
+- [Checksums](https://raw.githubusercontent.com/roedoeroe/Gather/11cbb43173d72ba6194227d665e183b4a5584604/releases/1.8.10/Gather-1.8.10-SHA256SUMS.txt)
+
+The URLs pin immutable package bytes. Public download verification is recorded in `Gather-1.8.10-DOWNLOAD-VERIFICATION.json` after publication.

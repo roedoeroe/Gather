@@ -38,4 +38,10 @@ body:not(.panel) #captureLibrary{margin:0;padding:0;border:0}.capture-library-he
 
 .workspace-nav button{transition:none}
 
+/* Keep large findings lists responsive without removing records from search,
+   keyboard navigation or the accessibility tree. Render offscreen card contents
+   when approached; remember their measured size to reduce scroll jumps. */
+#items>.card{content-visibility:auto;contain-intrinsic-size:auto 280px}
+@media print{#items>.card{content-visibility:visible;contain-intrinsic-size:none}}
+
 .capture-inspector .capture-viewer .inspector-image{height:auto;width:auto;max-width:100%;margin:0 auto;border-radius:0}.capture-inspector .capture-viewer[data-fit=image] .inspector-image{max-height:58vh}.capture-inspector .image-viewport{max-height:58vh}

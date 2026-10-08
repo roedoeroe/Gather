@@ -246,6 +246,28 @@ function walk(roots, visit) {
 }
 const asId = value => typeof value === 'string' ? value : Number.isSafeInteger(value) ? String(value) : '';
 
+// The anonymous profile route binds its handle/URL to the content view's user
+// ID before hydration. Logging IDs only corroborate that content ID; arbitrary
+// profile_id fields, preload variables and recommended accounts are insufficient.
+function instagramRouteIds(info, profile) {
+  const route = info?.route;
+  if (!route || route.canonicalRouteName !== 'comet.igweb.PolarisLoggedOutDesktopWWWProfileRoute' ||
+      route.tracePolicy !== 'polaris.profilePage' || route.polarisRouteConfig?.pageID !== 'profilePage' ||
+      typeof route.params?.username !== 'string' || lower(route.params.username) !== lower(profile.handle) ||
+      typeof route.url !== 'string') return [];
+  try { if (normalizeProfile(new URL(route.url, profile.url).href).key !== profile.key) return []; }
+  catch { return []; }
+  const ids = [route.rootView, route.hostableView].map(view => {
+    const id = asId(view?.props?.id), logging = view?.props?.page_logging;
+    return view?.resource?.__dr === 'PolarisProfilePostsTabRoot.react' &&
+      view?.entryPoint?.__dr === 'PolarisLoggedOutDesktopWWWProfilePostsTabRoot.entrypoint' &&
+      numeric(id) && logging?.name === 'profilePage' && logging.params?.sub_path === 'posts' &&
+      asId(logging.params.profile_id) === id && logging.params.page_id === 'profilePage_' + id ? id : '';
+  });
+  // Both views must be valid. Distinct IDs enter the ordinary ambiguity guard.
+  return ids.every(Boolean) ? ids : [];
+}
+
 // Challenge libraries and login links occur on ordinary profile pages too.
 // Only rendered text, explicit structured errors or a known redirect screen
 // justify asking the analyst to sign in or complete a security check.
@@ -287,8 +309,15 @@ export function extractId(html, profile, pageUrl = profile.url) {
   walk(roots, (obj, key) => {
     if (['instagram', 'threads'].includes(profile.platform)) {
       if (matching(obj.username)) {
-        for (const field of ['id', 'pk', 'profile_id']) if (obj[field]) add(obj[field], 'Profile data · ' + field, obj.full_name || obj.fullName);
+        // Hydrated Instagram users can expose a separate numeric `id` beside
+        // their account `pk`. Do not mix those namespaces or silently resolve
+        // real conflicts between account keys in different observations.
+        const instagramPk = profile.platform === 'instagram' && Object.hasOwn(obj, 'pk');
+        const fields = instagramPk ? numeric(asId(obj.pk)) ? ['pk', 'profile_id'] : [] : ['id', 'pk', 'profile_id'];
+        for (const field of fields) if (obj[field]) add(obj[field], 'Profile data · ' + field, obj.full_name || obj.fullName);
       }
+      if (profile.platform === 'instagram' && key === 'initialRouteInfo')
+        for (const id of instagramRouteIds(obj, profile)) add(id, 'Matched Instagram profile route');
     } else if (profile.platform === 'tiktok') {
       if (matching(obj.uniqueId || obj.unique_id)) {
         if (numeric(asId(obj.id || obj.uid))) add(obj.id || obj.uid, 'Profile data · user ID', obj.nickname);

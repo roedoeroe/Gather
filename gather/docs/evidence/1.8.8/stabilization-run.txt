@@ -1,0 +1,11 @@
+PASS An open print preview removes stale pixels and disables printing after redaction or deletion.
+PASS Two documents cannot export the same capture concurrently; the rejected attempt leaves the active export intact.
+PASS Editing and case deletion reject a pending folder export without losing the image; editing works once export finishes.
+PASS Deleting a case during its pending folder export is rejected atomically.
+PASS A stale editor cannot replace a newer redaction with pixels from its older image.
+PASS An interrupted old export cannot overwrite the status of its successful retry.
+PASS Restoring a binary backup made during folder export keeps its image and permits an immediate retry.
+PASS Clipboard conversion rejects bytes when the selected image changes during PNG preparation.
+PASS A durable screenshot releases its capture lock even when preview loading fails; focus restores the preview.
+PASS A delayed clipboard failure after deletion keeps completion actions disabled and reports that the capture was deleted.
+PASS final stabilization journey

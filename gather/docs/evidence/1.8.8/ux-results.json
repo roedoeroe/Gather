@@ -1,0 +1,124 @@
+{
+  "kind": "rendered-product-with-extension-api-doubles",
+  "nativeExtension": false,
+  "fixture": "1000 fictional notes and 100 small PNG captures",
+  "samples": {
+    "reloadMs": 299.75006099999973,
+    "filter": [
+      {
+        "query": "0999",
+        "renderMs": 12.399999998509884,
+        "paintMs": 29.899999998509884,
+        "cards": 1
+      },
+      {
+        "query": "source 000",
+        "renderMs": 2.100000001490116,
+        "paintMs": 33.20000000298023,
+        "cards": 10
+      },
+      {
+        "query": "no matching fictional source",
+        "renderMs": 1.5,
+        "paintMs": 33.399999998509884,
+        "cards": 0
+      },
+      {
+        "query": "source",
+        "renderMs": 52.5,
+        "paintMs": 112.19999999552965,
+        "cards": 1000
+      },
+      {
+        "query": "",
+        "renderMs": 61.399999998509884,
+        "paintMs": 115.5,
+        "cards": 1000
+      }
+    ],
+    "captureFilterMs": 48.230805000000146,
+    "showMoreMs": 112.3643119999997
+  },
+  "workspaceBytes": 761680,
+  "offscreen": "Last finding renders on scroll; its Add note dialog opens and cancels without losing records",
+  "initialCaptureCards": 12,
+  "reflow": [
+    {
+      "width": 1440,
+      "section": "Research",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "section": "Captures",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "section": "Case",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "section": "Settings",
+      "overflow": false
+    },
+    {
+      "width": 800,
+      "section": "Research",
+      "overflow": false
+    },
+    {
+      "width": 800,
+      "section": "Captures",
+      "overflow": false
+    },
+    {
+      "width": 800,
+      "section": "Case",
+      "overflow": false
+    },
+    {
+      "width": 800,
+      "section": "Settings",
+      "overflow": false
+    },
+    {
+      "width": 400,
+      "section": "Research",
+      "overflow": false
+    },
+    {
+      "width": 400,
+      "section": "Captures",
+      "overflow": false
+    },
+    {
+      "width": 400,
+      "section": "Case",
+      "overflow": false
+    },
+    {
+      "width": 400,
+      "section": "Settings",
+      "overflow": false
+    }
+  ],
+  "keyboard": "Tab arrows, Home/End, modal Escape and focus return passed; scan unchanged",
+  "popupOverflow": false,
+  "errors": [],
+  "longTasks": [
+    {
+      "start": 98.60000000149012,
+      "duration": 73
+    },
+    {
+      "start": 394,
+      "duration": 86
+    },
+    {
+      "start": 506.19999999552965,
+      "duration": 95
+    }
+  ]
+}

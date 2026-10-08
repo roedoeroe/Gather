@@ -1,12 +1,12 @@
-# Check Gather 1.8.6 in Chrome or Edge
+# Check Gather 1.8.8 in Chrome or Edge
 
 The cloud tests reproduced and fixed the reported worker exception. This checklist verifies the remaining native behavior on the browser where Gather is installed. Use only disposable fictional cases for the privacy checks.
 
 ## Update without losing storage
 
 1. Preserve the installed folder. Back up work if the current build opens. If 1.8.0 cannot open, keep the browser profile and stored data intact; do not uninstall or clear site data.
-2. Extract `Gather-1.8.6-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include all modules, including `backup-validation.js` and `history-ui.js`.
-3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.6**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
+2. Extract `Gather-1.8.8-extension.zip`. Replace all files in the existing installed `account-id-tool` folder with the ZIP's `account-id-tool` contents. Include all modules, including `backup-validation.js` and `history-ui.js`.
+3. Close Gather pages, open `chrome://extensions` or `edge://extensions`, click Gather's **Reload**, and verify version **1.8.8**. Reopen the popup. Reload clears Ephemeral Case session values; saved evidence remains.
 
 ## Workspace acceptance
 
@@ -37,7 +37,7 @@ The cloud tests reproduced and fixed the reported worker exception. This checkli
 
 Privacy acceptance: confirm New case says **Case name** and explains local storage. With a fictional Northbridge case selected, check the red **Delete case…** button in Settings → Data & Privacy. Cancel first; then test the typed-name guard and each backup choice on disposable cases. A denied backup must retain the complete case. Delete without backup must create no new download. Confirm Southridge and its images remain. With popup and full tool open, clear recent lookup history and confirm old results/drafts disappear, saved cases/images remain, and fresh lookup works. Reload Gather and confirm cleared data stays cleared. Browser history, clipboard and old downloaded files intentionally remain outside these controls.
 
-If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.6; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
+If opening still fails, the browser Extensions page lists errors for Gather. Record the displayed version and the newest error's message/file/line after reloading 1.8.8; old 1.8.0 errors can remain in that list. Never include private intake or screenshots of unrelated case data in a diagnostic report.
 
 ## New capture acceptance
 
@@ -54,3 +54,10 @@ If opening still fails, the browser Extensions page lists errors for Gather. Rec
 - Start folder export in one window, attempt another export/edit/Delete case elsewhere, and confirm active work is protected. Denial/interruption must retain the image, display the correct state and offer Retry. No completed older attempt may replace a newer retry's status.
 - Make a private binary backup during an export; restore it in a separate clean profile. Images/relationships/hashes remain, and the imported unfinished export offers immediate Retry.
 - Save two captures successively while the first completion window remains open. Test deletion from History while a clipboard/save action is pending: the deleted preview stays empty and its image actions remain disabled.
+
+## Lookup and clipboard follow-through
+
+- In Edge, open a permitted Instagram profile and choose Run on this page. Current hydrated `pk`/`id` data must resolve the account key, not the separate ID. Copy IDs must match the inspected key. Raw source fallback must remain account-bound, with login/mismatch/ambiguity labelled honestly.
+- Preview a fictional role account block: Candidate/Confirmed labels, original dates and exact IDs remain. Change an association or coverage in another Gather window; the stale preview must clear. Changing only the global scan preserves its reviewed scope. Cancel a delayed Copy; nothing copies afterward.
+- Deny a clipboard write: advice appears inside the preview, text is selected for manual copying and Retry remains available. Previously copied text is outside Gather deletion.
+- In a larger fictional findings list, scroll to an offscreen item, review it and reopen its note editor. Filtering must retain all matching records; tab/focus navigation and report export must still work.

@@ -1,8 +1,14 @@
-# Gather 1.8.6 — capture stabilization build
+# Gather 1.8.7 — clipboard review stabilization build
 
 Gather is a browser extension for project-free account lookup, deliberate research and screenshot capture. Case data stays in the browser on your computer. Gather has no case server, cloud sync or analytics. The public GitHub repository contains source and fictional test data, not your cases. Searches and profile lookups contact the services you choose; exported files are separate local copies.
 
-## Changes in 1.8.6
+## Changes in 1.8.7
+
+Role account block previews now retain Candidate/Confirmed decisions, the reviewed case/scan, original observation dates and exact string IDs. Rejected associations remain omitted; observations across scans stay separate. Changing relevant findings, coverage or case context invalidates the open preview; deleting the case releases its text. Switching the global destination keeps the originally reviewed scope. Cancel during delayed validation does not copy afterward.
+
+A clipboard denial appears inside the preview and selects its text for manual Ctrl+C/Cmd+C, while Copy remains available to retry. These changes fix existing actions; no new views, permissions, dependencies or data migrations.
+
+## Retained capture fixes
 
 This is a fixes-only release of the existing capture workflow. No features, permissions, runtime dependencies or storage-schema migrations were added.
 
@@ -21,13 +27,13 @@ The 1.8.1 fixes remain: static service-worker imports and stable 420 px popup si
 
 ## Install or update
 
-1. Extract `Gather-1.8.6-extension.zip` into a permanent directory.
+1. Extract `Gather-1.8.7-extension.zip` into a permanent directory.
 2. Open `chrome://extensions` or `edge://extensions`, enable Developer mode, choose **Load unpacked**, and select **account-id-tool** containing `manifest.json`.
 3. Pin Gather. Open a supported profile → Gather → inspect/copy. Chrome 116+ or compatible Edge is required.
 
-For an existing installation, preserve its folder and optionally back up work before updating. Finish captures and close Gather windows. Replace **all files in the same installed directory**, then Reload on the Extensions page and confirm **1.8.6**. Do not uninstall or clear browser storage. Extension reload/update clears Ephemeral Case session values; durable findings and images remain. If an older startup error prevents backup, preserve the browser profile/storage and update in place.
+For an existing installation, preserve its folder and optionally back up work before updating. Finish captures and close Gather windows. Replace **all files in the same installed directory**, then Reload on the Extensions page and confirm **1.8.7**. Do not uninstall or clear browser storage. Extension reload/update clears Ephemeral Case session values; durable findings and images remain. If an older startup error prevents backup, preserve the browser profile/storage and update in place.
 
-Rollback: retain the preserved 1.8.5 package and its matching pre-update backup. Keep the older source and its matching pre-update backup. Test the older release in a **separate clean browser profile**, restoring its matching backup. Retain the current profile until recovery is verified. Older versions do not enforce the new privacy-write guards; do not downgrade in place or let 1.7.x rewrite R3 records. Deletion without backup cannot be undone.
+Rollback: retain the preserved 1.8.6 package and its matching pre-update backup. Test the older release in a **separate clean browser profile**, restoring its matching backup. Retain the current profile until recovery is verified. Older versions do not enforce all current clipboard and privacy guards; do not downgrade in place or let 1.7.x rewrite R3 records. Deletion without backup cannot be undone.
 
 ## Workflow and limits
 
@@ -45,7 +51,7 @@ Limits: 4 MiB workspace JSON, 512 MiB capture storage, 192 MiB/capture, 64 MiB/a
 
 ## Validation and development
 
-**130 Node tests, 71 rendered-browser groups (21 capture/UX, 22 toolbar/capture/lookup, 18 case/privacy, 10 stabilization), and 10 real Chromium service-worker groups passed.** Browser journeys use controlled Chrome API doubles and deterministic fictional data, with real DOM, IndexedDB and applicable canvas/Web Locks/worker lifecycle behavior. Native installed Chrome/Edge testing remains blocked by administrator policy in this runner; live platforms were not tested. See `docs/TESTING.md` and `docs/LOCAL-ACCEPTANCE.md`.
+**132 Node tests, 85 rendered-browser groups (21 capture/UX, 22 toolbar/capture/lookup, 18 case/privacy, 10 stabilization, 7 case clipboard and 7 installed-runner interface groups), and 10 real Chromium service-worker groups passed.** Browser journeys use controlled Chrome API doubles and deterministic fictional data, with real DOM, IndexedDB and applicable canvas/Web Locks/worker lifecycle behavior. Native installed Chrome/Edge testing remains blocked by administrator policy in this runner; live platforms were not tested. See `docs/TESTING.md` and `docs/LOCAL-ACCEPTANCE.md`.
 
 No runtime dependency install, server or bundler is required. From the development package root:
 
@@ -56,6 +62,8 @@ node tests/browser-case.mjs
 node tests/browser-toolbar.mjs
 node tests/browser-worker.mjs
 node tests/browser-stabilization.mjs
+node tests/browser-case-clipboard.mjs
+node tests/browser-installed-ui.mjs
 python3 scripts/package.py
 ```
 

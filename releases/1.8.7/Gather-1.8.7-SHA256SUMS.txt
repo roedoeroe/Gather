@@ -1,0 +1,2 @@
+b5c2f520faee2da41271f32ae6cd9b8ebf5fae878add87640d991e69664b2e59  Gather-1.8.7-extension.zip
+7474f7f1a55fcbff99cdb104919078eb2409e9ed08e81a59c6573b2f8d19d54b  Gather-1.8.7-development.zip

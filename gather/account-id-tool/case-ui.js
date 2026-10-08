@@ -4,7 +4,7 @@ import {updateCaseSession} from './case-session.js';
 import {request,act} from './workspace-client.js';
 import {parseIntake,SEED_KINDS,COVERAGE_STATES,FAMILIES,resolveQuery} from './case-model.js';
 import {listSubjects,selectSubject,selectedSubject} from './capture-store.js';
-import {accountLine,orderAccounts} from './account-state.js';
+import {clipboardSnapshot} from './case-clipboard.js';
 const panel=new URLSearchParams(location.search).has('panel'),host=document.getElementById('caseTools');
 const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
 const status=el('p','','micro');status.setAttribute('role','status');
@@ -13,7 +13,43 @@ let state,scan,project,subjects=[],serial=0,queueOpen=false,coverageOpen=false,t
 function field(label,input){const wrap=el('div',undefined,'case-field'),caption=el('label',label);input.id||='case-field-'+crypto.randomUUID();caption.htmlFor=input.id;wrap.append(caption,input);return wrap;}
 function input(value='',max=100){const i=el('input');i.value=value;i.maxLength=max;return i;}
 function dialog(title){const d=el('dialog'),h=el('h2',title),body=el('div'),error=el('p','','capture-error'),actions=el('div',undefined,'dialog-actions');h.id='dialog-'+crypto.randomUUID();d.setAttribute('aria-labelledby',h.id);error.setAttribute('role','alert');d.append(h,body,error,actions);document.body.append(d);actions.append(button('Cancel',()=>d.close()));d.onclose=()=>d.remove();d.showModal();return {d,body,error,actions};}
-function previewClipboard(title,text){const {d,body,actions}=dialog(title),out=el('textarea');out.value=text;out.readOnly=true;out.rows=12;out.setAttribute('aria-label','Clipboard preview');body.append(out,el('p','Review this text before copying. Public page titles and URLs can contain names.','micro'));actions.append(button('Copy',async()=>{await navigator.clipboard.writeText(out.value);d.close();status.textContent='Copied.';}));}
+const clipboardPreviews=new Set();
+async function readClipboard(scope){
+  const current=(await request('workspace.state')).state;
+  return clipboardSnapshot(current,await listSubjects(scope.projectId),scope);
+}
+async function previewClipboard(kind,scope){
+  let snapshot=await readClipboard({...scope,kind});
+  scope={...scope,kind};
+  const {d,body,error,actions}=dialog(kind==='accounts'?'Account block preview':'Coverage preview'),out=el('textarea');
+  out.value=snapshot.text;out.readOnly=true;out.rows=12;out.setAttribute('aria-label','Clipboard preview');
+  body.append(out,el('p',kind==='accounts'?'Candidate and Confirmed are analyst association decisions. Rejected findings are omitted. Saved titles and URLs can contain names. Review before copying.':'Review this text before copying. Saved titles, URLs and notes can contain names.','micro'));
+  let invalid=false,checking=0;
+  const invalidate=message=>{if(!d.isConnected||!d.open||invalid)return;invalid=true;out.value='';snapshot=null;copy.disabled=true;error.textContent=message;};
+  const validate=async()=>{
+    if(invalid||!d.isConnected||!d.open)return false;
+    const ticket=++checking;
+    try{
+      const current=await readClipboard(scope);
+      if(!d.isConnected||!d.open||invalid)return false;
+      if(current.signature!==snapshot.signature){invalidate('These findings or their context changed. Close this preview and reopen it to review the current text.');return false;}
+      return true;
+    }catch(e){if(ticket===checking)invalidate(e.message);return false;}
+  };
+  const copy=button('Copy',async()=>{
+    if(!await validate()||!d.isConnected||!d.open||invalid)return;
+    try{await navigator.clipboard.writeText(out.value);if(d.isConnected&&d.open&&!invalid){d.close();status.textContent='Copied.';}}
+    catch{if(d.isConnected&&d.open&&!invalid){error.textContent='Copy was blocked. The text is selected; press Ctrl+C or Cmd+C to copy it, or try Copy again.';out.focus();out.select();}}
+  });
+  // The shared button wrapper normally re-enables controls; invalid previews
+  // must remain disabled even when a delayed Copy action finishes.
+  const runCopy=copy.onclick;
+  copy.onclick=async()=>{try{await runCopy();}finally{if(invalid)copy.disabled=true;}};
+  actions.append(copy);
+  const preview={recheck:()=>void validate()};clipboardPreviews.add(preview);
+  d.onclose=()=>{clipboardPreviews.delete(preview);out.value='';snapshot=null;d.remove();};
+  await validate();
+}
 async function startCase(raw=''){
   const {d,body,error,actions}=dialog('New case'),name=input('',100),scanName=input('Initial scan'),mode=el('select'),paste=el('textarea'),preview=el('div'),intake=el('details',undefined,'intake-options');
   mode.append(new Option('Session only — release approved names on restart','ephemeral'),new Option('Keep locally — retain approved names until removed','local'));
@@ -88,7 +124,9 @@ async function refresh(){
   const secondary=el('details',undefined,'case-secondary'),secondaryActions=el('div',undefined,'case-actions');secondary.append(el('summary','Case tools'),secondaryActions);secondary.open=toolsOpen;secondary.ontoggle=()=>{if(secondary.isConnected)toolsOpen=secondary.open;};content.append(secondary);
   actions.append(button('Associate / reject finding',associate));
   secondaryActions.append(button('Resume seed values',resumeValues),button('Hide / show friendly labels',async()=>{const old=(await chrome.storage.session.get('gather.hideFriendlyLabels'))['gather.hideFriendlyLabels'];await chrome.storage.session.set({'gather.hideFriendlyLabels':!old});await refresh();status.textContent='This control masks friendly role labels. Saved page content, project titles and URLs may contain names.';}));
-  secondaryActions.append(button('Copy role account block',()=>{const ids=state.research.associations.filter(a=>a.subjectId===selected&&a.status!=='rejected').map(a=>a.itemId),accounts=state.items.filter(i=>i.kind==='account'&&ids.includes(i.id));previewClipboard('Account block preview',orderAccounts(accounts.map(i=>i.entry)).map(accountLine).join('\n')||'No explicitly associated accounts for this role.');}),button('Copy coverage summary',()=>previewClipboard('Coverage preview',state.research.coverage.filter(c=>c.scanId===scan.id).map(c=>(subjects.find(s=>s.id===c.subjectId)?.roleId||'Unassigned')+' · '+c.family+' · '+c.status+' · '+new Date(c.checkedAt).toISOString()+(c.note?' · '+c.note:'')).join('\n')||'No coverage checks recorded.')));
+  const clipboardScope={projectId:project.id,scanId:scan.id,subjectId:selected};
+  const accountsCopy=button('Copy role account block',()=>previewClipboard('accounts',clipboardScope));accountsCopy.disabled=!selected;
+  secondaryActions.append(accountsCopy,button('Copy coverage summary',()=>previewClipboard('coverage',clipboardScope)));
   const queue=el('details'),queueTitle=el('summary','Scan queue · '+rows.length);queue.open=queueOpen;queue.ontoggle=()=>{if(queue.isConnected)queueOpen=queue.open;};queue.append(queueTitle);
   const hidden=(await chrome.storage.session.get('gather.hideFriendlyLabels'))['gather.hideFriendlyLabels'];
   for(const row of rows){const card=el('article',undefined,'case-queue-row');card.dataset.focusKey=row.id;let resolved;try{resolved=resolveQuery(state,row,session);}catch{resolved='Session values needed';}card.append(el('p',(hidden?row.tokenizedQuery:resolved)+' · '+row.provider),el('small',row.status));const controls=el('div',undefined,'case-actions');controls.append(button('Launch ↗',async()=>{await request('workspace.launchQueued',{id:row.id});await refresh();}),button('Edit',()=>editQuery(row)));const status=el('select');status.setAttribute('aria-label','Search queue status');for(const s of ['ready','launched','has-findings','reviewed','skipped','blocked'])status.append(new Option(s,s));status.value=row.status;status.onchange=()=>act({type:'research.queue',id:row.id,status:status.value}).then(refresh).catch(e=>{summary.textContent=e.message;});controls.append(status);card.append(controls);queue.append(card);}content.append(queue);
@@ -97,7 +135,7 @@ async function refresh(){
   const associations=state.research.associations.filter(a=>a.projectId===project.id);if(associations.length){const detail=el('details');detail.append(el('summary','Analyst associations · '+associations.length));for(const a of associations)detail.append(el('p',(subjects.find(s=>s.id===a.subjectId)?.roleId||a.subjectId)+' · '+a.status+' · '+(state.items.find(i=>i.id===a.itemId)?.title||a.itemId)+(a.reason?' · '+a.reason:'')));content.append(detail);}
   }finally{restoreFocus();}
 }
-let timer;function schedule(){clearTimeout(timer);timer=setTimeout(()=>refresh().catch(e=>status.textContent=e.message),70);}
+let timer;function schedule(){for(const preview of clipboardPreviews)preview.recheck();clearTimeout(timer);timer=setTimeout(()=>refresh().catch(e=>status.textContent=e.message),70);}
 chrome.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes['gather.workspace.v1']||area==='session')schedule();});window.addEventListener('focus',schedule);if(globalThis.BroadcastChannel){const channel=new BroadcastChannel('gather-captures');channel.onmessage=schedule;window.addEventListener('pagehide',()=>channel.close());}
 let pending=(await chrome.storage.session.get('gather.caseSelection'))['gather.caseSelection'];if(pending&&!panel){await chrome.storage.session.remove('gather.caseSelection');await startCase(pending.text);pending.text='';pending=null;}
 refresh().catch(e=>status.textContent=e.message);

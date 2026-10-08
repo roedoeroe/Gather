@@ -1,0 +1,9 @@
+{
+  "version": "1.8.7",
+  "runtimeFilesChecked": 71,
+  "allRuntimeBytesMatchTestedExtraction": true,
+  "extractedNodePassed": 132,
+  "extractedClipboardGroupsPassed": 7,
+  "zipCRCAndPaths": "passed",
+  "nativeInstalledExtension": false
+}

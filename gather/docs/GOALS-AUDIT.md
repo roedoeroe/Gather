@@ -148,3 +148,7 @@ Saved 1.8.6 release evidence records **130 Node checks, 71 rendered-browser grou
 5. Preserve clean commits, versioned ZIPs/checksums, install/update/rollback instructions and an accurate handoff. Publish only the authorized development branch; no main merge or repository visibility change. Verify remote state and public download hashes. The saved cloud startup draft still requires environment review/publication; a saved draft is not proof of fresh-task restoration.
 
 Do not upgrade this audit to “everything is perfect.” The concrete conclusion is that the foundational intent survives, the major later capture/privacy simplifications are implemented, and the remaining useful mechanics and verification gaps now have explicit durable owners in the backlog.
+
+## Follow-up checkpoint — 1.8.7
+
+The user subsequently asked to resolve the cloud setup dialog and continue development. A narrow fixes-only pass resolves the earlier G-07 clipboard decision-label gap: Candidate and Confirmed remain labelled beside their account observations, with dates and scan context; Rejected associations remain omitted. Account and coverage previews invalidate when relevant source records change or the case is deleted, stay attached to their original case after a global destination change, and show clipboard denial/manual recovery inside the dialog. This is not a Reference Library, general documentation engine, identity confirmation or bulk-save feature. All other retained goals and native/live verification limits remain. See the current handoff and 1.8.7 evidence.

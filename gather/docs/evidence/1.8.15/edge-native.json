@@ -1,0 +1,52 @@
+{
+  "status": "passed",
+  "kind": "native-installed-extension",
+  "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36 Edg/155.0.0.0",
+  "version": "1.8.15",
+  "passed": [
+    "Native worker + isolated reader resolves loaded metadata in one operation with the exact string ID.",
+    "Native worker + isolated reader resolves delayed 650ms metadata in one operation with the exact string ID.",
+    "Native worker + isolated reader resolves delayed 1450ms metadata in one operation with the exact string ID.",
+    "Missing DOM metadata uses the existing same-origin source fallback after two seconds, in the same operation.",
+    "SPA navigation during the readiness window cannot return a stale or different account ID.",
+    "Refresh before lookup reads the current document and succeeds.",
+    "Cancellation during the buffer stops the native worker job without accepting an ID.",
+    "Observed sign-in gate returns useful advice and never loops or guesses.",
+    "Conflicting fictional account IDs stay unresolved in the installed extension.",
+    "Real OS shortcut invokes the normal extension action; its actual popup resolves the current profile without a second click.",
+    "Actual toolbar invocation grants activeTab; real captureVisibleTab saves an original in the extension IndexedDB.",
+    "Native capture controller writes the screenshot to the system clipboard.",
+    "Native horizontal selection saves exact pixel dimensions and removes its overlay.",
+    "Native vertical selection saves exact pixel dimensions and removes its overlay.",
+    "Native drag while scrolling stitches an extended selection and restores the initial page position.",
+    "Native full-page acquisition stitches multiple real browser screenshots and restores the page.",
+    "Cancelling a native full-page capture restores the starting scroll position and reports cancellation.",
+    "Native Escape before drawing a selection cancels and restores the page.",
+    "Native Escape during a scrolling drag cancels and restores the page.",
+    "A new native capture after cancellation succeeds; nine actions create exactly nine distinct records, with no ghost capture tab or session lock.",
+    "Native editor supports adjustable crop, Undo, pointer arrows/circles/manual black redaction, unsaved-close cancellation and Save & Copy while retaining original bytes.",
+    "Native Save edits persists the optional caption without replacing the original.",
+    "Shared Help loads natively, focuses search, filters locally, clears by Escape and fits 400px."
+  ],
+  "timings": [
+    {
+      "scenario": "already loaded",
+      "milliseconds": 109
+    },
+    {
+      "scenario": "metadata after 650ms",
+      "milliseconds": 810
+    },
+    {
+      "scenario": "metadata after 1450ms",
+      "milliseconds": 1581
+    },
+    {
+      "scenario": "existing source fallback after bounded readiness",
+      "milliseconds": 2074
+    }
+  ],
+  "errors": [],
+  "livePlatforms": false,
+  "osSavePrintDialogs": "not-tested"
+}

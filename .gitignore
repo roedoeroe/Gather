@@ -6,3 +6,12 @@
 **/.tools/
 **/__pycache__/
 **/test-artifacts/
+# Local organization content and diagnostic/case dumps must never enter public source.
+**/organization-packs/
+**/local-packs/
+**/case-data/
+**/storage-dumps/
+**/.env
+**/.env.*
+**/*.gather
+**/*.har

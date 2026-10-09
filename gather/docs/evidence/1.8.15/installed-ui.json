@@ -1,0 +1,16 @@
+{
+  "kind": "rendered-native-runner-ui-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [
+    "Current workspace starts in Inbox with four task tabs and a worker/storage response.",
+    "Current New case and Link or excerpt controls create scoped local work.",
+    "Findings and tasks remember independent filters, so switching views does not conceal unrelated work.",
+    "Task creation and completion persist through current controls.",
+    "Web/image searches open provider tabs without query, draft or launch logs; placeholders, keyboard focus and reload work.",
+    "Case switching clears filters and preserves deliberately saved findings.",
+    "Actual file download contains only the selected scan; reload retains work.",
+    "Settings exposes both destructive actions; cancelling preserves the case.",
+    "Workspace reflows at 400px without horizontal overflow or page errors."
+  ],
+  "errors": []
+}

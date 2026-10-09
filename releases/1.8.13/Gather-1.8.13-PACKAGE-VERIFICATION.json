@@ -1,0 +1,85 @@
+{
+  "version": "1.8.13",
+  "verified_at_utc": "2026-10-08T20:39:46.257995+00:00",
+  "packages": [
+    {
+      "file": "Gather-1.8.13-extension.zip",
+      "bytes": 206609,
+      "sha256": "00b3452243aa39ea3a2c57f376ebbdecabb200fe6d893b6d591961fd16a5329a",
+      "crc": "passed",
+      "runtime_files_matching_source": 81
+    },
+    {
+      "file": "Gather-1.8.13-development.zip",
+      "bytes": 14282591,
+      "sha256": "ff07edab1544e7be4d12a706cc27ef4096ebe51f328c128a3507be504281b029",
+      "crc": "passed",
+      "runtime_files_matching_source": 81
+    }
+  ],
+  "extracted_development_runtime_matches_source": 81,
+  "permissions_unchanged_from": "85705e10a228ef0e52a4bf8ded0a5709eb5608fd",
+  "extracted_package_tests": {
+    "node": {
+      "tests": 201,
+      "passed": 201,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "log": "evidence/node.log"
+    },
+    "browser_suites": [
+      {
+        "suite": "toolbar",
+        "passed_groups": 27,
+        "exit_code": 0,
+        "native_extension": false,
+        "scenario_record": "evidence/toolbar.json"
+      },
+      {
+        "suite": "case",
+        "passed_groups": 19,
+        "exit_code": 0,
+        "native_extension": false,
+        "scenario_record": "evidence/case.json"
+      },
+      {
+        "suite": "capture",
+        "passed_groups": 21,
+        "exit_code": 0,
+        "native_extension": false,
+        "scenario_record": "evidence/capture.json"
+      },
+      {
+        "suite": "selection-pixels",
+        "passed_groups": 11,
+        "exit_code": 0,
+        "native_extension": false,
+        "scenario_record": "evidence/selection-pixels.json"
+      },
+      {
+        "suite": "worker",
+        "passed_groups": 10,
+        "exit_code": 0,
+        "native_extension": false,
+        "scenario_record": "evidence/worker.json"
+      },
+      {
+        "suite": "profile-reader",
+        "passed_groups": 5,
+        "exit_code": 0,
+        "native_extension": false,
+        "scenario_record": "evidence/profile-reader.json"
+      }
+    ]
+  },
+  "full_source_evidence": "../../gather/docs/evidence/1.8.13/README.md",
+  "native_extension": {
+    "status": "blocked",
+    "exit_code": 2,
+    "passed_groups": 0,
+    "reason": "Managed ExtensionInstallBlocklist [\"*\"] denies unpacked extensions."
+  },
+  "live_platform": "not run for 1.8.13",
+  "scope_note": "Rendered browser uses actual Chromium pixels/DOM/IndexedDB/clipboard with extension API doubles. Simulated DPR is not native Edge zoom."
+}

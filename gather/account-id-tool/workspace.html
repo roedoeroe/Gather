@@ -2,7 +2,7 @@
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Gather — Workspace</title><link rel="icon" href="icon.svg"><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="capture-ui.css"><link rel="stylesheet" href="case-ui.css"><link rel="stylesheet" href="workspace-layout.css"><link rel="stylesheet" href="capture-viewer.css"></head>
 <body>
-<header class="bar"><a class="brand" href="workspace.html"><img src="icon.svg" width="28" height="28" alt="">Gather<span>Workspace</span></a><nav><button id="openCaseStart">New case</button><a href="index.html" target="_blank">Quick lookup ↗</a><button id="expand" class="subtle" hidden>Open full workspace ↗</button></nav></header>
+<header class="bar"><a class="brand" href="workspace.html"><img src="icon.svg" width="28" height="28" alt="">Gather<span>Workspace</span></a><nav><a class="help-link" href="help.html" target="_blank" rel="noopener">Help</a><button id="openCaseStart">New case</button><a href="index.html" target="_blank">Quick lookup ↗</a><button id="expand" class="subtle" hidden>Open full workspace ↗</button></nav></header>
 <div class="layout" inert>
 <aside>
   <button id="libraryToggle" aria-expanded="false" aria-controls="libraryContents">Library ▾</button>
@@ -56,7 +56,7 @@
   <section id="view-settings" class="workspace-view" role="tabpanel" aria-labelledby="tab-settings" tabindex="0" hidden>
     <h2>Settings</h2>
     <section id="privacyTools"></section>
-    <section class="settings-section" aria-labelledby="backupHeading"><h3 id="backupHeading">Backup & restore</h3><p class="quiet">Keep a separate copy of all cases and images. Backups include unredacted originals.</p><div class="export-actions"><button id="backup">Back up all work</button><button id="restore">Restore backup</button><input id="restoreFile" type="file" accept=".gather,.json,application/json,application/octet-stream" hidden></div></section>
+    <section class="settings-section" aria-labelledby="backupHeading"><h3 id="backupHeading">Backup & restore</h3><p class="quiet">Backups are unencrypted files containing all case data and unredacted originals. Anyone with the file can read it. Store it in an approved private location.</p><div class="export-actions"><button id="backup">Back up all work</button><button id="restore">Restore backup</button><input id="restoreFile" type="file" accept=".gather,.json,application/json,application/octet-stream" hidden></div></section>
     <section id="capturePreferences" class="settings-section" aria-label="Capture export preferences"></section>
     <details class="storage-details"><summary>Storage details</summary><p id="storageUsage" class="micro"></p></details>
   </section>

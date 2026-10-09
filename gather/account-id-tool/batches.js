@@ -4,7 +4,7 @@ import {normalizeProfile, cleanName, suppliedIds} from './core.js';
 import {cleanProfileStatus} from './profile-status.js';
 
 const PREFIX = 'gather.batch.';
-export const MAX_BATCHES = 50;
+export const MAX_BATCHES = 5;
 export const HISTORY_EPOCH_KEY = 'gather.lookupEpoch';
 const extension = Boolean(globalThis.chrome?.storage?.local);
 export const storage = {
@@ -49,9 +49,20 @@ export function restoreBatch(value) {
   return {...(typeof value.historyEpoch==='string'&&/^[\w-]{1,80}$/.test(value.historyEpoch)?{historyEpoch:value.historyEpoch}:{}),...(cleanLookupContext(value.lookupContext)?{lookupContext:cleanLookupContext(value.lookupContext)}:{}),id: value.id, title: cleanName(value.title).slice(0,80), createdAt: Number(value.createdAt) || Date.now(), updatedAt: Number(value.updatedAt) || Date.now(),
     entries, invalid: Array.isArray(value.invalid) ? value.invalid.slice(0,100).map(i=>({input:String(i.input || '').slice(0,2048),error:String(i.error || '').slice(0,300)})) : [], duplicates: Number(value.duplicates) || 0};
 }
-export async function recentBatches() {
-  const data = await storage.get(null);
-  return Object.entries(data).filter(([key]) => key.startsWith(PREFIX)).map(([,value])=>restoreBatch(value)).filter(Boolean).sort((a,b)=>b.createdAt-a.createdAt);
+function listedBatches(data){
+  return Object.entries(data).filter(([key])=>key.startsWith(PREFIX)).map(([,value])=>restoreBatch(value)).filter(Boolean).sort((a,b)=>b.createdAt-a.createdAt||b.updatedAt-a.updatedAt||a.id.localeCompare(b.id));
+}
+function evictionWrites(data,batches){
+  const removed=new Set(batches.slice(MAX_BATCHES).map(b=>PREFIX+b.id)),writes={};
+  if(!removed.size)return writes;
+  for(const key of removed)writes[key]=null; // Opaque tombstone stops stale tabs recreating an evicted batch.
+  for(const [key,value]of Object.entries(data))if(key.startsWith('gather.archive.'))writes[key]=scrubLookupArchive(value,k=>removed.has(k));
+  if(removed.has(PREFIX+data['gather.quick']?.batchId))writes['gather.quick']={input:'',submittedInput:'',batchId:null};
+  return writes;
+}
+export function recentRetentionWrites(data){return evictionWrites(data,listedBatches(data));}
+export function recentBatches(){
+  return withHistoryLock(async()=>{const data=await storage.get(null),batches=listedBatches(data);if(batches.length>MAX_BATCHES)await storage.set(evictionWrites(data,batches));return batches.slice(0,MAX_BATCHES);});
 }
 export async function loadBatch(id) {
   return restoreBatch((await storage.get(PREFIX + id))[PREFIX + id]);
@@ -104,13 +115,16 @@ export function saveBatch(batch) {
       const state=(await storage.get('gather.workspace.v1'))['gather.workspace.v1'];
       if(!state||!state.projects.some(p=>p.id===projectId))throw new Error('This case was deleted. Start a new lookup.');
     }
-    const existing=await storage.get(PREFIX+batch.id);
-    if(!existing[PREFIX+batch.id]&&(await recentBatches()).length>=MAX_BATCHES)
-      throw new Error('Recent batches is full (50). Remove one to save this batch.');
-    await storage.set({[PREFIX+batch.id]:batchSnapshot(batch)});
+    const data=await storage.get(null),key=PREFIX+batch.id;
+    if(Object.hasOwn(data,key)&&data[key]===null)throw new Error('This lookup has left Recent. Start a new lookup.');
+    const snapshot=batchSnapshot(batch),next={...data,[key]:snapshot};
+    const ordered=listedBatches(next);
+    const writes=evictionWrites(next,ordered);
+    if(Object.hasOwn(writes,key))throw new Error('This older lookup has left Recent. Start a new lookup.');
+    await storage.set({[key]:snapshot,...writes});
   });
 }
-export function removeBatch(id) {return withHistoryLock(()=>storage.remove(PREFIX+id));}
+export function removeBatch(id) {return withHistoryLock(()=>storage.set({[PREFIX+id]:null}));}
 // Imported settings archives can contain old lookup copies. Scrub those copies
 // as well, without removing unrelated preferences or saved case records.
 export function scrubLookupArchive(value,remove,depth=0) {

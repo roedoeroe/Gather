@@ -1,6 +1,8 @@
-# What prevents testing the installed extension here?
+# Historical Chromium installation blocker
 
-Historical diagnosis checked October 8 UTC (October 7 in the user’s timezone) against this machine and Gather 1.8.6. Current release: [1.8.7 delivery](../../releases/1.8.7/Gather-1.8.7-DELIVERY.md), with 132 automated checks, 85 rendered groups and 10 worker groups passed; native installation remains blocked under the unchanged policy.
+**1.8.15 update:** the user authorized installing Edge. Verified official Edge now passes 36 native groups without changing Chromium policy or disabling sandboxing. See [current tests](TESTING.md) and [setup](ENVIRONMENT-SETUP.md). The account below explains the earlier Chromium-only blocker.
+
+Historical diagnosis checked October 8 UTC (October 7 in the user’s timezone) against this machine and Gather 1.8.6. Historical release: [1.8.7 delivery](../../releases/1.8.7/Gather-1.8.7-DELIVERY.md), with 132 automated checks, 85 rendered groups and 10 worker groups passed; native installation remains blocked under the unchanged policy.
 
 “Browser acceptance” means checking Gather after installing it in Chrome/Edge: open the toolbar, select an area on a page, copy the screenshot, save it and check its destination. It is a testing step, not another product mode or a requirement to set up a case.
 
@@ -13,7 +15,7 @@ This cloud machine's managed Chromium policy is:
 ExtensionInstallBlocklist: ["*"]
 ```
 
-[Chromium's official policy definition](https://raw.githubusercontent.com/chromium/chromium/main/components/policy/resources/templates/policy_definitions/Extensions/ExtensionInstallBlocklist.yaml), retrieved successfully over verified HTTPS, explicitly says this blocks **all unpacked extensions**. Exceptions for signed installed extensions do not permit unpacked ones. The prior browser diagnostic reported “Loading of unpacked extensions is disabled by the administrator.” The restriction still exists. This machine has Chromium 151; no separate installed Chrome or Edge is available. Changing the network allowlist or saving startup instructions cannot remove this browser policy.
+[Chromium's official policy definition](https://raw.githubusercontent.com/chromium/chromium/main/components/policy/resources/templates/policy_definitions/Extensions/ExtensionInstallBlocklist.yaml), retrieved successfully over verified HTTPS, explicitly says this blocks **all unpacked extensions**. Exceptions for signed installed extensions do not permit unpacked ones. The prior browser diagnostic reported “Loading of unpacked extensions is disabled by the administrator.” The restriction still exists. At that time this machine had Chromium 151 and no separate installed Chrome or Edge. Changing the network allowlist or saving startup instructions cannot remove this browser policy.
 
 The restriction belongs to this cloud machine. The user's earlier screenshots show Gather already installed on their computer. It does not establish that their browser has the same policy or that Gather is failing there.
 

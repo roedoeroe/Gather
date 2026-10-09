@@ -17,12 +17,12 @@ export async function workspaceJourney(context, baseURL, artifacts) {
     await page.getByRole('button', {name: 'New case', exact: true}).click();
     const dialog = page.getByRole('dialog');
     await dialog.getByLabel('Case name', {exact: true}).fill(name);
-    await dialog.getByLabel('First scan', {exact: true}).fill(scan);
+    assert.equal(await dialog.getByLabel('First scan', {exact: true}).count(),0);
     await dialog.getByRole('button', {name: 'Create case', exact: true}).click();
-    await page.getByRole('heading', {name: scan, exact: true}).waitFor();
-    await dialog.waitFor({state: 'detached'});
+    await page.getByRole('heading', {name, exact:true}).waitFor();
+    await dialog.waitFor({state:'detached'});await page.getByRole('tab',{name:'Research',exact:true}).click();
   };
-  await createCase('Northbridge', 'October review');
+  await createCase('Northbridge', 'Northbridge');
   await page.getByText('Add to this scan', {exact: true}).click();
   await page.locator('#addSource').click();
   await page.getByLabel('Source URL', {exact: true}).fill('https://example.test/report');
@@ -67,7 +67,19 @@ export async function workspaceJourney(context, baseURL, artifacts) {
   assert.equal(await page.locator('#query').inputValue(),'');
   const after=await page.evaluate(async()=>({local:await chrome.storage.local.get(null),session:await chrome.storage.session.get(null),tabs:await chrome.tabs.query({})}));
   assert.deepEqual(after.local,snapshot.local);assert.doesNotMatch(JSON.stringify(after.local)+JSON.stringify(after.session),/Northbridge fictional search/);
-  assert.ok(after.tabs.some(tab=>decodeURIComponent(tab.url||'').includes('Northbridge fictional search')));
+  // Without the tabs permission, a native extension cannot read arbitrary search-tab URLs.
+  // Observe navigation through browser automation while API doubles expose their test tabs.
+  const launched = async match => {
+    const deadline=Date.now()+5000;
+    do {
+      const tabs=await page.evaluate(()=>chrome.tabs.query({}));
+      const urls=[...tabs.flatMap(t=>[t.url,t.pendingUrl]),...context.pages().map(p=>p.url())].filter(Boolean);
+      if(urls.some(match))return;
+      await new Promise(resolve=>setTimeout(resolve,50));
+    } while(Date.now()<deadline);
+    assert.fail('Expected provider navigation did not occur.');
+  };
+  await launched(url=>new URL(url).searchParams.get('q')==='Northbridge fictional search');
   await page.getByRole('button',{name:'Changes',exact:true}).click();
   await page.locator('#localSearch').fill('no fictional activity matches');
   await page.getByText('No matching activity', {exact: true}).waitFor();
@@ -79,11 +91,11 @@ export async function workspaceJourney(context, baseURL, artifacts) {
   await page.screenshot({path:path.join(artifacts,'reverse-image.png'),fullPage:true});
   await page.getByRole('button',{name:'Open image search ↗',exact:true}).click();
   await page.getByText('Image search opened. Choose an image on the provider’s website.',{exact:true}).waitFor();
-  assert.ok(await page.evaluate(async()=>(await chrome.tabs.query({})).some(t=>t.url==='https://tineye.com/')));
+  await launched(url=>url==='https://tineye.com/');
   await page.getByRole('button',{name:'Search the web',exact:true}).click();
   assert.equal(await page.evaluate(()=>document.activeElement.id),'query');
   await page.locator('#query').fill('Fictional unsent draft');
-  await page.reload();await page.getByRole('heading',{name:'October review',exact:true}).waitFor();
+  await page.reload();await page.getByRole('heading',{name:'Northbridge',exact:true}).waitFor();
   assert.equal(await page.locator('#query').inputValue(),'');
   assert.doesNotMatch(JSON.stringify(await page.evaluate(()=>chrome.storage.local.get(null))),/Fictional unsent draft/);
   passed.push('Web/image searches open provider tabs without query, draft or launch logs; placeholders, keyboard focus and reload work.');
@@ -92,7 +104,7 @@ export async function workspaceJourney(context, baseURL, artifacts) {
   await page.locator('[data-view="items"]').click();
   await page.locator('#items .empty').waitFor();
   assert.equal(await page.locator('#items .card').count(), 0);
-  await page.locator('#projects').getByRole('button', {name: 'October review', exact: true}).click();
+  await page.locator('#projects').getByRole('button', {name: 'Northbridge', exact: true}).click();
   await page.getByRole('heading', {name: 'Northbridge fictional report', exact: true}).waitFor();
   passed.push('Case switching clears filters and preserves deliberately saved findings.');
 
@@ -104,7 +116,7 @@ export async function workspaceJourney(context, baseURL, artifacts) {
   assert.match(report, /Northbridge fictional report/);
   assert.doesNotMatch(report, /Southridge/);
   await page.reload();
-  await page.getByRole('heading', {name: 'October review', exact: true}).waitFor();
+  await page.getByRole('heading', {name: 'Northbridge', exact: true}).waitFor();
   assert.equal(await page.locator('#items .card').count(), 1);
   passed.push('Actual file download contains only the selected scan; reload retains work.');
 
@@ -114,7 +126,7 @@ export async function workspaceJourney(context, baseURL, artifacts) {
   await deletion.getByRole('button', {name: 'Delete without backup', exact: true}).waitFor();
   await deletion.getByRole('button', {name: 'Cancel', exact: true}).click();
   await deletion.waitFor({state: 'detached'});
-  assert.equal(await page.locator('#projects').getByRole('button', {name: 'October review', exact: true}).count(), 1);
+  assert.equal(await page.locator('#projects').getByRole('button', {name: 'Northbridge', exact: true}).count(), 1);
   await page.getByRole('button', {name: 'Clear recent lookup history…', exact: true}).waitFor();
   passed.push('Settings exposes both destructive actions; cancelling preserves the case.');
 

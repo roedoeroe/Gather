@@ -31,12 +31,12 @@ async function refresh({reset=false}={}){
     const subjectId=await selectedSubject(result.context.scanId);
     if(ticket!==serial)return;
     snapshot={tabId:tab.id,url:tab.url,context:{...result.context},subjectId:subjectId||null};
-  }
+  }else snapshot.url=tab.url; // Navigation changes the source, never the frozen filing destination.
   // Background destination changes never replace the destination already displayed.
   const frozen=snapshot;
   const [subjects,settings]=await Promise.all([listSubjects(frozen.context.projectId),getCaptureSettings(frozen.context.projectId)]);
   if(ticket!==serial)return;
-  $('captureScan').replaceChildren(new Option('Inbox',''),...state.scans.map(s=>new Option(destinationLabel(state,s.id),s.id)));
+  $('captureScan').replaceChildren(new Option('Inbox',''),...state.scans.map(s=>new Option(state.scans.filter(x=>x.projectId===s.projectId).length===1?(state.projects.find(p=>p.id===s.projectId)?.name||s.name):destinationLabel(state,s.id),s.id)));
   const valid=!frozen.context.scanId||state.scans.some(s=>s.id===frozen.context.scanId&&s.projectId===frozen.context.projectId);
   if(!valid){$('captureScan').append(new Option('Scan unavailable — choose another',frozen.context.scanId));status('This scan is no longer available. Choose where to save.',true);}
   $('captureScan').value=frozen.context.scanId||'';
@@ -79,7 +79,7 @@ async function init(){
     status('Page link saved to '+r.result.destinationLabel+'.');
   });
   $('useDefaultScan').onclick=run(async()=>{await request('workspace.detachTab',{tabId:frozen().tabId});await refresh({reset:true});});
-  $('viewCaptures').onclick=run(()=>chrome.tabs.create({url:captureHistoryLink()}));
+  $('viewCaptures').onclick=run(()=>chrome.tabs.create({url:captureHistoryLink(frozen().context.scanId)}));
   $('openDashboard').onclick=run(()=>chrome.tabs.create({url:workspaceLink(frozen().context.scanId,'research')}));
   const schedule=()=>{clearTimeout(timer);timer=setTimeout(()=>refresh().catch(e=>status(e.message,true)),50);};
   chrome.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes[WORKSPACE_KEY]||area==='session'&&Object.keys(changes).some(k=>k.startsWith('gather.case.')))schedule();});

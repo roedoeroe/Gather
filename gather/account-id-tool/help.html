@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Gather — Help</title><link rel="icon" href="icon.svg"><link rel="stylesheet" href="help.css"></head>
+<body>
+<header><a class="brand" href="workspace.html"><img src="icon.svg" width="28" height="28" alt="">Gather</a><span id="version">Help</span><a href="workspace.html">Open workspace</a></header>
+<main>
+  <p class="eyebrow">HOW TO USE GATHER</p><h1>A little less repetitive work.</h1>
+  <p class="intro">Find account IDs, capture what matters, and keep the work you choose. A case is optional.</p>
+  <label for="helpSearch">Find an answer</label><div class="search"><input id="helpSearch" type="search" autocomplete="off" placeholder="e.g. copy IDs, redaction, update"><button id="clearSearch" hidden>Clear</button></div>
+  <p id="helpStatus" role="status" aria-live="polite"></p>
+  <nav aria-label="Help topics"><a href="#start">Quick start</a><a href="#accounts">Account IDs</a><a href="#screenshots">Screenshots</a><a href="#privacy">Privacy</a><a href="#update">Updating</a></nav>
+  <div id="answers"></div><p id="noAnswers" hidden>No matching answer. Try “capture”, “copy”, “case” or “update”.</p>
+  <footer>Gather supports your observations. Identity, intent, threat level, affiliation and account ownership remain analyst judgments.</footer>
+</main><script type="module" src="help.js"></script>
+</body></html>

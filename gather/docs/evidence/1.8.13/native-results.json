@@ -1,0 +1,20 @@
+{
+  "kind": "installed-extension-smoke",
+  "status": "blocked",
+  "version": "1.8.13",
+  "nativeExtension": false,
+  "passed": [],
+  "nativeToolbarAndCapture": "not-tested",
+  "livePlatforms": "not-tested",
+  "blocker": {
+    "code": "MANAGED_UNPACKED_EXTENSION_BLOCK",
+    "policyFile": "/etc/chromium/policies/managed/extensions.json",
+    "policy": "ExtensionInstallBlocklist",
+    "value": [
+      "*"
+    ],
+    "reason": "This machine administrator blocks loading unpacked test extensions.",
+    "action": "Run in an environment whose administrator permits test extensions. Keep this machine policy intact."
+  },
+  "browserLaunched": false
+}

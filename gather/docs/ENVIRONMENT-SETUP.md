@@ -1,41 +1,61 @@
-# Cloud environment setup — Gather 1.8.11
+# Cloud environment setup — Gather 1.8.15 RC
 
-Use the existing checkout at `/workspace/Gather`. Each task is already isolated; do not create a new worktree unless explicitly requested. Inspect Git status, instructions, manifest/package versions and the current handoff before changing files. Preserve newer work and all completed release ZIPs.
+Use the existing `/workspace/Gather` checkout. Cloud tasks are already isolated: do not create a worktree unless the user asks. Inspect Git status and newer edits before changing anything. Read NEXT-RUN-HANDOFF, TESTING, RELEASE-CANDIDATE-1.8.15 and R4-WORKFLOW-RECONCILIATION. Preserve source edits and immutable release ZIPs. Development-branch publication, the 1.8.15 GitHub prerelease and GitHub presentation updates are authorized. The user subsequently delegated the Compare & pull request workflow; main now contains the reviewed 1.8.15 RC source. The release remains a prerelease. Do not treat that integration as authorization for arbitrary future releases or visibility changes.
 
-Runtime source is `gather/account-id-tool`. There are no runtime dependencies, install step, bundler, server or case-storage credentials. Node 24 and Python 3 run the existing tests and packaging. From `/workspace/Gather/gather`:
+The extension needs no runtime dependencies, install script, bundler, server or case-storage credential. Node 24 and Python 3 run tests/packaging. Supplied Playwright 1.62.1 is at `/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules`; browser tests require that path as NODE_PATH. Run from `/workspace/Gather/gather`:
 
 ```sh
+export NODE_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules
+python3 scripts/build-profile-reader.py --check
 node --test tests/*.test.mjs
-node tests/browser-capture.mjs
-node tests/browser-toolbar.mjs
-node tests/browser-case.mjs
-node tests/browser-worker.mjs
-node tests/browser-stabilization.mjs
-node tests/browser-installed-ui.mjs
-node tests/browser-image-tools.mjs
-GATHER_TEST_DPR=2 node tests/browser-image-tools.mjs
-node tests/browser-case-clipboard.mjs
-python3 scripts/package.py
 ```
 
-The prepared environment supplies Playwright 1.62.1 and Chromium 151 at `/usr/lib/chromium/chromium`. Browser scripts start/close their own fixture server and temporary profile. No process needs to survive between tasks. `GATHER_BROWSER_ARTIFACTS` chooses output and `GATHER_CHROMIUM_PATH` selects another available browser. Follow TESTING.md if these tools are absent after restoration; do not add extension runtime dependencies or weaken `chromiumSandbox:true`.
+The generated reader uses local adapters, not remote scripts. Preserve static worker imports, exact IDs, local case data, query-free search, frozen filing, original pixels, derivative guards and restore/deletion journals. Do not edit runtime/tests during suites. Test scripts close their temporary profiles/servers. Runtime needs no continuously running service.
 
-1.8.11 validation: 178 Node tests; 21 capture/UX + 24 toolbar + 18 case/privacy + 10 stabilization + 7 case clipboard + 9 installed-runner UI + 16 image-tool groups (105 unique rendered total); image tools also pass at 2× device scale; 10 actual ServiceWorkerGlobalScope groups. [Release evidence](evidence/1.8.11/README.md) records their scope; the earlier [restriction diagnosis](evidence/browser-blocker-2026-10-08/README.md) remains historical evidence. Chrome APIs are doubles; actual installed-browser behavior and live-platform reliability remain separate checks.
+## Browser capabilities
 
-The current cloud machine has `/etc/chromium/policies/managed/extensions.json` with `ExtensionInstallBlocklist: ["*"]`. Chromium's official policy definition says this blocks **all unpacked extensions**, including allowlisted ones. No Chrome/Edge alternative is installed here. The restriction prevents installing Gather for a native test in this machine; it is not an observed failure of the user's installation. Existing rendered tests use real pages/canvas/IndexedDB/clipboard and controlled extension APIs and remain useful.
+Rendered suites use sandboxed `/usr/lib/chromium/chromium`. Its managed `ExtensionInstallBlocklist:["*"]` is unchanged; it still cannot load unpacked extensions. That restriction must not be edited or weakened.
 
-`node tests/browser-acceptance.mjs` now checks this policy before launching, records `status: blocked`, zero passed native groups and exits **2**. Failure is exit 1; an actually completed installed-extension smoke journey is exit 0. It uses current controls and a bounded worker wait, not the old + New/Project name UI. The nine shared UI groups passed separately with rendered/API-double fixtures using `node tests/browser-installed-ui.mjs`. Native toolbar invocation, activeTab screenshots and OS dialogs remain outside that smoke test. Never count the blocked run as passed or change policy/sandbox/TLS. Use a permitted test environment or [the short installed-browser check](BROWSER-TEST-BLOCKER.md).
+The user authorized installing Microsoft Edge and WebDriver. Official **Edge 155.0.4283.45** is locally extracted at `/workspace/gather-browser-tools/edge-install/runtime/opt/microsoft/msedge/msedge`. Microsoft-signed repository metadata and package hashes were verified. Matching official driver: `/workspace/gather-browser-tools/edge-install/driver/msedgedriver`; version checked, but tests use Playwright rather than WebDriver. Edge normally permits this unpacked extension with sandboxing enabled. No policy change, no no-sandbox, TLS bypass or unsafe extension-debugging flag.
 
-The redesign has four views, optional-intake New case, capture inspection and Settings privacy controls. Preserve frozen filing, exact string IDs, project-free lookup, original images and binary backups. Preserve static worker imports, privacy generations/locks/queues, tombstones, archive scrubbing and late-write guards. Case data stays local; source remains public by the user's choice. Searches/lookups contact chosen sites, exports create separate files. No cloud sync, analytics, passive collection or name-based identity inference.
+Native headless checks:
 
-The maintained branch is `develop/1.8.0-r3` (historical name). Main remains the original README-only branch. If restoration checks out main without `gather`, check local changes and fetch/switch to the existing development branch; do not reset user edits. Use the supplied Git proxy authentication. Development-branch publication is authorized; merging main or changing visibility is not requested. Versioned delivery assets are tracked in `releases/1.8.11/`; `/dist` also contains local copies. Earlier releases remain immutable. GitHub Release upload endpoints previously returned HTTP 400 Bad Content-Length; Git ZIP mirrors are the working delivery path. Fetch the development branch for later testing-tool/document changes; the release source ZIP is an immutable snapshot.
+```sh
+export GATHER_CHROMIUM_PATH=/workspace/gather-browser-tools/edge-install/runtime/opt/microsoft/msedge/msedge
+GATHER_BROWSER_ARTIFACTS=/workspace/Gather/artifacts/native-workspace node tests/browser-acceptance.mjs
+GATHER_BROWSER_ARTIFACTS=/workspace/Gather/artifacts/native-update node tests/browser-native-update.mjs
+```
 
-Update at the same installed directory and Reload, without uninstalling or clearing storage. Reload releases ephemeral session values. Keep the old package and matching backup; validate rollback in a separate clean profile.
+The update test reads the immutable releases/1.8.14 extension ZIP. `GATHER_EXTENSION_ROOT` and `GATHER_PREVIOUS_PACKAGE` allow exact extracted-package verification without changing source.
 
-## The setup dialog
+## Restart the display for native toolbar/capture checks
 
-Choose **Done** in “Configure setup instructions.” **Install script — Not set** is expected: no runtime dependencies or install script are required. **Start skill** is the saved agent startup guide, not an additional extension to install. If the product then offers **Publish environment**, use it to preserve this prepared cloud workspace for future tasks. These are cloud settings; Gather is separately installed from its extension ZIP on your computer.
+Live processes do not survive snapshots. The verified Debian Xvfb/xdotool files are retained under `/workspace/gather-browser-tools/x11/runtime`; package receipts are outside the public repository. The private Xauthority file is `/workspace/gather-browser-tools/x11/session/auth`. Do not print or commit it. If missing, create a mode-600 file and a fresh random MIT-MAGIC-COOKIE-1 entry for `:94` using xauth; pass the cookie on stdin, not in logs. Never use `-ac`.
 
-The `start_skill` configuration draft captures these steps. Saving a draft does not execute startup, publish a cloud snapshot or verify restoration in a fresh task. Environment publication remains a separate user action. The repository draft is corrected from main to the verified development checkout at mount Gather. Network, credentials and the intentionally absent install script are preserved.
+First check whether the display is already ready using `DISPLAY=:94 XAUTHORITY=/workspace/gather-browser-tools/x11/session/auth xdpyinfo`. If absent, start this in a background terminal task and keep it running while native tests execute:
 
-Latest behavior: web/image searches launch without retained query/draft/log; old query text is scrubbed while stable legacy references preserve captures. Read SEARCH-AND-LOOKUP-1.8.11.md before changing retention. Full runtime uses 77 packaged files.
+```sh
+/workspace/gather-browser-tools/x11/runtime/usr/bin/Xvfb :94 -screen 0 1440x1000x24 -nolisten tcp -auth /workspace/gather-browser-tools/x11/session/auth
+```
+
+Confirm `xdpyinfo` succeeds before starting Edge. The `/tmp/.X11-unix` ownership warning seen in this non-root container did not prevent readiness. Diagnose a failed display instead of retrying the browser repeatedly. Then:
+
+```sh
+export DISPLAY=:94
+export XAUTHORITY=/workspace/gather-browser-tools/x11/session/auth
+export LD_LIBRARY_PATH=/workspace/gather-browser-tools/x11/runtime/usr/lib/x86_64-linux-gnu
+export GATHER_XDOTOOL=/workspace/gather-browser-tools/x11/runtime/usr/bin/xdotool
+export GATHER_CHROMIUM_PATH=/workspace/gather-browser-tools/edge-install/runtime/opt/microsoft/msedge/msedge
+export NODE_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules
+GATHER_BROWSER_ARTIFACTS=/workspace/Gather/artifacts/native-workflow node tests/browser-native-workflow.mjs
+```
+
+The test assigns a normal extension action shortcut through Edge's settings in its temporary profile, then uses real OS keyboard/mouse input. It does not override activeTab. Only run one headed native interaction suite per display at a time. Stop only display processes you started when finished. The display startup/readiness and all native commands succeeded in this instance; fresh-task restoration of this final snapshot has not been verified.
+
+## Publication and the setup dialog
+
+Branch `develop/1.8.0-r3` is historical naming; main and development were synchronized after the 1.8.15 RC pull request. Inspect current remote refs before starting new work. Use existing HTTPS proxy authentication rather than requesting a token because GH_TOKEN is absent. Only sanitized fictional evidence belongs in public packages. Versioned ZIPs and download receipts are in releases/1.8.15; prior releases stay immutable.
+
+Choose **Done** in “Configure setup instructions.” **Install script — Not set** is expected, because no runtime installation step is needed. **Start skill** is the saved cloud startup guide, not another extension to install. Review/save environment settings and use **Publish environment** when offered to snapshot installed tools and activate the final repository ref. A saved configuration draft does not publish itself. This is separate from updating Gather on the user's computer.
+
+Keep network, secrets and the absent install script unchanged. Published Git source/ZIPs are independently reproducible; the locally installed browser tools also require the environment snapshot. Never claim a restored environment was tested merely because this instance passed.

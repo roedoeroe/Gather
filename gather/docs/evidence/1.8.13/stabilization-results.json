@@ -1,0 +1,18 @@
+{
+  "kind": "rendered-browser-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [
+    "An open print preview removes stale pixels and disables printing after redaction or deletion.",
+    "Two documents cannot export the same capture concurrently; the rejected attempt leaves the active export intact.",
+    "Editing and case deletion reject a pending folder export without losing the image; editing works once export finishes.",
+    "Deleting a case during its pending folder export is rejected atomically.",
+    "A stale editor cannot replace a newer redaction with pixels from its older image.",
+    "An interrupted old export cannot overwrite the status of its successful retry.",
+    "Restoring a binary backup made during folder export keeps its image and permits an immediate retry.",
+    "Clipboard conversion rejects bytes when the selected image changes during PNG preparation.",
+    "A durable screenshot releases its capture lock even when preview loading fails; focus restores the preview.",
+    "A delayed clipboard failure after deletion keeps completion actions disabled and reports that the capture was deleted."
+  ],
+  "failures": [],
+  "errors": []
+}

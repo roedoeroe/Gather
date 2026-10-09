@@ -1,10 +1,16 @@
 import {extractId, normalizeProfile, pageAccessIssue} from './core.js';
-import {readProfileSource} from './read-profile-source.js';
+import {readProfileInPage} from './profile-read-client.js';
 
 export const isExtension = Boolean(globalThis.chrome?.runtime?.id && globalThis.chrome?.scripting);
 const ownedTabs = new Set();
 const abortError = () => new DOMException('Lookup stopped', 'AbortError');
 function check(signal) { if (signal?.aborted) throw abortError(); }
+const SETTLE_MS = 2000, SETTLE_INTERVAL_MS = 250;
+function matchesProfile(url, profile) { try { return normalizeProfile(url).key === profile.key; } catch { return false; } }
+async function sameCurrentProfile(tabId, profile) {
+  const tab = await chrome.tabs.get(tabId);
+  return matchesProfile(tab.url, profile) && (!tab.pendingUrl || matchesProfile(tab.pendingUrl, profile));
+}
 function pause(ms, signal) {
   return new Promise((resolve, reject) => {
     check(signal);
@@ -25,7 +31,7 @@ async function fetchSource(profile, signal) {
   try {
     check(signal);
     // Only normalized, allowlisted profile URLs ever reach this function.
-    const response = await fetch(profile.url, {credentials: 'include', signal: controller.signal, redirect: 'follow', cache: 'no-store'});
+    const response = await fetch(profile.url, {credentials: 'omit', signal: controller.signal, redirect: 'follow', cache: 'no-store'});
     if (!response.ok) return {error: `The site returned HTTP ${response.status}. Open the profile to check its response, then retry.`};
     if (!response.body) return {error: 'The site returned no page source'};
     const reader = response.body.getReader(), decoder = new TextDecoder(); let html = '';
@@ -45,7 +51,7 @@ async function fetchSource(profile, signal) {
   } finally { clearTimeout(timer); signal?.removeEventListener('abort', abort); }
 }
 
-async function readBrowserPage(profile, signal, onStage, tabOwner) {
+async function readBrowserPage(profile, signal, onStage, tabOwner, includeName) {
   check(signal);
   const tab = await chrome.tabs.create({url: profile.url, active: false});
   ownedTabs.add(tab.id);
@@ -63,13 +69,9 @@ async function readBrowserPage(profile, signal, onStage, tabOwner) {
       let actual;
       try { actual = normalizeProfile(state.url); } catch { return {error: pageAccessIssue('',state.url)||'The browser page did not return a supported profile URL. Open the intended profile and retry.'}; }
       if (actual.platform !== profile.platform) return {error: 'The profile redirected outside its platform'};
-      const results = await chrome.scripting.executeScript({
-        target: {tabId: tab.id},
-        func: () => ({html: document.documentElement.outerHTML.slice(0, 15000001), url: location.href})
-      });
+      const snapshot = await readProfileInPage(tab.id, profile, {includeName});
       check(signal);
-      const snapshot = results[0]?.result;
-      if (snapshot) last = extractId(snapshot.html, profile, snapshot.url);
+      last = snapshot.result;
       if (last.id || last.accountState==='GONE' || /security check|sign in|Multiple account IDs|different profile/.test(last.error || '')) return last;
       // Allow hydrated profile data to arrive, but never solve login or CAPTCHA screens.
       if (Date.now() > deadline - 17000) return last;
@@ -93,30 +95,65 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
   if (Number.isInteger(currentTabId)) {
     onStage?.('Reading current page…');
     try {
-      const tab=await chrome.tabs.get(currentTabId);
+      let tab=await chrome.tabs.get(currentTabId);
+      const deadline=Date.now()+SETTLE_MS;
+      // A just-opened tab may still expose its previous/blank committed URL.
+      // Wait only when its explicit pending URL is the requested profile.
+      while(profile.platform==='instagram'&&!matchesProfile(tab.url,profile)&&matchesProfile(tab.pendingUrl,profile)&&Date.now()<deadline){
+        await pause(Math.min(SETTLE_INTERVAL_MS,deadline-Date.now()),signal);
+        tab=await chrome.tabs.get(currentTabId);
+      }
       let actual;
       try {actual=normalizeProfile(tab.url);} catch {return {error:'The current page changed. Open the profile and run it again.'};}
-      if(actual.key!==profile.key)return {error:'The current page changed. Open the profile and run it again.'};
-      const results=await chrome.scripting.executeScript({target:{tabId:currentTabId},func:()=>({html:document.documentElement.outerHTML.slice(0,15000001),url:location.href})});
+      if(actual.key!==profile.key||tab.pendingUrl&&!matchesProfile(tab.pendingUrl,profile))return {error:'The current page changed. Open the profile and run it again.'};
+      let snapshot=await readProfileInPage(currentTabId,profile,{includeName});
       check(signal);
-      const snapshot=results[0]?.result;
+      while(profile.platform==='instagram'&&snapshot.result.error?.startsWith('No matching account ID')&&Date.now()<deadline){
+        onStage?.('Waiting briefly for profile data…');
+        await pause(Math.min(SETTLE_INTERVAL_MS,deadline-Date.now()),signal);
+        if(!await sameCurrentProfile(currentTabId,profile))return {error:'The page changed during lookup. Open the intended profile and retry.'};
+        snapshot=await readProfileInPage(currentTabId,profile,{includeName,documentId:snapshot.documentId,reuseReader:true});
+        check(signal);
+      }
       if(snapshot){
-        const result=extractId(snapshot.html,profile,snapshot.url);
+        const result=snapshot.result;
+        if(!await sameCurrentProfile(currentTabId,profile))return {error:'The page changed during lookup. Open the intended profile and retry.'};
         if(result.id||result.accountState==='GONE')return {...result,method:'Current page · '+result.method};
         // Authentication, conflicting IDs and a different profile are explicit
         // failures. Only missing hydrated data triggers an automatic source read.
         if(!result.error?.startsWith('No matching account ID'))return result;
         onStage?.('Reading profile source automatically…');
-        const documentId=results[0]?.documentId;
-        const sourceResults=await chrome.scripting.executeScript({target:{tabId:currentTabId,...(documentId?{documentIds:[documentId]}:{})},func:readProfileSource});
+        const source=await readProfileInPage(currentTabId,profile,{source:true,includeName,documentId:snapshot.documentId});
         check(signal);
         const latest=await chrome.tabs.get(currentTabId);
-        if(normalizeProfile(latest.url).key!==profile.key)return {error:'The page changed during lookup. Open the intended profile and retry.'};
-        const source=sourceResults[0]?.result;
-        if(source?.error)return source;
-        if(!source)return {error:'The profile returned no readable source. Reload it, then retry.'};
-        const found=extractId(source.html,profile,source.url);
-        return found.id||found.accountState==='GONE'?{...found,method:'Current profile source · '+found.method}:found;
+        if(!matchesProfile(latest.url,profile)||latest.pendingUrl&&!matchesProfile(latest.pendingUrl,profile))return {error:'The page changed during lookup. Open the intended profile and retry.'};
+        const found=source.result;
+        if(found.id||found.accountState==='GONE')return {...found,method:'Current profile source · '+found.method};
+        if(profile.platform!=='instagram'||!found.error?.startsWith('No matching account ID'))return found;
+        // A signed-in page can omit the profile data exposed by the public
+        // response. Previously only a second, pasted-link lookup tried this
+        // path. Do it once in the original operation, without cookies or a tab.
+        onStage?.('Checking public profile source…');
+        const publicResult=await fetchSource(profile,signal);
+        check(signal);
+        // Pin the original document and recheck hydration after the request.
+        // Navigation, access checks and conflicting IDs must never be hidden
+        // by a result from the public response.
+        const current=await readProfileInPage(currentTabId,profile,{includeName,documentId:source.documentId});
+        check(signal);
+        const stillCurrent=await chrome.tabs.get(currentTabId);
+        if(!matchesProfile(stillCurrent.url,profile)||stillCurrent.pendingUrl&&!matchesProfile(stillCurrent.pendingUrl,profile))return {error:'The page changed during lookup. Open the intended profile and retry.'};
+        if(/Multiple account IDs|different account ID/.test(publicResult.error||''))return publicResult;
+        if(current.result.id){
+          if(publicResult.id&&current.result.id!==publicResult.id)return {error:'The page and public profile returned different account IDs. Gather did not choose either ID.'};
+          return {...current.result,method:'Current page · '+current.result.method};
+        }
+        if(!current.result.error?.startsWith('No matching account ID'))return current.result;
+        if(publicResult.id){
+          if(!includeName)delete publicResult.displayName;
+          return {...publicResult,method:'Public profile source · '+publicResult.method};
+        }
+        return {error:'No matching account ID was available from this page or its public profile.'+(!publicResult.error?.startsWith('No matching account ID')&&publicResult.error?' '+publicResult.error:'')};
       }
       return {error:'The current page returned no readable source. Reload the profile, then retry.'};
     }catch{check(signal);return {error:'Gather could not read this tab. Reopen Gather using its toolbar button on the profile, then retry.'};}
@@ -127,6 +164,6 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
   const direct = await fetchSource(profile, signal);
   check(signal);
   if (direct.id || direct.accountState==='GONE' || !browserFallback) return fallbackId(direct);
-  try { return fallbackId(await readBrowserPage(profile, signal, onStage, tabOwner)); }
+  try { return fallbackId(await readBrowserPage(profile, signal, onStage, tabOwner, includeName)); }
   catch (error) { check(signal); return fallbackId({error: 'Could not read the browser page. Open the profile, then choose Find IDs on this page.'}); }
 }

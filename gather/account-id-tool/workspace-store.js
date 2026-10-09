@@ -10,7 +10,7 @@ import {forgetSearchText,forgetSearchDrafts} from './search-privacy.js';
 import {imageSearchUrl} from './image-search.js';
 import {prepareCase,resolveQuery} from './case-model.js';
 import {withoutProject,projectSignature} from './case-close.js';
-import {withHistoryLock,clearHistoryRecords,historySummary,HISTORY_EPOCH_KEY,scrubLookupArchive} from './batches.js';
+import {withHistoryLock,clearHistoryRecords,historySummary,HISTORY_EPOCH_KEY,scrubLookupArchive,recentRetentionWrites} from './batches.js';
 let queue=Promise.resolve();
 let privacyReady;
 async function removeLegacySearchData(){
@@ -120,6 +120,7 @@ export function importBackup(value,stageId=null){
     }
     // Keep conflicting legacy drafts/preferences exactly as imported, without overwriting live settings.
     if(Object.keys(conflicts).length)writes['gather.archive.'+crypto.randomUUID()]=conflicts;
+    Object.assign(writes,recentRetentionWrites({...all,...writes}));
     if(stageId){
       const staged=(await readCaptureSetting('restore-stage:'+stageId))?.value;if(!staged)throw new Error('The staged image backup is unavailable. Select the backup file again.');
       if(JSON.stringify(staged.workspaceBackup)!==JSON.stringify(value))throw new Error('The staged backup changed. Select it again.');

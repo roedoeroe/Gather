@@ -3,3 +3,5 @@
 .panel #openCaseStart{display:none}
 
 button.danger{background:#b42318;color:#fff;border:1px solid #b42318;font-weight:600}button.danger:hover{background:#8f1c13;color:#fff}button.danger:focus-visible{outline:3px solid #b42318;outline-offset:3px}button.danger:disabled{opacity:.5}.data-privacy{border-top:1px solid #d9dcdf;margin:20px 0;padding:16px 0}.data-privacy>button{margin:4px 8px 4px 0}
+
+.soc-entry{display:flex;gap:10px;align-items:end;margin:12px 0}.soc-entry .case-field{flex:1;margin:0}.soc-entry>button{margin-bottom:1px}.soc-entry-list{max-height:35vh;overflow:auto}

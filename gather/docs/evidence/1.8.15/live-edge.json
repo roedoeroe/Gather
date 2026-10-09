@@ -1,0 +1,9 @@
+{
+  "scope": "Native installed Edge, signed-out, one explicitly user-authorized public profile; no account details retained.",
+  "pageHTTP": 200,
+  "pageLoadMs": 871,
+  "lookupMs": 271,
+  "firstActionSucceeded": true,
+  "outcome": "Exact string ID returned",
+  "path": "Current page"
+}

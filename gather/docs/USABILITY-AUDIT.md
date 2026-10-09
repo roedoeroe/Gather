@@ -1,4 +1,8 @@
+> Current 1.8.13/R4 status: see [R4 reconciliation](R4-WORKFLOW-RECONCILIATION.md). Simple Case/SOC filing, five recents, direct selection and Crop handles are implemented. Native Edge reports remain open. Earlier intake/coverage and communication-composer proposals below are historical and superseded; current Reference direction is exact local retrieval only.
+
 # Gather usability audit — 1.8.11
+
+Latest steering: read [R4 workflow reconciliation](R4-WORKFLOW-RECONCILIATION.md) first. It narrows the product to Edge utilities and supersedes older coverage/intake/composer priorities. The signed-in Instagram and horizontal-selection defects reported there remain open; 1.8.12 is a tested development checkpoint, not completion of R4.
 
 ## 1.8.11 corrections from direct user testing
 
@@ -63,3 +67,7 @@ Keep ongoing-scan scheduling, sanitized archive/closure, broader evidence compar
 - Quick Parts, selected-result saving, new-scan carry-forward, query recipes and field provenance were deferred, not cancelled. The broader blueprint is not permission to build every future feature at once.
 
 See [current validation](TESTING.md) for what was actually exercised and [the handoff](NEXT-RUN-HANDOFF.md) for the next run. Do not label unverified native behavior, performance at arbitrary scale or legal compliance as guaranteed.
+
+## 1.8.12 hardening follow-through
+
+Working 1.8.11 retained as checkpoint; privacy boundaries hardened without new workflow features. Public fetch is anonymous, page parsing returns minimal validated results, storage/messages and packaging are restricted. Clear backup/clipboard limits accompany existing manual redaction and red deletion controls. Local does not mean encrypted or legally compliant. Next priority is permitted installed Edge verification and organization deployment requirements before returning to retained product features. See HARDENING-REVIEW-1.8.12.md; no earlier worthwhile goal is silently marked shipped.

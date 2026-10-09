@@ -6,4 +6,4 @@ export function workspaceLink(scanId,section='captures',captureId=null){
   url.hash=section;
   return url.href;
 }
-export function captureHistoryLink(){return chrome.runtime.getURL('workspace.html?captureScope=all#captures');}
+export function captureHistoryLink(scanId){if(scanId!==undefined){const url=new URL(workspaceLink(scanId));url.searchParams.set('captureScope',scanId?'case':'scan');return url.href;}return chrome.runtime.getURL('workspace.html?captureScope=all#captures');}

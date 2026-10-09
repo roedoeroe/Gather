@@ -29,7 +29,16 @@ export function parseIntake(raw){
   return fields;
 }
 export function normalizedSeed(value){return value.normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase('en');}
+export function prepareFilingCase(previous,input,at=Date.now()){
+  if(!Array.isArray(input.subjects)||input.subjects.length>50)fail('Add up to 50 SOCs to a case.');
+  const state=structuredClone(previous),projectId=uid(),scanId=uid();
+  state.projects.push({id:projectId,name:text(input.name,100),mode:'local',workflow:'filing',createdAt:at});
+  state.scans.push({id:scanId,projectId,name:'Captures',createdAt:at});state.activeScanId=scanId;
+  const subjects=input.subjects.map((name,index)=>{const roleId='SOC-'+String(index+1).padStart(2,'0');return {id:uid(),projectId,name:text(name,100),roleId,roleType:'SOC',mode:'local',createdAt:at,accountObservationIds:[]};});
+  state.revision++;return {state,subjects,settings:[{key:'project-label:'+projectId,value:'SOC'},...(subjects.length?[{key:'subject:'+scanId,value:subjects[0].id}]:[])],session:{names:{},values:{}},result:{id:projectId,scanId}};
+}
 export function prepareCase(previous,input,at=Date.now()){
+  if(input.workflow==='filing')return prepareFilingCase(previous,input,at);
   if(!['ephemeral','local'].includes(input.mode))fail('Choose a case retention mode.');
   if(!Array.isArray(input.fields)||input.fields.length>300)fail('Review the extracted fields.');
   const state=structuredClone(previous),projectId=uid(),scanId=uid(),counts={},subjects=[],names={},values={};

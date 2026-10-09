@@ -1,0 +1,10 @@
+{
+  "scope": "tracked and unignored candidate files",
+  "counts": {
+    "blobs": 728,
+    "archives": 24,
+    "bytes": 157152312
+  },
+  "issues": [],
+  "limits": "Credential/path patterns only; cannot classify personal names, proprietary prose or image pixels."
+}

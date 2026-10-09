@@ -1,0 +1,30 @@
+{
+  "source_package_commit": "91fdc6c3a9b32361e75a69ca896dd5576b42f1c6",
+  "verified_at_utc": "2026-10-08T20:41:47.419111+00:00",
+  "packages": [
+    {
+      "file": "Gather-1.8.13-extension.zip",
+      "bytes": 206609,
+      "sha256": "00b3452243aa39ea3a2c57f376ebbdecabb200fe6d893b6d591961fd16a5329a",
+      "crc": "passed",
+      "runtime_files_matching_source": 81,
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/91fdc6c3a9b32361e75a69ca896dd5576b42f1c6/releases/1.8.13/Gather-1.8.13-extension.zip",
+      "http_status": 200,
+      "download_sha256_matches": true,
+      "runtime_files_matching_tested_source": 81
+    },
+    {
+      "file": "Gather-1.8.13-development.zip",
+      "bytes": 14282591,
+      "sha256": "ff07edab1544e7be4d12a706cc27ef4096ebe51f328c128a3507be504281b029",
+      "crc": "passed",
+      "runtime_files_matching_source": 81,
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/91fdc6c3a9b32361e75a69ca896dd5576b42f1c6/releases/1.8.13/Gather-1.8.13-development.zip",
+      "http_status": 200,
+      "download_sha256_matches": true,
+      "runtime_files_matching_tested_source": 81
+    }
+  ],
+  "tls_verification": "enabled",
+  "native_extension_claim": false
+}

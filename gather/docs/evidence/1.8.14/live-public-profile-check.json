@@ -1,0 +1,16 @@
+{
+  "version": "1.8.14",
+  "nativeExtension": false,
+  "livePublicProfile": true,
+  "signedIn": false,
+  "missingSignedInMarkup": "controlled reproduction, not a signed-in session",
+  "accountDetailsPublished": false,
+  "httpStatus": 200,
+  "livePageLookupPassed": true,
+  "firstAttemptFallbackPassed": true,
+  "publicRequests": 1,
+  "sameOriginControlledRequests": 1,
+  "idMatchesLivePage": true,
+  "elapsedMs": 1282,
+  "scope": "Actual Chromium isolated reader, live credential-free public response; controlled missing markup and Chrome API adapter, not installed Edge."
+}

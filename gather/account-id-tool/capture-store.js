@@ -3,7 +3,7 @@ import {updateCaseSession} from './case-session.js';
 // Capture binaries deliberately live outside the 4 MiB workspace JSON.
 export const CAPTURE_DB = 'gather-captures-v1';
 export const CAPTURE_LIMITS = Object.freeze({assetBytes:64*1024*1024,captureBytes:192*1024*1024,totalBytes:512*1024*1024,records:20000});
-const DEFAULTS = {subjectLabel:'Subject',automaticExport:false,automaticCopy:true};
+const DEFAULTS = {subjectLabel:'SOC',automaticExport:false,automaticCopy:true};
 let connection;
 const uid=()=>crypto.randomUUID();
 const fail=message=>{throw new Error(message);};
@@ -44,13 +44,14 @@ export async function listSubjects(projectId){
   const db=await openCaptureDB(),tx=db.transaction('subjects','readwrite'),done=finish(tx),store=tx.objectStore('subjects');
   const subjects=(await request(store.getAll())).filter(s=>s.projectId===projectId).sort((a,b)=>a.createdAt-b.createdAt||a.id.localeCompare(b.id));
   const used=new Set(subjects.map(s=>s.roleId).filter(Boolean));let n=1;
-  for(const subject of subjects)if(!subject.roleId){while(used.has('SUBJECT-'+String(n).padStart(2,'0')))n++;subject.roleId='SUBJECT-'+String(n++).padStart(2,'0');subject.roleType='SUBJECT';subject.mode??='local';used.add(subject.roleId);store.put(subject);}await done;
+  for(const subject of subjects)if(!subject.roleId){const prefix=subject.roleType==='SOC'?'SOC':'SUBJECT';n=1;while(used.has(prefix+'-'+String(n).padStart(2,'0')))n++;subject.roleId=prefix+'-'+String(n++).padStart(2,'0');subject.roleType=prefix;subject.mode??='local';used.add(subject.roleId);store.put(subject);}await done;
   let session={},hidden=false;if(globalThis.chrome?.storage?.session){const all=await chrome.storage.session.get(null);session=all['gather.case.'+projectId]||{};hidden=all['gather.hideFriendlyLabels']===true;}
+  subjects.sort((a,b)=>a.createdAt-b.createdAt||String(a.roleId).localeCompare(String(b.roleId),'en',{numeric:true})||a.id.localeCompare(b.id));
   return subjects.map(s=>({...s,name:hidden?s.roleId:session.names?.[s.id]||s.name}));
 }
 export async function createSubject({projectId,name}){captureId(projectId);name=cleanText(name,100);if(!name)fail('Enter a subject name.');
   const state=globalThis.chrome?.storage?.local?(await chrome.storage.local.get('gather.workspace.v1'))['gather.workspace.v1']:null,mode=state?.projects.find(p=>p.id===projectId)?.mode||'local';
-  const subject={id:uid(),projectId,name:mode==='ephemeral'?'Subject':name,mode,createdAt:Date.now(),accountObservationIds:[]};await writeOne('subjects',subject);const migrated=(await listSubjects(projectId)).find(s=>s.id===subject.id);
+  const subject={id:uid(),projectId,roleType:state?.projects.find(p=>p.id===projectId)?.workflow==='filing'?'SOC':'SUBJECT',name:mode==='ephemeral'?'Subject':name,mode,createdAt:Date.now(),accountObservationIds:[]};await writeOne('subjects',subject);const migrated=(await listSubjects(projectId)).find(s=>s.id===subject.id);
   if(mode==='ephemeral'){await updateCaseSession(projectId,value=>({...value,names:{...value.names,[subject.id]:name}}));await writeOne('subjects',{...subject,roleId:migrated.roleId,roleType:migrated.roleType,name:migrated.roleId});}
   return {...migrated,name};}
 

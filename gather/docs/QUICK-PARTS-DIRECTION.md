@@ -1,3 +1,5 @@
+> Current 1.8.13/R4 status: see [R4 reconciliation](R4-WORKFLOW-RECONCILIATION.md). Simple Case/SOC filing, five recents, direct selection and Crop handles are implemented. Native Edge reports remain open. Earlier intake/coverage and communication-composer proposals below are historical and superseded; current Reference direction is exact local retrieval only.
+
 # Quick Parts / Reference Library — proposed first implementation
 
 Status: design/backlog after the 1.8.6 capture stabilization checkpoint; **no Reference Library engine or composer is shipped yet**. The supplied Optimized Design Engineering Steer R3 was read as product guidance; it does not turn every phase into this release's scope. The [goals audit](GOALS-AUDIT.md) preserves the later refinements and earlier product goals. The first implementation remains generic and local, with fictional language. Real reference exports are not present; their availability does not block engine/interaction work. Verify source labels and conversion fidelity before calling imported material approved.

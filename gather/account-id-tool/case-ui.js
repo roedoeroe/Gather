@@ -50,26 +50,14 @@ async function previewClipboard(kind,scope){
   d.onclose=()=>{clipboardPreviews.delete(preview);out.value='';snapshot=null;d.remove();};
   await validate();
 }
-async function startCase(raw=''){
-  const {d,body,error,actions}=dialog('New case'),name=input('',100),scanName=input('Initial scan'),mode=el('select'),paste=el('textarea'),preview=el('div'),intake=el('details',undefined,'intake-options');
-  name.placeholder='e.g. Northbridge';scanName.placeholder='e.g. October review';
-  mode.append(new Option('Session only — release approved names on restart','ephemeral'),new Option('Keep locally — retain approved names until removed','local'));
-  paste.maxLength=100000;paste.rows=7;paste.placeholder='SOC: Alex Example\nSchool: Northbridge School\nUsername: alex.example';paste.value=raw;intake.open=Boolean(raw);
-  body.append(field('Case name',name),field('First scan',scanName),el('p','Saved in this browser. Gather does not upload or sync your cases.','micro'));
-  intake.append(el('summary','Add intake to prepare searches (optional)'),el('p','Review extracted fields before retaining them. Saved findings and screenshots may contain names regardless of this choice.','micro'),field('Remember approved intake',mode),field('Paste intake for local review',paste));body.append(intake);
-  let fields=[],reviewedText=null;const rows=new Map();
-  const updateSave=()=>{save.disabled=!name.value.trim()||!scanName.value.trim()||Boolean(paste.value.trim()&&reviewedText!==paste.value);};
-  const review=button('Review extracted fields',()=>{fields=parseIntake(paste.value);reviewedText=paste.value;rows.clear();preview.replaceChildren();for(const f of fields){const row=el('div',undefined,'case-review-row'),keep=el('input');keep.type='checkbox';keep.checked=f.keep;keep.setAttribute('aria-label','Retain '+f.label);const kind=el('select');kind.setAttribute('aria-label','Field type');for(const k of SEED_KINDS)kind.append(new Option(k,k));kind.value=f.kind;const value=input(f.value,2000);value.setAttribute('aria-label','Reviewed value');row.append(keep,kind,value,el('small',f.reason));rows.set(f.id,{keep,kind,value});preview.append(row);}updateSave();});intake.append(review,preview);
-  const save=button('Create case',async()=>{save.disabled=true;try{
-    if(paste.value.trim()&&reviewedText!==paste.value)throw new Error('Review the updated intake before creating the case.');
-    const hasIntake=Boolean(paste.value.trim()),reviewed=fields.map(f=>({...f,keep:rows.get(f.id).keep.checked,kind:rows.get(f.id).kind.value,value:rows.get(f.id).value.value}));
-    if(hasIntake)await request('workspace.caseCreate',{input:{name:name.value,scanName:scanName.value,mode:mode.value,fields:reviewed}});
-    else await act({type:'project.create',name:name.value,scanName:scanName.value});
-    d.close();await refresh();status.textContent=hasIntake?'Case created. Your search plan is ready.':'Case created. Start a search or add a finding.';
-    document.dispatchEvent(new CustomEvent('gather:navigate',{detail:hasIntake?'case':'research'}));document.dispatchEvent(new Event('gather:captures-changed'));
-  }catch(e){error.textContent=e.message;}finally{updateSave();}});save.className='primary';actions.append(save);updateSave();
-  name.oninput=scanName.oninput=updateSave;paste.oninput=()=>{reviewedText=null;fields=[];rows.clear();preview.replaceChildren();updateSave();};
-  d.onclose=()=>{raw='';paste.value='';fields=[];for(const row of rows.values())row.value.value='';rows.clear();d.remove();};name.focus();
+async function startCase(){
+  const {d,body,error,actions}=dialog('New case'),name=input('',100),rows=el('div',undefined,'soc-entry-list');name.placeholder='e.g. CASE-28175';
+  body.append(field('Case name',name),el('p','Use a non-identifying case label. Cases and SOCs stay in this browser.','micro'),rows);
+  const subjects=[];
+  const updateSave=()=>{save.disabled=!name.value.trim()||subjects.some(row=>!row.value.value.trim());};
+  const addSoc=()=>{if(subjects.length>=50)return;const row=el('div',undefined,'soc-entry'),value=input('SOC-'+String(subjects.length+1).padStart(2,'0'),100);value.placeholder='e.g. SOC-01';const item={row,value};subjects.push(item);row.append(field('SOC '+subjects.length,value),button('Remove',()=>{subjects.splice(subjects.indexOf(item),1);row.remove();updateSave();}));rows.append(row);value.oninput=updateSave;updateSave();return value;};
+  const add=button('+ Add SOC',()=>addSoc()?.focus());body.append(add);
+  const save=button('Create case',async()=>{try{await request('workspace.caseCreate',{input:{workflow:'filing',name:name.value,subjects:subjects.map(s=>s.value.value)}});d.close();await refresh();document.dispatchEvent(new CustomEvent('gather:navigate',{detail:'captures'}));document.dispatchEvent(new Event('gather:captures-changed'));status.textContent='Case created. Choose its SOC when saving a capture.';}catch(e){error.textContent=e.message;}finally{updateSave();}});save.className='primary';actions.append(save);name.oninput=updateSave;addSoc();name.focus();
 }
 const heading=el('div',undefined,'section-heading'),title=el('h2','Search plan & coverage'),summary=el('p','','micro'),actions=el('div',undefined,'case-actions'),content=el('div');
 heading.append(title);host.append(heading,summary,actions,content);document.getElementById('workspaceStatus').append(status);status.classList.add('workspace-status');
@@ -81,7 +69,7 @@ async function closeCase(){
   const store=await import('./capture-store.js'),{projectSignature}=await import('./case-close.js');
   const reviewed=(await request('workspace.state')).state,bundle=await store.snapshotCaptureBundle();
   const guard={revision:reviewed.revision,digest:await store.hashBytes(new Blob([projectSignature(bundle,frozenProject)]))};
-  body.append(el('p',frozenName),el('p',`${reviewed.items.filter(i=>i.projectId===frozenProject).length} saved findings · ${bundle.captures.filter(c=>c.projectId===frozenProject).length} captures · ${bundle.subjects.filter(s=>s.projectId===frozenProject).length} subjects`),el('p','Deletes this case, scans, saved findings, tasks, searches, subjects, images (including originals and derivatives), case context and associated recent lookups from Gather. Other cases remain.'),el('p','A backup is optional and creates a separate file containing original, unredacted images. Downloaded files, browser history, clipboard contents and external sites are not cleared. This is logical deletion, not forensic erasure.','micro'));
+  body.append(el('p',frozenName),el('p',`${reviewed.items.filter(i=>i.projectId===frozenProject).length} saved findings · ${bundle.captures.filter(c=>c.projectId===frozenProject).length} captures · ${bundle.subjects.filter(s=>s.projectId===frozenProject).length} subjects`),el('p','Deletes this case, scans, saved findings, tasks, searches, subjects, images (including originals and derivatives), case context and associated recent lookups from Gather. Other cases remain.'),el('p','A backup is optional and creates a separate, unencrypted file containing case data and original, unredacted images. Anyone with the file can read it. Downloaded files, browser history, clipboard contents and external sites are not cleared. This is logical deletion, not forensic erasure.','micro'));
   const verify=input('',100);verify.placeholder='Enter the exact case name shown above';body.append(field('Type the case name to confirm deletion: '+frozenName,verify));
   let deleting=false;
   const remove=async withBackup=>{if(deleting)return;deleting=true;for(const b of actions.querySelectorAll('.danger'))b.disabled=true;try{
@@ -117,7 +105,7 @@ async function refresh(){
   if(!project){summary.textContent='Inbox works without a case. Select a case from the library, or use New case to organize subjects and research.';return;}
   const seeds=state.research?.seeds.filter(s=>s.projectId===project.id)||[],session=await sessionFor(project.id),selected=await selectedSubject(scan.id);if(ticket!==serial)return;
   summary.textContent=(project.mode==='ephemeral'?'Ephemeral Case · friendly labels and seed values are session-only':project.mode==='local'?'Local Case · approved context retained on this device':'Local project')+(seeds.length?' · '+seeds.length+' approved fields':'');
-  if(!seeds.length){host.hidden=panel;summary.textContent+=' · Use Research for searches and findings. Add subjects above when you need them.';return;}
+  if(!seeds.length){host.hidden=true;summary.textContent+=' · Use Research for searches and findings. Add subjects above when you need them.';return;}
   const chips=el('div',undefined,'case-actions');for(const subject of subjects.slice(0,6)){const chip=button(subject.roleId,async()=>{await selectSubject(scan.id,subject.id,project.id);await refresh();});chip.setAttribute('aria-pressed',String(subject.id===selected));chips.append(chip);}content.append(chips);
   const rows=state.research.queue.filter(q=>q.scanId===scan.id),next=rows.find(q=>q.status==='ready'&&(!selected||q.subjectId===selected))||rows.find(q=>q.status==='ready');
   if(next)actions.append(button('Launch next search ↗',async()=>{await request('workspace.launchQueued',{id:next.id});await refresh();}));
@@ -138,7 +126,7 @@ async function refresh(){
 }
 let timer;function schedule(){for(const preview of clipboardPreviews)preview.recheck();clearTimeout(timer);timer=setTimeout(()=>refresh().catch(e=>status.textContent=e.message),70);}
 chrome.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes['gather.workspace.v1']||area==='session')schedule();});window.addEventListener('focus',schedule);if(globalThis.BroadcastChannel){const channel=new BroadcastChannel('gather-captures');channel.onmessage=schedule;window.addEventListener('pagehide',()=>channel.close());}
-let pending=(await chrome.storage.session.get('gather.caseSelection'))['gather.caseSelection'];if(pending&&!panel){await chrome.storage.session.remove('gather.caseSelection');await startCase(pending.text);pending.text='';pending=null;}
+let pending=(await chrome.storage.session.get('gather.caseSelection'))['gather.caseSelection'];if(pending&&!panel){await chrome.storage.session.remove('gather.caseSelection');pending.text='';pending=null;}
 refresh().catch(e=>status.textContent=e.message);
 
 document.getElementById('openCaseStart')?.addEventListener('click',()=>startCase().catch(e=>status.textContent=e.message));

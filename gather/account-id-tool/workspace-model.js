@@ -27,7 +27,7 @@ export function context(state,scanId) {
 export function destinationLabel(state,scanId) {
   if(scanId===null)return 'Inbox';
   const s=state.scans.find(x=>x.id===scanId),p=state.projects.find(x=>x.id===s?.projectId);
-  return s&&p?p.name+' / '+s.name:'Unavailable scan';
+  return s&&p?(p.workflow==='filing'&&state.scans.filter(x=>x.projectId===p.id).length===1?p.name:p.name+' / '+s.name):'Unavailable scan';
 }
 export function searchUrl(provider,query) {
   const q=text(query,2000,true);if(!Object.hasOwn(PROVIDERS,provider))fail('Choose a search provider.');

@@ -5,12 +5,16 @@ import hashlib
 import json
 from pathlib import Path
 import zipfile
+import subprocess
+import sys
+from privacy_gate import check_files
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--source', type=Path, default=Path(__file__).resolve().parents[1])
 parser.add_argument('--out', type=Path, default=Path(__file__).resolve().parents[2] / 'dist')
 args = parser.parse_args()
 source, out = args.source.resolve(), args.out.resolve()
+if out == source or source in out.parents: raise SystemExit('Package output must be outside the source tree.')
 extension = source / 'account-id-tool'
 manifest = json.loads((extension / 'manifest.json').read_text())
 version = manifest['version']
@@ -20,6 +24,12 @@ assert '<all_urls>' not in manifest.get('host_permissions', [])
 assert 'tabs' not in manifest['permissions']
 for name in [manifest['action']['default_popup'], manifest['background']['service_worker'], manifest['side_panel']['default_path'].split('?')[0]]:
     assert (extension / name).is_file(), name
+subprocess.run([sys.executable, str(source / 'scripts' / 'build-profile-reader.py'), '--check'], check=True)
+# Review every candidate before excluding build caches; private packs must never
+# be silently added to either ZIP by a broad recursive include.
+cache_parts={'.git','node_modules','.tools','test-artifacts','__pycache__'}
+candidates=[p for p in source.rglob('*') if p.is_file() and not any(part in cache_parts for part in p.relative_to(source).parts)]
+check_files(source, candidates)
 out.mkdir(parents=True, exist_ok=True)
 hashes = {str(p.relative_to(source)): hashlib.sha256(p.read_bytes()).hexdigest()
           for p in sorted(extension.rglob('*')) if p.is_file()}

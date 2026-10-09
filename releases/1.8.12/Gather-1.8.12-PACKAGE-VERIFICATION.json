@@ -1,0 +1,42 @@
+{
+  "version": "1.8.12",
+  "packages": [
+    {
+      "file": "Gather-1.8.12-extension.zip",
+      "bytes": 204091,
+      "sha256": "af0b537315649edda6af3ea36759c6ce8c7b9725edb54a33708f3367b5ef1183",
+      "crc": "passed",
+      "runtimeFilesMatched": 80,
+      "extractedTestedRuntimeMatched": true
+    },
+    {
+      "file": "Gather-1.8.12-development.zip",
+      "bytes": 13964169,
+      "sha256": "53710765805ce2653d3f964076281ad73385ad6790d61132f41c798186ddac8c",
+      "crc": "passed",
+      "runtimeFilesMatched": 80,
+      "extractedTestedRuntimeMatched": true
+    }
+  ],
+  "permissionsUnchanged": true,
+  "storageSchemaUnchanged": true,
+  "original1811PackagesUnchanged": true,
+  "nodeTests": 191,
+  "renderedWorkflowGroups": 105,
+  "realWorkerGroups": 10,
+  "realIsolatedWorldGroups": 5,
+  "dpr2RepeatedGroups": 16,
+  "native": {
+    "status": "blocked",
+    "exit": 2,
+    "groupsPassed": 0
+  },
+  "livePlatform": "not rerun in 1.8.12",
+  "extractedGates": {
+    "node": 191,
+    "toolbar": 24,
+    "worker": 10,
+    "isolatedReader": 5
+  },
+  "releaseStatus": "development checkpoint; R4 reported defects/native Edge work pending"
+}

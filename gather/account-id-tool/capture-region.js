@@ -1,9 +1,9 @@
-import {CAPTURE_LIMITS,CaptureStopped,browserCaptureAdapter,cropImage} from './capture-engine.js';
+import {CAPTURE_LIMITS,CaptureStopped,browserCaptureAdapter,cropImage,exactSelectionBounds} from './capture-engine.js';
 
 // A selected document region uses only the top-level page. It does not turn a
 // nested feed into an archive, nor use timing/URL guesses to identify the tab.
 export function regionPlan(metrics,rect,scale=metrics.devicePixelRatio||1,limits=CAPTURE_LIMITS){
-  if(![rect.x,rect.y,rect.width,rect.height,scale].every(Number.isFinite)||rect.width<1||rect.height<1||scale<=0||rect.x<metrics.scrollX||rect.x+rect.width>metrics.scrollX+metrics.width+1||rect.y<0||rect.y>=metrics.totalHeight)throw new Error('The selected page region is unavailable. Start a new selection.');
+  if(![rect.x,rect.y,rect.width,rect.height,scale].every(Number.isFinite)||rect.width<1||rect.height<1||scale<=0||rect.x<metrics.scrollX||rect.x+rect.width>metrics.scrollX+metrics.width+1e-7||rect.y<0||rect.y>=metrics.totalHeight)throw new Error('The selected page region is unavailable. Start a new selection.');
   const originY=Math.min(rect.y,Math.max(0,metrics.totalHeight-metrics.height));
   const width=Math.ceil(metrics.width*scale),maxCssHeight=Math.min(limits.maxHeight,Math.floor(limits.maxPixels/width/scale),metrics.height*limits.maxTiles);
   const bottom=Math.min(rect.y+rect.height,metrics.totalHeight,originY+maxCssHeight);
@@ -21,7 +21,9 @@ export async function acquireRegionCapture({source,selection,signal,onProgress=(
     if(availableBottom<=selection.documentRect.y)throw new Error('No selected pixels could be captured.');
     const stitched=await api.compose(tiles,{...plan,height});
     const rect={x:Math.floor((plan.rect.x-plan.originX)*plan.scale),y:Math.floor((plan.rect.y-plan.originY)*plan.scale),width:Math.ceil((plan.rect.x+plan.rect.width-plan.originX)*plan.scale)-Math.floor((plan.rect.x-plan.originX)*plan.scale),height:Math.ceil((availableBottom-plan.originY)*plan.scale)-Math.floor((plan.rect.y-plan.originY)*plan.scale)};
-    const selected=await (api.crop||cropImage)(stitched,rect);
+    const verified=exactSelectionBounds(rect,plan.width,height);
+    const selected=await (api.crop||cropImage)(stitched,verified);
+    if(selected.bounds.width!==verified.width||selected.bounds.height!==verified.height)throw new Error('The stored selection would omit selected pixels. Capture a smaller area and retry.');
     return {assets:[{blob:selected.blob,role:'derivative',kind:'selection',dimensions:{width:selected.bounds.width,height:selected.bounds.height},crop:selected.bounds},...tiles],dimensions:{width:selected.bounds.width,height:selected.bounds.height},crop:selected.bounds,scale:plan.scale,status,coordinates:{scrollX:metrics.scrollX,scrollY:metrics.scrollY,viewportWidth:metrics.width,viewportHeight:metrics.height,requestedDocumentRect:selection.documentRect,capturedDocumentRect:{...plan.rect,height:availableBottom-plan.rect.y},initialPageHeight:metrics.totalHeight,tiles:tiles.map(t=>t.coordinates)},technical:{selectionMethod:'page',scrollingSelection:true,selectionViewport:selection.viewport},limitations};
   };
   try{
@@ -39,7 +41,7 @@ export async function acquireRegionCapture({source,selection,signal,onProgress=(
       const wait=bounds.intervalMs-(api.now()-lastShot);if(wait>0)await api.sleep(wait,signal);await guard();
       const before=await api.page('state',token),blob=await api.screenshot();lastShot=api.now();await guard();
       const after=await api.page('state',token),dimensions=await api.dimensions(blob),scale=dimensions.width/after.width;
-      if(['width','height','devicePixelRatio','visualScale'].some(k=>before[k]!==after[k]||after[k]!==metrics[k])||Math.abs(before.scrollY-after.scrollY)>1||after.scrollX!==metrics.scrollX||Math.abs(after.scrollY-plan.positions[index])>2||Math.abs(dimensions.height/after.height-scale)>0.02)throw new CaptureStopped('The source moved or changed zoom during capture.');
+      if(['width','height','devicePixelRatio','visualScale'].some(k=>before[k]!==after[k]||after[k]!==metrics[k])||Math.abs(before.scrollY-after.scrollY)>1||after.scrollX!==metrics.scrollX||Math.abs(after.scrollY-plan.positions[index])>2||Math.abs(dimensions.height/after.height-scale)*Math.min(after.width,after.height)>2)throw new CaptureStopped('The source moved or changed zoom during capture.');
       if(!tiles.length)plan=regionPlan(metrics,selection.documentRect,scale,bounds);
       else if(Math.abs(scale-plan.scale)>0.01)throw new CaptureStopped('The screenshot scale changed during capture.');
       lastMetrics=after;tiles.push({blob,role:'tile',index,dimensions,coordinates:{x:after.scrollX,y:after.scrollY,width:after.width,height:after.height}});

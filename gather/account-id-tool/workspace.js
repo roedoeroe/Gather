@@ -31,14 +31,14 @@ function setView(next,{clearFilter=false}={}){viewQueries.set(view,$('localSearc
 function render(){
   const restoreFocus=retainFocus(document.querySelector('main'));const restoreLibraryFocus=retainFocus($('projects'));
   const scan=state.scans.find(x=>x.id===currentScan()),project=state.projects.find(x=>x.id===scan?.projectId);
-  $('projectName').textContent=project?.name||'YOUR LIBRARY';$('scanName').textContent=scan?.name||'Inbox';
-  $('scanHelp').textContent=scan?'Research saved to this scan.':'Save findings here. A case is optional.';
-  $('saveDestination').textContent='Destination: '+label(currentScan());$('savePage').textContent='Save page to '+label(currentScan());if(isPanel)renderTabContext();$('newScan').hidden=!scan;$('renameContext').hidden=!scan;
+  $('projectName').textContent=project?.workflow==='filing'?'CASE':project?.name||'YOUR LIBRARY';$('scanName').textContent=project?.workflow==='filing'?project.name:scan?.name||'Inbox';
+  $('scanHelp').textContent=project?.workflow==='filing'?'Captures and findings stay in this case. Choose a SOC below.':scan?'Research saved to this scan.':'Save findings here. A case is optional.';
+  $('saveDestination').textContent='Destination: '+label(currentScan());$('savePage').textContent='Save page to '+label(currentScan());if(isPanel)renderTabContext();$('newScan').hidden=!scan||project?.workflow==='filing';$('renameContext').hidden=!scan;
   setCaseAvailable(Boolean(project));
   $('libraryToggle').textContent='Library · '+(project?.name||'Inbox')+' ▾';
   $('inboxCount').textContent=state.items.filter(x=>x.scanId===null).length;$('inboxCount').hidden=Number($('inboxCount').textContent)===0;$('inbox').classList.toggle('selected',state.activeScanId===null);
   $('projects').replaceChildren();
-  for(const p of state.projects){$('projects').append(make('div','project-label',p.name));for(const s of state.scans.filter(s=>s.projectId===p.id))$('projects').append(Object.assign(button(s.name,()=>selectScan(s.id),'scan'+(state.activeScanId===s.id?' selected':'')),{id:'scan-'+s.id}));}
+  for(const p of state.projects){if(p.workflow==='filing'&&state.scans.filter(s=>s.projectId===p.id).length===1){const s=state.scans.find(s=>s.projectId===p.id);$('projects').append(Object.assign(button(p.name,()=>selectScan(s.id),'scan'+(state.activeScanId===s.id?' selected':'')),{id:'scan-'+s.id}));continue;}$('projects').append(make('div','project-label',p.name));for(const s of state.scans.filter(s=>s.projectId===p.id))$('projects').append(Object.assign(button(s.name,()=>selectScan(s.id),'scan'+(state.activeScanId===s.id?' selected':'')),{id:'scan-'+s.id}));}
   if(!state.projects.length)$('projects').append(make('p','quiet','No cases yet. Use New case when you need one.'));
   $('reviewCount').textContent=rows('items').filter(x=>['unreviewed','follow-up'].includes(x.review)).length;
   $('taskCount').textContent=rows('tasks').filter(x=>x.status==='open').length;
@@ -110,7 +110,7 @@ $('undoAction').onclick=()=>safely(async()=>{const eventId=undoId;$('undoAction'
 $('closeHistory').onclick=()=>$('historyDialog').close();
 $('editorForm').addEventListener('submit',async event=>{event.preventDefault();$('submitEdit').disabled=true;try{await editorSave(Object.fromEntries(new FormData(event.target)));$('editor').close();message('Saved.');}catch(error){$('editorError').textContent=error.message;}finally{$('submitEdit').disabled=false;}});
 $('cancelEdit').onclick=()=>$('editor').close();
-$('renameContext').onclick=()=>{const scan=state.scans.find(x=>x.id===state.activeScanId),project=state.projects.find(x=>x.id===scan.projectId);openEditor('Rename case and scan',[{name:'projectName',label:'Case name',value:project.name,max:100},{name:'scanName',label:'Scan name',value:scan.name,max:100}],v=>action({type:'context.rename',scanId:scan.id,...v}),scan.id);};
+$('renameContext').onclick=()=>{const scan=state.scans.find(x=>x.id===state.activeScanId),project=state.projects.find(x=>x.id===scan.projectId);openEditor(project.workflow==='filing'?'Rename case':'Rename case and scan',[{name:'projectName',label:'Case name',value:project.name,max:100},...(project.workflow==='filing'?[]:[{name:'scanName',label:'Scan name',value:scan.name,max:100}])],v=>action({type:'context.rename',scanId:scan.id,scanName:scan.name,...v}),scan.id);};
 $('newScan').onclick=()=>{const projectId=state.scans.find(s=>s.id===state.activeScanId).projectId;openEditor('New scan',[{name:'name',label:'Scan name',max:100}],values=>action({type:'scan.create',projectId,...values}));};
 $('inbox').onclick=()=>safely(()=>selectScan(null));
 $('addSource').onclick=()=>{const scanId=currentScan();openEditor('Save a source',[{name:'url',label:'Source URL',type:'url',max:4096},{name:'title',label:'Title',required:false},{name:'excerpt',label:'Selected excerpt (optional)',type:'textarea',max:20000,required:false}],v=>action({type:'item.save',kind:'source',scanId,...v}),scanId);};

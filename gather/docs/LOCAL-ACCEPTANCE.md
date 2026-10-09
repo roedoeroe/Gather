@@ -41,7 +41,7 @@ If opening still fails, the browser Extensions page lists errors for Gather. Rec
 
 ## New capture acceptance
 
-- Choose Select area & copy from the toolbar on a controlled page. Drag/release on the page, paste the image into an image-capable local application, and verify its exact bounds with no overlay. Check high-DPI screens and native browser zoom. Keyboard: Tab to Precise selection, Enter, enter coordinates, then Capture selection.
+- Choose Select area from the toolbar (with Auto-copy screenshots enabled) on a controlled page. Drag/release on the page, paste the image into an image-capable local application, and verify its exact bounds with no overlay. Check high-DPI screens and native browser zoom. Keyboard: Tab to Precise selection, Enter, enter coordinates, then Capture selection.
 - Cancel with Escape, close the controller, resize/navigate/switch the source tab, and verify selector/page scroll/styles restore. No other tab image may be saved. Reopen Gather after worker suspension and repeat.
 - Save PNG and JPEG through the real save dialog; cancel/deny and retry. Verify no overwrite, the local capture remains, and folder-export state is separate. Print / Save PDF must use only the selected derivative and keep source captions outside pixels; verify actual page boundaries on long images.
 - Open History: saved screenshots appear grouped by case/scan; Filters reveals attempts, status and case/scan choices. Browsing all cases must leave the current save destination unchanged. Export must identify its scan.
@@ -66,13 +66,13 @@ If opening still fails, the browser Extensions page lists errors for Gather. Rec
 
 On a disposable fictional page, drag a selection, scroll down while holding, and release. Guides should reach all viewport edges; the copied rectangle should include the extended content and remain in the original scan. Cancel a second extended drag and verify the starting scroll position returns. Try upward/reverse drag and browser zoom/high-DPI. Nested scroll containers remain visible-only.
 
-In Edit image draw a red arrow, red circle and a black redaction, then Save & copy. Paste into your normal document app and inspect the pixels. Crop/Undo/precise coordinates should work; original bytes remain in a private backup. Auto-copy screenshots can be turned off/reopened; Select area & copy still deliberately copies. Toggle account-ID auto-copy separately. Denied clipboard access keeps the image and explicit Copy retries. Single-image print source details start off.
+In Edit image draw a red arrow, red circle and a black redaction, then Save & copy. Paste into your normal document app and inspect the pixels. Crop/Undo/precise coordinates should work; original bytes remain in a private backup. Auto-copy screenshots can be turned off/reopened; Select area still deliberately copies. Toggle account-ID auto-copy separately. Denied clipboard access keeps the image and explicit Copy retries. Single-image print source details start off.
 
 Review sheets must clear stale images if the selected derivative changes in another Gather window. Confirm edited PNG export, denied folder retry, private binary restore and deletion with disposable data. These are native installed-browser checks, not instructions to upload private data or make cases public.
 
 ## Usability checkpoint
 
-With a supported profile open and no pasted input, Find IDs on this page should be enabled. A pasted link takes priority. Opening the popup alone must not start a lookup. Filter Findings, switch to Tasks/History, then return; each view should keep its own filter. A scan change clears them. Draw a manual mark or edit a caption, choose Close, then Cancel; the edits must remain. Save edits, then Close without a discard prompt. Check the browser's native tab-close/reload prompt separately with unsaved work.
+With a supported profile open and no pasted input, Find IDs on this page should be enabled. A pasted link takes priority. Opening the toolbar on a supported profile starts its lookup when there is no staged pasted draft. A draft must remain intact. Auto-copy IDs is independent of manual details format and screenshot auto-copy. Filter Findings, switch to Tasks/History, then return; each view should keep its own filter. A scan change clears them. Draw a manual mark or edit a caption, choose Close, then Cancel; the edits must remain. Save edits, then Close without a discard prompt. Check the browser's native tab-close/reload prompt separately with unsaved work.
 
 ## Search and source-read changes
 
@@ -80,3 +80,14 @@ With a supported profile open and no pasted input, Find IDs on this page should 
 - Switch to Reverse image. Select TinEye (or another provider), Open image search, and choose an image yourself there. Gather must not upload/read any image or clipboard content automatically. Confirm the result tab keeps the original scan after a workspace switch.
 - Open a supported profile, then Find IDs on this page. If hydrated data is missing, Gather should read source automatically. Check the final exact ID against that profile; test navigation/cancellation and login-required recovery. No automatic extractor can guarantee every platform’s markup/access state.
 - Confirm old search text/drafts are absent after update and old-backup restore, with saved findings/captures preserved. Check only fictional data. Query-free legacy references remain internal; older releases may reject them, so do not downgrade the active profile in place.
+
+
+## 1.8.13 R4 checks on permitted Windows Edge
+
+Create CASE-28175 with SOC-01 and SOC-02. Confirm the primary Select area action is visible after a profile resolves. Test visible and scrolling selected rectangles with unique colored markers at every corner, every edge midpoint and center at 80/100/125/150/200% native browser zoom and actual Windows DPI settings. Compare saved image, clipboard paste and PNG/JPEG dimensions; no selected horizontal content may disappear. Capture cancellation must restore page position/styles.
+
+Edit image → Crop: resize sides/corners at different viewing sizes, move, Reset, Cancel, then Apply and Undo. Nothing is cropped until Apply. Manual redaction remains opaque in copied/saved derivatives; originals stay only in Gather/private backup.
+
+New case has no intake, retention or scan wizard. Same-named SOCs remain separate; rename preserves history. All captures/Unassigned/SOC history filters must not alter filing. Start delayed Northbridge/SOC capture, switch default to Southridge, and confirm original assignment. Six lookups retain the newest five; old open windows cannot recreate evicted content. Clear recent leaves saved findings/images.
+
+Repeat the previously failing authorized signed-in Instagram profile. Retry reads the same current profile/source automatically. An unrelated viewer/recommendation ID is never a substitute. Native results must be reported separately from cloud fixtures; do not publish raw signed-in HTML or real case screenshots to diagnose it.

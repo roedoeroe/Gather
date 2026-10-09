@@ -1,46 +1,70 @@
-# Gather
+<p align="center">
+  <img src=".github/images/gather.svg" width="56" height="56" alt="Gather">
+</p>
 
-A local browser extension for fast account lookup, deliberate research and screenshot capture.
+<h1 align="center">Gather</h1>
 
-**Open a profile → Gather → inspect or copy.** A project is optional. For longer work, resume a scan, search, save findings deliberately, review and export.
+<p align="center">Account lookup. Screenshots. Organized research.</p>
 
-## Get the current build
+<p align="center">
+  <strong><a href="https://raw.githubusercontent.com/roedoeroe/Gather/ef8836502afade34c6e489ce182bc5a80a0aad0e/releases/1.8.15/Gather-1.8.15-extension.zip">Download Gather 1.8.15 RC</a></strong>
+  · <a href="#install-or-update">Install or update</a>
+  · <a href="https://github.com/roedoeroe/Gather/releases/tag/1.8.15-rc.1">Release notes</a>
+</p>
 
-**[Download Gather 1.8.11](https://raw.githubusercontent.com/roedoeroe/Gather/29dd714087235820d389996d85b9178fa5ee2f15/releases/1.8.11/Gather-1.8.11-extension.zip)** · Development build for Chrome and Edge
+Gather is a local browser extension that takes the repetitive work out of research. **Open a profile → Gather → inspect or copy.** Start immediately; a case is optional.
 
-[Source/test package](releases/1.8.11/Gather-1.8.11-development.zip) · [SHA-256 checksums](releases/1.8.11/Gather-1.8.11-SHA256SUMS.txt) · [Delivery notes](releases/1.8.11/Gather-1.8.11-DELIVERY.md)
+- **Look up accounts.** Find and copy exact platform IDs from Instagram, Facebook, Threads, TikTok and YouTube.
+- **Capture what matters.** Select an area, scroll to extend it, or capture the visible/full page. Copy the image or edit it with crop, arrows, circles and manual black redactions.
+- **Keep work together.** Save chosen findings and captures to a Case/SOC. Resume in a workspace organized into Research, Captures, Case and Settings.
 
-Choose `Gather-1.8.11-extension.zip`, extract it to a permanent folder, and load its **account-id-tool** directory from your browser's Extensions page with Developer mode enabled. For an update, replace all files at the same installed path and Reload; do not uninstall or clear storage. See the [installation and rollback guide](gather/README.md#install-or-update).
+<p align="center">
+  <img src=".github/images/lookup.png" width="350" alt="Gather toolbar showing a fictional account ID, Copy IDs, Case and SOC selectors, and three screenshot actions">
+  <br><sub>Actual Gather interface with fictional demonstration data.</sub>
+</p>
 
-The development source is maintained on **develop/1.8.0-r3**; the branch name is historical, while the current extension version is **1.8.11**. Delivery notes pin release ZIPs to their source/package commit. Main is unchanged.
+<details>
+<summary>See the image editor</summary>
 
-1.8.11 launches searches without saved queries/drafts, adds reverse-image provider launching and reads missing profile source automatically. Gray field examples and clear saved-item labels improve everyday use; capture history refreshes without flicker. No new permissions. Old search text is cleaned up while deliberate findings/images remain. See the [search and lookup changes](gather/docs/SEARCH-AND-LOOKUP-1.8.11.md).
+<p><img src=".github/images/image-editor.png" alt="Gather image editor with a red arrow, red circle and manual black redaction on a fictional screenshot"></p>
 
-## Capture directly from the toolbar
+Edits are saved separately from the original. Choose what to mark, review the result, then copy or save it.
 
-Choose **Select area & copy** to drag directly on the page, save locally and copy the image. **Full page**, **Visible area**, and **Select area** remain direct actions with a visible destination. Saved images offer PNG/JPEG save, Print / Save PDF, editing and history grouped by case/scan. The side panel is optional.
+</details>
 
-**Research · Captures · Case · Settings** separates daily work from management. New cases can start without intake. The side panel is optional.
+## Install or update
 
-## Local by design
+**You only need the extension ZIP.**
 
-Cases, findings, captures and lookup history stay in the browser on your computer. Gather has no case server, cloud sync or analytics. Web searches open without retaining queries in Gather. Your browser and chosen services may keep their own history. Profile lookups contact the selected platform. Exports create separate files.
+1. [Download Gather](https://raw.githubusercontent.com/roedoeroe/Gather/ef8836502afade34c6e489ce182bc5a80a0aad0e/releases/1.8.15/Gather-1.8.15-extension.zip) and extract the ZIP into a permanent folder.
+2. In Edge, open `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select **account-id-tool**. Your organization must allow unpacked extensions.
+3. Pin Gather in the browser toolbar, open a supported profile, and click Gather. **Help** is available in the popup, side panel and workspace.
 
-Workspace → **Settings → Data & Privacy** offers red **Delete case…** and **Clear recent lookup history…** controls. Case deletion requires its name and offers an optional backup. Clearing recent lookups preserves saved cases and images. Capture history also offers red individual/selected-capture deletion with confirmation. Browser history, clipboard and downloaded files are outside those controls.
+**Already using Gather?** Finish captures and close Gather windows. Replace all files in the **same installed account-id-tool folder**, then click **Reload** at `edge://extensions`. Confirm **1.8.15**. Do not uninstall or clear storage to update. Keep the previous version and a matching private backup for rollback testing in a separate browser profile.
 
-## Verification
+[Quick Start — read online](https://github.com/roedoeroe/Gather/blob/e718086513f61d2889498d843a7ba9cf39ecd2b5/gather/account-id-tool/COWORKER-QUICK-START.md) · [Detailed product guide](https://github.com/roedoeroe/Gather/blob/e718086513f61d2889498d843a7ba9cf39ecd2b5/gather/README.md)
 
-The 1.8.11 release passed **178 automated tests**, **105 rendered-browser scenario groups** and **10 actual service-worker groups**. Sixteen image-tool groups also passed at 2× device scale. Browser journeys use controlled Chrome API doubles with real DOM, canvas, clipboard and IndexedDB. Native Edge/Chrome installation is blocked by this runner's administrator policy; OS paste/save/print and managed Edge behavior remain unverified. See [test evidence](gather/docs/TESTING.md) and the [short local checklist](gather/docs/LOCAL-ACCEPTANCE.md).
+## Your work stays local
 
-## Continue development
+Cases, subjects, findings and images stay in this browser profile on your computer. Gather has **no case-data cloud sync or analytics**. Deliberate lookups and searches contact the selected platform or provider; Gather does not retain automatic web-search queries.
 
-- [Product guide and limitations](gather/README.md)
-- [Cloud setup dialog: what to click](gather/docs/ENVIRONMENT-SETUP.md#the-setup-dialog)
-- [Test evidence and commands](gather/docs/TESTING.md)
-- [Next-run handoff](gather/docs/NEXT-RUN-HANDOFF.md)
-- [Goals audit: original workflow, later requests and remaining work](gather/docs/GOALS-AUDIT.md)
-- [Whole-workflow usability audit and retained priorities](gather/docs/USABILITY-AUDIT.md)
-- [Product direction](gather/docs/PRODUCT-DIRECTION.md)
-- [Proposed Quick Parts / Reference Library](gather/docs/QUICK-PARTS-DIRECTION.md) — local search and reviewed composition; **not included in 1.8.11**
+Copying and exporting create copies outside Gather. Red deletion controls remove local Gather records, not downloaded files or browser/clipboard history. Image redaction is manual; private backups are unencrypted and can contain original, unredacted images.
 
-The extension has no runtime dependencies, bundler or server. From `gather`, run `node --test tests/*.test.mjs` and `python3 scripts/package.py`. Browser validation setup is documented in the testing guide. Public fixtures contain invented data only.
+## Current release
+
+**1.8.15 is a release candidate for a small coworker pilot.** It adds a conditional two-second wait for late Instagram metadata and shared searchable Help. Already available IDs return immediately.
+
+The build passed **214 Node tests, 116 rendered workflow groups and 36 installed Linux Edge groups**, plus worker, reader and pixel checks. Native capture, scrolling selection, cancellation, clipboard, editing and in-place update were tested. Signed-in Windows Edge, native zoom/DPI, native side-panel opening and OS save/print dialogs still need pilot verification.
+
+[Full test evidence](https://github.com/roedoeroe/Gather/blob/e718086513f61d2889498d843a7ba9cf39ecd2b5/gather/docs/TESTING.md) · [Known limitations](https://github.com/roedoeroe/Gather/blob/e718086513f61d2889498d843a7ba9cf39ecd2b5/gather/docs/RELEASE-CANDIDATE-1.8.15.md) · [Report a reproducible bug](https://github.com/roedoeroe/Gather/issues/new?template=bug-report.yml)
+
+<details>
+<summary>For developers and contributors</summary>
+
+Development continues on [`develop/1.8.0-r3`](https://github.com/roedoeroe/Gather/tree/develop/1.8.0-r3). The branch name is historical. The default `main` branch retains the 1.8.11 application baseline; its updated README points to the current pilot download. Use the release tag or development branch for 1.8.15 source.
+
+The runtime is in `gather/account-id-tool`, with no bundler, hosted server or runtime install step. See [Contributing](CONTRIBUTING.md) for test commands and repository layout, and [Security](SECURITY.md) for handling reports without exposing real case data.
+
+[Source/test package and integrity receipts](https://github.com/roedoeroe/Gather/tree/e718086513f61d2889498d843a7ba9cf39ecd2b5/releases/1.8.15) · [Product direction](https://github.com/roedoeroe/Gather/blob/e718086513f61d2889498d843a7ba9cf39ecd2b5/gather/docs/R4-WORKFLOW-RECONCILIATION.md)
+
+</details>

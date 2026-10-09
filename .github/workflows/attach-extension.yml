@@ -1,0 +1,86 @@
+name: Attach verified extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing release tag, such as 1.8.15-rc.1
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-asset-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  attach:
+    name: Verify and attach the extension ZIP
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify existing package and upload it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, io, json, os, re, urllib.error, urllib.parse, urllib.request, zipfile
+          repo = os.environ['GITHUB_REPOSITORY']
+          tag = os.environ['RELEASE_TAG']
+          match = re.fullmatch(r'(\d+\.\d+\.\d+)(?:-rc\.\d+)?', tag)
+          if not match:
+              raise SystemExit('Use a version tag such as 1.8.15-rc.1.')
+          version = match.group(1)
+          api = 'https://api.github.com/repos/' + repo
+          headers = {'Authorization': 'Bearer ' + os.environ['GH_TOKEN'],
+                     'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
+          def read(url, extra=None):
+              with urllib.request.urlopen(urllib.request.Request(url, headers={**headers, **(extra or {})}), timeout=45) as response:
+                  return response.read()
+          # Draft releases are listed for authorized maintainers but have no public tag yet.
+          releases = json.loads(read(api + '/releases?per_page=100'))
+          release = next((r for r in releases if r['tag_name'] == tag), None)
+          if not release:
+              raise SystemExit('Create the release first; it must be among the 100 most recent releases.')
+          target = release['target_commitish']
+          if not re.fullmatch(r'[a-f0-9]{40}', target):
+              raise SystemExit('The release must target a full immutable commit SHA.')
+          try:
+              tagged = json.loads(read(api + '/commits/' + tag))['sha']
+          except urllib.error.HTTPError as error:
+              if error.code != 404 or not release['draft']:
+                  raise
+          else:
+              if tagged != target:
+                  raise SystemExit('Release tag and immutable target commit differ; nothing uploaded.')
+          name = 'Gather-' + version + '-extension.zip'
+          prefix = api + '/contents/releases/' + version + '/'
+          raw = {'Accept': 'application/vnd.github.raw+json'}
+          receipt = json.loads(read(prefix + 'Gather-' + version + '-PACKAGE-VERIFICATION.json?ref=' + target, raw))
+          expected = next(p for p in receipt['packages'] if p['file'] == name)
+          data = read(prefix + name + '?ref=' + target, raw)
+          digest = hashlib.sha256(data).hexdigest()
+          if digest != expected['sha256'] or len(data) != expected['bytes']:
+              raise SystemExit('Package does not match its recorded SHA-256 and size.')
+          with zipfile.ZipFile(io.BytesIO(data)) as archive:
+              if archive.testzip() is not None:
+                  raise SystemExit('ZIP integrity check failed.')
+              if json.loads(archive.read('account-id-tool/manifest.json'))['version'] != version:
+                  raise SystemExit('Manifest version does not match the release.')
+          existing = next((a for a in release['assets'] if a['name'] == name), None)
+          if existing:
+              if existing.get('digest') != 'sha256:' + digest:
+                  raise SystemExit('An asset with different or unverified bytes already exists; nothing overwritten.')
+              print(name + ' is already attached with the verified digest.')
+          else:
+              upload = 'https://uploads.github.com/repos/' + repo + '/releases/' + str(release['id']) + '/assets?name=' + urllib.parse.quote(name)
+              request = urllib.request.Request(upload, data=data, method='POST', headers={**headers, 'Content-Type': 'application/zip'})
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  asset = json.load(response)
+              if asset.get('state') != 'uploaded' or asset.get('size') != len(data) or asset.get('digest') != 'sha256:' + digest:
+                  raise SystemExit('The uploaded asset did not return the expected integrity metadata.')
+              print('Attached ' + name + '; SHA-256 and ZIP integrity verified. No rebuild or overwrite.')
+          PY

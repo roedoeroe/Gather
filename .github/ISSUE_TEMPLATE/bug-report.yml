@@ -1,0 +1,46 @@
+name: Report a bug
+description: Tell us what went wrong using a fictional example.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This report is public. Use fictional data only. Do not attach real cases, profile identifiers, school/student/contact details, investigation screenshots, page source, credentials or backups.
+  - type: input
+    id: gather-version
+    attributes:
+      label: Gather version
+      placeholder: e.g. 1.8.15 RC
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and operating system
+      placeholder: e.g. Edge 155 on Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Use a fictional page, account or case. Include whether this followed an update, reload or cancellation.
+      placeholder: |
+        1. Open Gather on a fictional test page.
+        2. Choose Select area.
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Include the visible error wording after removing identifying information.
+    validations:
+      required: true
+  - type: checkboxes
+    id: public-data
+    attributes:
+      label: Public report
+      options:
+        - label: This report contains only fictional or non-identifying information and no private attachments.
+          required: true

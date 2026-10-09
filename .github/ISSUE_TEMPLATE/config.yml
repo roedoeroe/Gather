@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Installation and everyday use
+    url: https://github.com/roedoeroe/Gather/blob/e718086513f61d2889498d843a7ba9cf39ecd2b5/gather/account-id-tool/COWORKER-QUICK-START.md
+    about: Read the short guide before opening an issue.
+  - name: Current release and known limitations
+    url: https://github.com/roedoeroe/Gather/releases/tag/1.8.15-rc.1
+    about: Download the extension and check release status.

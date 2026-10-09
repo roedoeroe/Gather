@@ -46,3 +46,5 @@ html{width:420px}
 
 /* Results and pasted input scroll independently of the primary capture actions. */
 .quick-panel main{display:flex;flex-direction:column;height:calc(var(--panel-limit,580px) - 54px);overflow:hidden;padding-top:12px;padding-bottom:10px}.quick-panel .lookup-pane{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;padding:4px 1px 8px}.quick-panel .page-tools{flex:0 0 auto;max-height:65%;overflow-y:auto;margin:0;padding:10px 1px 0}.quick-panel.single-result #quickList{max-height:none}.quick-panel .capture-heading{margin-top:6px}.quick-panel #pageOptions{margin-top:6px}
+
+.quick-nav{display:flex;align-items:center;gap:14px}.quick-nav a{font-size:12px;color:#1463d6;text-decoration:none}.quick-nav a:hover{text-decoration:underline}

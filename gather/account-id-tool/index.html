@@ -7,7 +7,7 @@
 <body>
 <header class="topbar">
   <div class="brand"><img src="icon.svg" width="30" height="30" alt=""><span>Gather</span><span class="brand-detail">Account IDs</span></div>
-  <nav aria-label="Tools"><a class="text-button" href="workspace.html">Workspace ↗</a><button id="recentButton" class="text-button">Recent batches</button><button id="helpButton" class="help-button" aria-label="Help and settings">?</button></nav>
+  <nav aria-label="Tools"><a class="text-button" href="workspace.html">Workspace ↗</a><button id="recentButton" class="text-button">Recent batches</button><a class="text-button" href="help.html" target="_blank" rel="noopener">Help</a><button id="helpButton" class="text-button" aria-label="Lookup settings">Settings</button></nav>
 </header>
 <main>
   <p id="previewNotice" class="notice" hidden>Preview · Install the extension for live lookup. Sorting, source import, and local batches work here.</p>
@@ -48,18 +48,10 @@
   <p class="quiet">The five most recent lookup batches stay in this browser. Older lookups leave Recent automatically; deliberately saved findings remain.</p>
 </dialog>
 <dialog id="helpDialog">
-  <form method="dialog" class="dialog-close"><button aria-label="Close help" class="close-button">×</button></form>
-  <h2>Paste. Find. Copy.</h2>
-  <p>Each result keeps the display name, your original link, and user ID together. Missing names stay marked as unavailable. Imported names are marked as supplied until checked.</p>
-  <p><strong>Account details</strong> keeps the account, supplied ID, and notes together. Message headers, timestamps, and unrelated text are ignored. IDs immediately after a link stay with that account; ambiguous numbers are listed for review.</p>
-  <p>Use <strong>Display names</strong> beside Account details to show or omit the name line in the preview, copied text, and text downloads. Names stay saved with the batch. This choice is remembered and shared with the toolbar panel.</p>
-  <p>From the toolbar panel, <strong>Run on this page</strong> grabs your current profile link and starts immediately. It reads the open page first and follows your Auto-copy setting. The button is greyed out on non-profile pages or while a page is loading.</p>
-  <p>Clear profile data adds <strong>(PRIV)</strong> or <strong>(EMPTY)</strong> beside the link. EMPTY means an explicit zero public-post or upload count. Private, hidden, or unavailable content is never assumed empty. <strong>POSS is always yours</strong>; an existing POSS combines as (POSS/PRIV) or (POSS/EMPTY).</p>
-  <p><strong>Notes</strong> lets you edit your annotations or turn off automatic status for an account. Changes to an older PRIV/EMPTY note are shown, and the original note stays in the saved record. If the site provides no clear evidence, supplied status remains marked as unverified.</p>
-  <p>Supplied IDs are checked against the profile. Mismatches show both IDs; choose <strong>Use found ID</strong> to accept a correction. <strong>IDs only</strong> excludes unchecked or conflicting supplied IDs and removes repeated IDs within each platform. A saved check reflects its lookup time; use Recheck for a fresh check.</p>
-  <div class="option-row"><div><label for="browserFallback">Use signed-in pages</label><p>Try temporary background tabs if needed.</p></div><input id="browserFallback" type="checkbox" role="switch" checked></div>
-  <p>Batches save automatically as results arrive. Reopen them from Recent batches; use Recheck when you need fresh results. A name is optional and can be reused across batches.</p>
-  <p class="quiet">Profile and channel links only. If a site asks for sign-in, open the link and finish that step yourself. Source lets you paste profile HTML. No Gather server, tracking, or stored page HTML. History is local to this browser; save important lists as text before uninstalling.</p>
+  <form method="dialog" class="dialog-close"><button aria-label="Close lookup settings" class="close-button">×</button></form>
+  <h2>Lookup settings</h2>
+  <div class="option-row"><div><label for="browserFallback">Use signed-in pages</label><p>Try temporary background tabs if a pasted-profile lookup needs them.</p></div><input id="browserFallback" type="checkbox" role="switch" checked></div>
+  <p><a href="help.html#accounts" target="_blank" rel="noopener">Help with account lookup, copy formats and annotations</a></p>
 </dialog>
 <dialog id="sourceDialog">
   <form method="dialog" class="dialog-close"><button aria-label="Close source import" class="close-button">×</button></form>

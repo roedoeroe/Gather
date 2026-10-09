@@ -104,7 +104,7 @@ async function start(message) {
     if(!Number.isInteger(message.currentTabId)||batch.entries.length!==1)throw new Error('Open one supported profile to run this page.');
     try {
       const tab=await chrome.tabs.get(message.currentTabId);
-      if(normalizeProfile(tab.url).key!==batch.entries[0].key)throw new Error('changed');
+      if(normalizeProfile(tab.pendingUrl||tab.url).key!==batch.entries[0].key)throw new Error('changed');
       currentTabId=message.currentTabId;
     }catch{throw new Error('The current page changed. Open the profile and run it again.');}
   }

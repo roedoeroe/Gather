@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "kind": "native-installed-update",
+  "from": "1.8.14",
+  "to": "1.8.15",
+  "passed": [
+    "1.8.14 creates fictional case/SOC records and a hashed original in native extension storage.",
+    "Replacing files at the same installed folder and restarting Edge preserves extension ID, case, scan, SOC, capture and original bytes.",
+    "Reload after the native upgrade preserves the saved capture."
+  ],
+  "errors": []
+}

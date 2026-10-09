@@ -1,0 +1,70 @@
+{
+  "live": true,
+  "imagesUploaded": 0,
+  "rows": [
+    {
+      "id": "baidu",
+      "requestedUrl": "https://image.baidu.com/",
+      "status": 200,
+      "landedHost": "image.baidu.com",
+      "imageControlMatches": 0,
+      "scope": "Landing page only; no image submitted."
+    },
+    {
+      "id": "bing",
+      "requestedUrl": "https://www.bing.com/visualsearch",
+      "status": 200,
+      "landedHost": "explore.microsoft.com",
+      "imageControlMatches": 0,
+      "scope": "Landing page only; no image submitted."
+    },
+    {
+      "id": "google",
+      "requestedUrl": "https://images.google.com/",
+      "status": 200,
+      "landedHost": "images.google.com",
+      "imageControlMatches": 1,
+      "scope": "Landing page only; no image submitted."
+    },
+    {
+      "id": "lenso",
+      "requestedUrl": "https://lenso.ai/en",
+      "status": 403,
+      "landedHost": "lenso.ai",
+      "imageControlMatches": 0,
+      "scope": "Landing page only; no image submitted."
+    },
+    {
+      "id": "shutterstock",
+      "requestedUrl": "https://www.shutterstock.com/",
+      "status": 403,
+      "landedHost": "www.shutterstock.com",
+      "imageControlMatches": 0,
+      "scope": "Landing page only; no image submitted."
+    },
+    {
+      "id": "sogou",
+      "requestedUrl": "https://pic.sogou.com/",
+      "status": 200,
+      "landedHost": "pic.sogou.com",
+      "imageControlMatches": 0,
+      "scope": "Landing page only; no image submitted."
+    },
+    {
+      "id": "tineye",
+      "requestedUrl": "https://tineye.com/",
+      "status": 200,
+      "landedHost": "tineye.com",
+      "imageControlMatches": 1,
+      "scope": "Landing page only; no image submitted."
+    },
+    {
+      "id": "yandex",
+      "requestedUrl": "https://yandex.com/images/",
+      "status": 200,
+      "landedHost": "yandex.com",
+      "imageControlMatches": 1,
+      "scope": "Landing page only; no image submitted."
+    }
+  ]
+}

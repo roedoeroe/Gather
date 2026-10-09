@@ -1,0 +1,47 @@
+[
+  {
+    "suite": "node",
+    "exit": 0,
+    "seconds": 33.22
+  },
+  {
+    "suite": "reader-check",
+    "exit": 0,
+    "seconds": 0.05
+  },
+  {
+    "suite": "toolbar",
+    "exit": 0,
+    "seconds": 55.13
+  },
+  {
+    "suite": "worker",
+    "exit": 0,
+    "seconds": 8.75
+  },
+  {
+    "suite": "profile-reader",
+    "exit": 0,
+    "seconds": 2.13
+  },
+  {
+    "suite": "help",
+    "exit": 0,
+    "seconds": 2.56
+  },
+  {
+    "suite": "edge-installed",
+    "exit": 0,
+    "seconds": 33.13
+  },
+  {
+    "suite": "edge-update",
+    "exit": 0,
+    "seconds": 2.98
+  },
+  {
+    "suite": "edge-native",
+    "exit": 0,
+    "seconds": 108.92
+  }
+]

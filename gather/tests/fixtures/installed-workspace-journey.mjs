@@ -67,7 +67,19 @@ export async function workspaceJourney(context, baseURL, artifacts) {
   assert.equal(await page.locator('#query').inputValue(),'');
   const after=await page.evaluate(async()=>({local:await chrome.storage.local.get(null),session:await chrome.storage.session.get(null),tabs:await chrome.tabs.query({})}));
   assert.deepEqual(after.local,snapshot.local);assert.doesNotMatch(JSON.stringify(after.local)+JSON.stringify(after.session),/Northbridge fictional search/);
-  assert.ok(after.tabs.some(tab=>decodeURIComponent(tab.url||'').includes('Northbridge fictional search')));
+  // Without the tabs permission, a native extension cannot read arbitrary search-tab URLs.
+  // Observe navigation through browser automation while API doubles expose their test tabs.
+  const launched = async match => {
+    const deadline=Date.now()+5000;
+    do {
+      const tabs=await page.evaluate(()=>chrome.tabs.query({}));
+      const urls=[...tabs.flatMap(t=>[t.url,t.pendingUrl]),...context.pages().map(p=>p.url())].filter(Boolean);
+      if(urls.some(match))return;
+      await new Promise(resolve=>setTimeout(resolve,50));
+    } while(Date.now()<deadline);
+    assert.fail('Expected provider navigation did not occur.');
+  };
+  await launched(url=>new URL(url).searchParams.get('q')==='Northbridge fictional search');
   await page.getByRole('button',{name:'Changes',exact:true}).click();
   await page.locator('#localSearch').fill('no fictional activity matches');
   await page.getByText('No matching activity', {exact: true}).waitFor();
@@ -79,7 +91,7 @@ export async function workspaceJourney(context, baseURL, artifacts) {
   await page.screenshot({path:path.join(artifacts,'reverse-image.png'),fullPage:true});
   await page.getByRole('button',{name:'Open image search ↗',exact:true}).click();
   await page.getByText('Image search opened. Choose an image on the provider’s website.',{exact:true}).waitFor();
-  assert.ok(await page.evaluate(async()=>(await chrome.tabs.query({})).some(t=>t.url==='https://tineye.com/')));
+  await launched(url=>url==='https://tineye.com/');
   await page.getByRole('button',{name:'Search the web',exact:true}).click();
   assert.equal(await page.evaluate(()=>document.activeElement.id),'query');
   await page.locator('#query').fill('Fictional unsent draft');

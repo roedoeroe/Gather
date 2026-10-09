@@ -5,6 +5,12 @@ export const isExtension = Boolean(globalThis.chrome?.runtime?.id && globalThis.
 const ownedTabs = new Set();
 const abortError = () => new DOMException('Lookup stopped', 'AbortError');
 function check(signal) { if (signal?.aborted) throw abortError(); }
+const SETTLE_MS = 2000, SETTLE_INTERVAL_MS = 250;
+function matchesProfile(url, profile) { try { return normalizeProfile(url).key === profile.key; } catch { return false; } }
+async function sameCurrentProfile(tabId, profile) {
+  const tab = await chrome.tabs.get(tabId);
+  return matchesProfile(tab.url, profile) && (!tab.pendingUrl || matchesProfile(tab.pendingUrl, profile));
+}
 function pause(ms, signal) {
   return new Promise((resolve, reject) => {
     check(signal);
@@ -89,14 +95,29 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
   if (Number.isInteger(currentTabId)) {
     onStage?.('Reading current page…');
     try {
-      const tab=await chrome.tabs.get(currentTabId);
+      let tab=await chrome.tabs.get(currentTabId);
+      const deadline=Date.now()+SETTLE_MS;
+      // A just-opened tab may still expose its previous/blank committed URL.
+      // Wait only when its explicit pending URL is the requested profile.
+      while(profile.platform==='instagram'&&!matchesProfile(tab.url,profile)&&matchesProfile(tab.pendingUrl,profile)&&Date.now()<deadline){
+        await pause(Math.min(SETTLE_INTERVAL_MS,deadline-Date.now()),signal);
+        tab=await chrome.tabs.get(currentTabId);
+      }
       let actual;
       try {actual=normalizeProfile(tab.url);} catch {return {error:'The current page changed. Open the profile and run it again.'};}
-      if(actual.key!==profile.key)return {error:'The current page changed. Open the profile and run it again.'};
-      const snapshot=await readProfileInPage(currentTabId,profile,{includeName});
+      if(actual.key!==profile.key||tab.pendingUrl&&!matchesProfile(tab.pendingUrl,profile))return {error:'The current page changed. Open the profile and run it again.'};
+      let snapshot=await readProfileInPage(currentTabId,profile,{includeName});
       check(signal);
+      while(profile.platform==='instagram'&&snapshot.result.error?.startsWith('No matching account ID')&&Date.now()<deadline){
+        onStage?.('Waiting briefly for profile data…');
+        await pause(Math.min(SETTLE_INTERVAL_MS,deadline-Date.now()),signal);
+        if(!await sameCurrentProfile(currentTabId,profile))return {error:'The page changed during lookup. Open the intended profile and retry.'};
+        snapshot=await readProfileInPage(currentTabId,profile,{includeName,documentId:snapshot.documentId,reuseReader:true});
+        check(signal);
+      }
       if(snapshot){
         const result=snapshot.result;
+        if(!await sameCurrentProfile(currentTabId,profile))return {error:'The page changed during lookup. Open the intended profile and retry.'};
         if(result.id||result.accountState==='GONE')return {...result,method:'Current page · '+result.method};
         // Authentication, conflicting IDs and a different profile are explicit
         // failures. Only missing hydrated data triggers an automatic source read.
@@ -105,7 +126,7 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
         const source=await readProfileInPage(currentTabId,profile,{source:true,includeName,documentId:snapshot.documentId});
         check(signal);
         const latest=await chrome.tabs.get(currentTabId);
-        if(normalizeProfile(latest.url).key!==profile.key)return {error:'The page changed during lookup. Open the intended profile and retry.'};
+        if(!matchesProfile(latest.url,profile)||latest.pendingUrl&&!matchesProfile(latest.pendingUrl,profile))return {error:'The page changed during lookup. Open the intended profile and retry.'};
         const found=source.result;
         if(found.id||found.accountState==='GONE')return {...found,method:'Current profile source · '+found.method};
         if(profile.platform!=='instagram'||!found.error?.startsWith('No matching account ID'))return found;
@@ -121,7 +142,7 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
         const current=await readProfileInPage(currentTabId,profile,{includeName,documentId:source.documentId});
         check(signal);
         const stillCurrent=await chrome.tabs.get(currentTabId);
-        if(normalizeProfile(stillCurrent.url).key!==profile.key)return {error:'The page changed during lookup. Open the intended profile and retry.'};
+        if(!matchesProfile(stillCurrent.url,profile)||stillCurrent.pendingUrl&&!matchesProfile(stillCurrent.pendingUrl,profile))return {error:'The page changed during lookup. Open the intended profile and retry.'};
         if(/Multiple account IDs|different account ID/.test(publicResult.error||''))return publicResult;
         if(current.result.id){
           if(publicResult.id&&current.result.id!==publicResult.id)return {error:'The page and public profile returned different account IDs. Gather did not choose either ID.'};

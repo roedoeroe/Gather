@@ -172,8 +172,8 @@ async function updateCurrentPage() {
   let tab, url='', hint='Open a supported profile or channel to use this';
   try {
     [tab]=await chrome.tabs.query({active:true,currentWindow:true});
-    if(tab?.status==='loading')hint='Wait for this page to finish loading';
-    else {normalizeProfile(tab?.url);url=tab.url;hint='Find and copy IDs from '+url;}
+    const candidate=tab?.pendingUrl||tab?.url;
+    normalizeProfile(candidate);url=candidate;hint=tab?.status==='loading'?'Find IDs as this profile finishes loading':'Find and copy IDs from '+url;
   }catch{}
   if(request===pageRequest){currentPage=url;currentTabId=tab?.id??null;$('usePage').title=hint;renderInput();}
   return request===pageRequest?{url:currentPage,tabId:currentTabId}:null;

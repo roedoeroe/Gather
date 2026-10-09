@@ -20,7 +20,7 @@ const {resolveProfile}=await import('../account-id-tool/resolver.js');
 const html='<script type="application/json">{"username":"alex.example","profile_id":"9007199254740993123"}</script>';
 function reset(){reads=[];denied=false;tabUrl=profile.url;source={url:profile.url,html:''};fetched={url:profile.url,html};afterSource=null;}
 test('missing hydrated ID automatically reads source in the same document and preserves exact ID',async()=>{
- reset();const result=await resolveProfile(profile,{currentTabId:10});assert.equal(result.id,'9007199254740993123');assert.match(result.method,/Current profile source/);assert.equal(reads.length,4);assert.deepEqual(reads[3].target,{tabId:10,documentIds:['document-one']});
+ reset();const result=await resolveProfile(profile,{currentTabId:10});assert.equal(result.id,'9007199254740993123');assert.match(result.method,/Current profile source/);assert.equal(reads.filter(r=>r.files).length,2);assert.equal(reads.filter(r=>r.args?.[1]).length,1);assert.deepEqual(reads.at(-1).target,{tabId:10,documentIds:['document-one']});
 });
 test('hydrated success is fast: no second source request',async()=>{
  reset();source.html=html;assert.equal((await resolveProfile(profile,{currentTabId:10})).id,'9007199254740993123');assert.equal(reads.length,2);
@@ -43,7 +43,7 @@ globalThis.fetch=async(url,options)=>{
 let publicHTML=html,publicURL;
 function missingSignedIn(){reset();source.html='<p>Fictional loaded profile</p>';fetched.html=source.html;publicReads=[];publicHTML=html;publicURL=null;afterPublic=null;}
 test('first current-page operation checks the public profile once when signed-in markup omits the ID',async()=>{
- missingSignedIn();const result=await resolveProfile(profile,{currentTabId:10});assert.equal(result.id,'9007199254740993123');assert.match(result.method,/Public profile source/);assert.equal(publicReads.length,1);assert.equal(publicReads[0].url,profile.url);assert.equal(publicReads[0].options.credentials,'omit');assert.equal(publicReads[0].options.cache,'no-store');assert.equal(reads.length,6);assert.deepEqual(reads.at(-1).target,{tabId:10,documentIds:['document-one']});assert.ok(!('displayName'in result));
+ missingSignedIn();const result=await resolveProfile(profile,{currentTabId:10});assert.equal(result.id,'9007199254740993123');assert.match(result.method,/Public profile source/);assert.equal(publicReads.length,1);assert.equal(publicReads[0].url,profile.url);assert.equal(publicReads[0].options.credentials,'omit');assert.equal(publicReads[0].options.cache,'no-store');assert.equal(reads.filter(r=>r.files).length,3);assert.deepEqual(reads.at(-1).target,{tabId:10,documentIds:['document-one']});assert.ok(!('displayName'in result));
 });
 test('profile hydration completing during the public request returns the now-loaded current page',async()=>{
  missingSignedIn();afterPublic=()=>source.html=html;const result=await resolveProfile(profile,{currentTabId:10});assert.equal(result.id,'9007199254740993123');assert.match(result.method,/Current page/);assert.equal(publicReads.length,1);

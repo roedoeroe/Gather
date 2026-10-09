@@ -1,25 +1,24 @@
-# Gather 1.8.14
+# Gather 1.8.15 RC
 
 Gather is a local browser extension for account lookup, screenshots and deliberate research. **Open a profile → Gather → inspect or copy.** A case is optional. Edge on Windows is the primary target; Chromium-based Chrome is also supported.
 
 ## What changed
 
-- An Instagram current-page lookup now checks the public profile automatically when the page and its session source omit the ID. This reuses the credential-free path that previously could succeed only after another click. One operation, one bounded fallback; no extra lookup batch or temporary tab.
-- The original document is rechecked after that request. Navigation, conflicting IDs, security checks and cancellation cannot silently produce a result for another account. Exact IDs and existing fast successful reads are preserved.
-- Current-page lookup/retry no longer focuses the collapsed paste box. Paste profile links stays closed unless you open it; explicit pasted drafts still take priority.
-- Case/SOC and **Select area · Full page · Visible area** stay in a separate bottom area while lookup results scroll. Long errors and opened paste input cannot push these controls down the page. Screenshot auto-copy is under **Page options** and remains remembered.
+- Instagram gets a conditional **two-second readiness buffer** when its profile metadata is still arriving. Gather reads immediately, checks missing metadata every 250 ms until the deadline, then uses the existing source/public fallback. Already-loaded profiles return immediately. One lookup operation; no second click required for the tested delayed-page scenarios.
+- Loading tabs remain usable when their explicit URL identifies the intended profile. Pinned-document, account-conflict, pending-navigation and cancellation guards preserve exact string IDs. The extractor itself is unchanged.
+- **Help** is available from the popup, side panel, workspace and full account tools. It has local, focused search and plain-language guidance. A [Coworker Quick Start](COWORKER-QUICK-START.md) ships with the extension.
 
-The existing selection guides/scrolling capture, Crop handles, red arrows/circles, manual redaction, five recent batches, local cases/history and recoverable binary backups remain. No new permissions, runtime dependencies, storage schema or cloud endpoint.
+Case/SOC and **Select area · Full page · Visible area** remain in the popup's fixed bottom area. Selection guides/scrolling capture, Crop handles, red arrows/circles, manual redaction, five recent batches, local cases/history and binary backups are retained. No new permissions, runtime dependency, storage schema, retention policy or cloud endpoint.
 
 ## Install or update
 
-1. Extract `Gather-1.8.14-extension.zip` into a permanent directory.
+1. Extract `Gather-1.8.15-extension.zip` into a permanent directory.
 2. Open `edge://extensions` (or `chrome://extensions`), enable Developer mode and choose **Load unpacked**. Select its **account-id-tool** directory containing `manifest.json`.
 3. Pin Gather, open a supported profile and click Gather. Use Copy IDs, or choose the Case/SOC and Select area, Full page or Visible area. The side panel is optional.
 
-**Updating:** finish captures and close Gather windows. Keep your existing installation folder and an optional private backup. Replace **all files at the same installed path**, then Reload on the Extensions page; confirm **1.8.14**. Do not uninstall or clear browser storage. Reload releases legacy ephemeral session values; durable findings/images remain. Updating trims unsaved recent lookup batches to the newest five.
+**Updating:** finish captures and close Gather windows. Keep your existing installation folder and an optional private backup. Replace **all files at the same installed path**, then Reload on the Extensions page; confirm **1.8.15**. Do not uninstall or clear browser storage. Reload releases legacy ephemeral session values; durable findings/images remain. Updating trims unsaved recent lookup batches to the newest five.
 
-**Rollback:** keep the immutable 1.8.13 package and a matching pre-update backup. Test them in a separate clean browser profile before changing your working profile. Earlier builds do not enforce all current fixes or history retention. Backup restore is deliberate; deletion without a backup cannot be undone.
+**Rollback:** keep the immutable 1.8.14 package and a matching pre-update backup. Test them in a separate clean browser profile before changing your working profile. Earlier builds do not enforce all current fixes or history retention. Backup restore is deliberate; deletion without a backup cannot be undone.
 
 ## Local data and copying
 
@@ -41,10 +40,10 @@ Downloads-relative folder export is optional. **Saved in Gather** and **Exported
 
 ## Verification and development
 
-**208 Node tests; 112 rendered workflow groups; 11 pixel-selection groups; 10 actual service-worker groups; five isolated-world parser groups passed.** Browser workflows use real DOM/canvas/clipboard/IndexedDB with controlled extension APIs. Pixel checks use five simulated DPR scales, not native Windows/browser zoom.
+**214 Node tests; 116 rendered workflow groups; 11 pixel-selection groups; 10 worker groups; five isolated-world reader groups passed.** Rendered tests use real DOM/canvas/clipboard/IndexedDB with extension API doubles. The 17 image-tool groups also passed at 2× simulated DPR; pixel checks cover five simulated scales, not native Windows zoom.
 
-A live signed-out Chromium read of the user-authorized profile succeeded. A controlled missing-markup test then used the actual resolver/isolated reader with its live public response: one request, first-operation success and matching ID. No actual account details were published.
+**Actual installed Linux Edge passed 36 groups:** 23 lookup/toolbar/capture/editor/Help, 10 workspace, three same-folder update. Real toolbar invocation, activeTab, screenshot acquisition, scrolling selection, cancellation, clipboard, editing and 1.8.14 → 1.8.15 data preservation were exercised. A live signed-out lookup of the original chat-authorized profile returned an exact ID on its first operation in **271 ms**, with no account details published.
 
-This machine still blocks unpacked extension installation. Signed-in Windows Edge, native toolbar invocation/zoom and OS dialogs remain unverified. [Evidence and commands](https://github.com/roedoeroe/Gather/blob/develop/1.8.0-r3/gather/docs/TESTING.md) · [Local check](https://github.com/roedoeroe/Gather/blob/develop/1.8.0-r3/gather/docs/LOCAL-ACCEPTANCE.md) · [R4 status](https://github.com/roedoeroe/Gather/blob/develop/1.8.0-r3/gather/docs/R4-WORKFLOW-RECONCILIATION.md).
+Signed-in Windows Edge, native zoom/Windows scaling, native side-panel opening and OS image-save/print dialogs remain unverified. This is a **controlled coworker pilot release candidate**, not a universal reliability guarantee. [Detailed results](https://github.com/roedoeroe/Gather/blob/develop/1.8.0-r3/gather/docs/TESTING.md) · [Release scope and limitations](https://github.com/roedoeroe/Gather/blob/develop/1.8.0-r3/gather/docs/RELEASE-CANDIDATE-1.8.15.md) · [R4 status](https://github.com/roedoeroe/Gather/blob/develop/1.8.0-r3/gather/docs/R4-WORKFLOW-RECONCILIATION.md).
 
-Runtime source is `account-id-tool`. There is no runtime install, bundler or server. From this directory run `node --test tests/*.test.mjs` and `python3 scripts/package.py`. Browser tests use the prepared Playwright/Chromium environment documented in TESTING. Generated `profile-reader.js` must match local adapter modules (`python3 scripts/build-profile-reader.py --check`). Packages reject common private files/credential patterns using a local scanner; this does not certify the absence of every sensitive datum.
+Runtime is `account-id-tool`, with no install, bundler or server. From this directory run `node --test tests/*.test.mjs` and `python3 scripts/package.py`. Browser setup is in TESTING and ENVIRONMENT-SETUP. Generated `profile-reader.js` must match local adapter modules (`python3 scripts/build-profile-reader.py --check`). The package privacy scanner checks common patterns; it is not general sensitive-data detection or legal certification.

@@ -1,0 +1,39 @@
+{
+  "version": "1.8.15",
+  "version_name": "1.8.15 RC",
+  "prepared_at_utc": "2026-10-09T00:32:34.853162+00:00",
+  "permissions_unchanged_from_1_8_14": true,
+  "runtime_files": 85,
+  "generated_reader_check": "passed",
+  "privacy_pattern_gate": "passed; not general PII/legal certification",
+  "packages": [
+    {
+      "file": "Gather-1.8.15-development.zip",
+      "sha256": "b7688ba6e6a758388098a837c4a8a635eaed2898daf5a49788292f2bee8bf7aa",
+      "bytes": 15307508,
+      "zip_crc": "passed",
+      "zip_entries": 719,
+      "runtime_files_matching_tested_source": 85
+    },
+    {
+      "file": "Gather-1.8.15-extension.zip",
+      "sha256": "bc58fad51b601b485c6465cbec24ef42d887372d0c261140471f2953481f2549",
+      "bytes": 215936,
+      "zip_crc": "passed",
+      "zip_entries": 85,
+      "runtime_files_matching_tested_source": 85
+    }
+  ],
+  "extracted_package_checks": {
+    "node": 214,
+    "toolbar": 29,
+    "worker": 10,
+    "profile_reader": 5,
+    "help": 4,
+    "native_edge_workspace": 10,
+    "native_edge_update": 3,
+    "native_edge_workflow": 23,
+    "generated_reader": "passed",
+    "all_exit_codes_zero": true
+  }
+}

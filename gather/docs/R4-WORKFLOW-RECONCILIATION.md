@@ -1,4 +1,4 @@
-# Edge-first R4 status — Gather 1.8.14
+# Edge-first R4 status — Gather 1.8.15 RC
 
 The supplied R4 document was read completely. The reattached copy is byte-identical. It supplies product direction, not evidence of native browser tests or any previous Drive/reference inspection. User authorization includes implementation and publication to the development branch. No real reference corpus was inspected in this run.
 
@@ -21,19 +21,19 @@ A user-confirmed first-failure/second-success exposed different current-tab and 
 | Five recents | Startup/read/write/restore enforce five batches; atomic eviction, archive scrubbing, stale-write tombstones. Saved findings unaffected. Red popup clear button. |
 | Privacy / utility | No added permissions or cloud endpoint; local cases, no automatic query history, manual redaction, independent copy preferences, binary backup and guarded deletion retained. |
 
-## Open correctness gate — native Edge
+## Native correctness progress in 1.8.15
 
-The reported signed-in Instagram failure and horizontal-selection loss were not reproduced in installed Windows Edge here. The confirmed parser/HUD bugs are fixed, and the marker tests pass, but they do not prove the reported native failures gone. The managed cloud Chromium policy `ExtensionInstallBlocklist:["*"]` blocks unpacked extension loading. Runner exits 2 with zero groups; do not weaken it or substitute simulated DPR for native zoom evidence.
+The conditional two-second Instagram readiness buffer preserves immediate successful reads and the existing source fallback. Installed Linux Edge now passes real action/activeTab, visible/full/selected capture, horizontal/vertical/scrolling selection, cancellation/repeat, clipboard, image editing and same-folder update tests. The authorized live signed-out lookup succeeded in one operation. Help and the bundled Quick Start are complete. [Exact evidence and limits](TESTING.md).
 
-Next permitted Edge check: install 1.8.14 in the same directory, open the previously failing authorized profile, invoke Gather, then run the controlled edge-marker selection at 80/100/125/150/200% zoom. Verify stored image, clipboard and saved file; cancel an extended selection and confirm restoration. If lookup fails, establish normalization → DOM/source read → account binding/conflict → worker/UI failure using sanitized structure, never publish raw signed-in source or guess unrelated IDs. [Checklist](LOCAL-ACCEPTANCE.md).
+The user explicitly authorized Edge installation. Official Edge loads this development extension normally with sandboxing enabled; Chromium's separate managed policy was not edited. The earlier blanket “native Edge unavailable” statement is obsolete. Native signed-in Windows Edge, browser/OS zoom, OS dialogs and native panel opening still require a controlled pilot. Rendered simulated DPR is not native zoom evidence.
 
 ## Narrow remaining order
 
-1. Finish that installed Edge gate (source/destination, activeTab/lifecycle, zoom/DPI, signed-in adapters, native paste/save/print). Fix observed failures before claiming final R4 acceptance.
+1. Complete the remaining Windows/signed-in/zoom/OS-dialog checks during the controlled 1.8.15 coworker pilot. Fix reproducible correctness failures before adding features; do not redo native Linux Edge checks without a change or unresolved concern.
 2. Source-image acquisition after P0 correctness: image context menu, explicit src/currentSrc/srcset candidates, reliable original bytes/format, frozen Case/SOC, Source image type, independent remembered auto-copy. Visible failure on protected/blob/canvas images; no guessed CDN URLs or silent screenshots.
 3. Local Reference retrieval after P0s: recursive Markdown import, sections/folder metadata, transparent local versioned pack, Login-Info/ARCHIVED-DONT-USE/media exclusions, deterministic alias/ranking, template/example/guidance distinction and exact copy. No AI, composer, sending, rewritten wording or automatic conclusions. Use fictional packs until real authorized material is provided.
 4. Only then evaluate nested-scroller capture and custom folder access against supported browser permissions. They are separate unshipped enhancements.
 
 R4 withdraws earlier intake/coverage platform and communication-composer priorities. Existing legacy records/tools remain compatible; do not expand them. Preserve project-free lookup, exact strings, original pixels, local deletion, recoverable backups and explicit associations. Avoid extra privacy wizards that harm utility. Public source stays generic; real case/reference content stays local.
 
-1.8.14 is a runnable tested development release, **not an R4-complete or native-Edge-verified release**. Earlier packages remain immutable. Main retains its independently completed 1.8.11 merge; publish this work only on develop/1.8.0-r3.
+1.8.15 is a native Linux Edge-tested **release candidate for a controlled coworker pilot**, not an R4-complete or signed-in Windows acceptance claim. Earlier packages remain immutable. Main retains its independently completed 1.8.11 merge; publish this work only on develop/1.8.0-r3.

@@ -18,9 +18,9 @@ export function validateProfileResult(value) {
   if(value.error&&(value.id||value.accountState))fail();
   return value;
 }
-export async function readProfileInPage(tabId,profile,{source=false,includeName=false,documentId}={}) {
+export async function readProfileInPage(tabId,profile,{source=false,includeName=false,documentId,reuseReader=false}={}) {
   let target={tabId,...(documentId?{documentIds:[documentId]}:{})};
-  const loaded=await chrome.scripting.executeScript({target,world:'ISOLATED',files:['profile-reader.js']});
+  const loaded=reuseReader&&documentId?[{documentId}]:await chrome.scripting.executeScript({target,world:'ISOLATED',files:['profile-reader.js']});
   const loadedId=loaded[0]?.documentId;
   if(documentId&&loadedId!==documentId)throw new Error('The profile document changed.');
   if(loadedId)target={tabId,documentIds:[loadedId]};

@@ -1,5 +1,7 @@
 # Gather 1.8.15 release candidate
 
+Publication follow-up: the user subsequently authorized the [GitHub prerelease](https://github.com/roedoeroe/Gather/releases/tag/1.8.15-rc.1). Its single attached extension ZIP is byte-identical to the package validated below. This report records the original package run; later GitHub presentation changes did not change the extension or its ZIPs.
+
 Prepared October 8, 2026 (America/Los_Angeles). Suitable for a **small controlled coworker pilot**, with the platform-specific limits below. This is an unpacked browser extension, not a hosted application.
 
 ## Recovered and finished

@@ -1,6 +1,6 @@
 # Cloud environment setup — Gather 1.8.15 RC
 
-Use the existing `/workspace/Gather` checkout. Cloud tasks are already isolated: do not create a worktree unless the user asks. Inspect Git status and newer edits before changing anything. Read NEXT-RUN-HANDOFF, TESTING, RELEASE-CANDIDATE-1.8.15 and R4-WORKFLOW-RECONCILIATION. Preserve source edits and immutable release ZIPs. Development-branch publication is authorized; main, visibility and GitHub Release changes are not.
+Use the existing `/workspace/Gather` checkout. Cloud tasks are already isolated: do not create a worktree unless the user asks. Inspect Git status and newer edits before changing anything. Read NEXT-RUN-HANDOFF, TESTING, RELEASE-CANDIDATE-1.8.15 and R4-WORKFLOW-RECONCILIATION. Preserve source edits and immutable release ZIPs. Development-branch publication, the 1.8.15 GitHub prerelease and GitHub presentation updates are authorized. Main’s application baseline remains independent; no app merge or visibility change is authorized.
 
 The extension needs no runtime dependencies, install script, bundler, server or case-storage credential. Node 24 and Python 3 run tests/packaging. Supplied Playwright 1.62.1 is at `/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules`; browser tests require that path as NODE_PATH. Run from `/workspace/Gather/gather`:
 

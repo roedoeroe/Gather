@@ -1,0 +1,32 @@
+{
+  "source_package_commit": "ef8836502afade34c6e489ce182bc5a80a0aad0e",
+  "verified_at_utc": "2026-10-09T00:40:27.324541+00:00",
+  "packages": [
+    {
+      "file": "Gather-1.8.15-development.zip",
+      "sha256": "b7688ba6e6a758388098a837c4a8a635eaed2898daf5a49788292f2bee8bf7aa",
+      "bytes": 15307508,
+      "zip_crc": "passed",
+      "zip_entries": 719,
+      "runtime_files_matching_tested_source": 85,
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/ef8836502afade34c6e489ce182bc5a80a0aad0e/releases/1.8.15/Gather-1.8.15-development.zip",
+      "http_status": 200,
+      "download_sha256_matches": true,
+      "all_package_files_matching_source": 719
+    },
+    {
+      "file": "Gather-1.8.15-extension.zip",
+      "sha256": "bc58fad51b601b485c6465cbec24ef42d887372d0c261140471f2953481f2549",
+      "bytes": 215936,
+      "zip_crc": "passed",
+      "zip_entries": 85,
+      "runtime_files_matching_tested_source": 85,
+      "url": "https://raw.githubusercontent.com/roedoeroe/Gather/ef8836502afade34c6e489ce182bc5a80a0aad0e/releases/1.8.15/Gather-1.8.15-extension.zip",
+      "http_status": 200,
+      "download_sha256_matches": true,
+      "all_package_files_matching_source": 85
+    }
+  ],
+  "tls_verification": "enabled",
+  "native_extension_tests": "36 Linux Edge groups, including a repeat using the extracted extension ZIP; see package receipt"
+}

@@ -4,7 +4,7 @@ A local browser extension for fast account lookup and precise screenshots. **Ope
 
 ## Get Gather 1.8.15 RC
 
-[Extension ZIP](releases/1.8.15/Gather-1.8.15-extension.zip) · [Source/test ZIP](releases/1.8.15/Gather-1.8.15-development.zip) · [SHA-256 checksums](releases/1.8.15/Gather-1.8.15-SHA256SUMS.txt) · [Delivery and verification](releases/1.8.15/Gather-1.8.15-DELIVERY.md)
+[Extension ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/ef8836502afade34c6e489ce182bc5a80a0aad0e/releases/1.8.15/Gather-1.8.15-extension.zip) · [Source/test ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/ef8836502afade34c6e489ce182bc5a80a0aad0e/releases/1.8.15/Gather-1.8.15-development.zip) · [SHA-256 checksums](releases/1.8.15/Gather-1.8.15-SHA256SUMS.txt) · [Delivery and verification](releases/1.8.15/Gather-1.8.15-DELIVERY.md)
 
 Instagram now gets a conditional **two-second readiness buffer** when profile metadata is late. Already-loaded IDs return immediately; the existing source fallback follows when needed. Shared searchable **Help** and a bundled [Coworker Quick Start](gather/account-id-tool/COWORKER-QUICK-START.md) explain the workflow, privacy and updates. No new permissions, storage schema or network endpoints.
 

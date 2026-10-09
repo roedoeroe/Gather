@@ -2,7 +2,7 @@
 
 Release candidate for a small controlled coworker pilot. Development branch only; main remains unchanged. No GitHub Release object or visibility change.
 
-[Extension ZIP](Gather-1.8.15-extension.zip) · [Source/test ZIP](Gather-1.8.15-development.zip) · [Checksums](Gather-1.8.15-SHA256SUMS.txt) · [Package verification](Gather-1.8.15-PACKAGE-VERIFICATION.json) · [QA and remaining limits](../../gather/docs/RELEASE-CANDIDATE-1.8.15.md) · [Coworker Quick Start](../../gather/account-id-tool/COWORKER-QUICK-START.md)
+[Extension ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/ef8836502afade34c6e489ce182bc5a80a0aad0e/releases/1.8.15/Gather-1.8.15-extension.zip) · [Source/test ZIP](https://raw.githubusercontent.com/roedoeroe/Gather/ef8836502afade34c6e489ce182bc5a80a0aad0e/releases/1.8.15/Gather-1.8.15-development.zip) · [Checksums](Gather-1.8.15-SHA256SUMS.txt) · [Package verification](Gather-1.8.15-PACKAGE-VERIFICATION.json) · [QA and remaining limits](../../gather/docs/RELEASE-CANDIDATE-1.8.15.md) · [Coworker Quick Start](../../gather/account-id-tool/COWORKER-QUICK-START.md)
 
 ## What changed
 
@@ -29,3 +29,7 @@ All 85 runtime files in both ZIPs match the tested source; ZIP CRC and SHA-256 v
 Cases/images stay local in Gather. Deliberate platform/search requests still contact external services. Deleting Gather data cannot delete existing downloads, clipboard/browser/provider history or backups. No automated identity/threat conclusions, automatic redaction or legal certification.
 
 Cloud environment configuration is separate from installing Gather: after reviewing/saving the updated settings, use **Publish environment** when offered. “Install script — Not set” is expected.
+
+## Published download verification
+
+Immutable package commit: `ef8836502afade34c6e489ce182bc5a80a0aad0e`. Both published ZIPs returned HTTP 200 over verified HTTPS; SHA-256 and CRC passed. All 85 runtime files match the tested source, and all 719 development ZIP entries match the repository files. [Download receipt](Gather-1.8.15-DOWNLOAD-VERIFICATION.json). ZIP bytes were not changed after testing or publication.

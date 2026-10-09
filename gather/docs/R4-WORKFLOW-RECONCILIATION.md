@@ -36,4 +36,4 @@ The user explicitly authorized Edge installation. Official Edge loads this devel
 
 R4 withdraws earlier intake/coverage platform and communication-composer priorities. Existing legacy records/tools remain compatible; do not expand them. Preserve project-free lookup, exact strings, original pixels, local deletion, recoverable backups and explicit associations. Avoid extra privacy wizards that harm utility. Public source stays generic; real case/reference content stays local.
 
-1.8.15 is a native Linux Edge-tested **release candidate for a controlled coworker pilot**, not an R4-complete or signed-in Windows acceptance claim. Earlier packages remain immutable. Main retains its independently completed 1.8.11 merge; publish this work only on develop/1.8.0-r3.
+1.8.15 is a native Linux Edge-tested **release candidate for a controlled coworker pilot**, not an R4-complete or signed-in Windows acceptance claim. Earlier packages remain immutable. Following the user's request to handle the Compare & pull request workflow, main contains the reviewed 1.8.15 RC source. Its public prerelease tag and download remain unchanged; future development continues on develop/1.8.0-r3.

@@ -61,7 +61,7 @@ The build passed **214 Node tests, 116 rendered workflow groups and 36 installed
 <details>
 <summary>For developers and contributors</summary>
 
-Development continues on [`develop/1.8.0-r3`](https://github.com/roedoeroe/Gather/tree/develop/1.8.0-r3). The branch name is historical. The default `main` branch retains the 1.8.11 application baseline; its updated README points to the current pilot download. Use the release tag or development branch for 1.8.15 source.
+The default `main` branch contains the 1.8.15 release-candidate source. Development continues on [`develop/1.8.0-r3`](https://github.com/roedoeroe/Gather/tree/develop/1.8.0-r3); the branch name is historical. Use the immutable [`1.8.15-rc.1` tag](https://github.com/roedoeroe/Gather/tree/1.8.15-rc.1) to reproduce the published download.
 
 The runtime is in `gather/account-id-tool`, with no bundler, hosted server or runtime install step. See [Contributing](CONTRIBUTING.md) for test commands and repository layout, and [Security](SECURITY.md) for handling reports without exposing real case data.
 

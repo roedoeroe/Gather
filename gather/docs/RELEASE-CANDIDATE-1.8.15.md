@@ -1,6 +1,6 @@
 # Gather 1.8.15 release candidate
 
-Publication follow-up: the user subsequently authorized the [GitHub prerelease](https://github.com/roedoeroe/Gather/releases/tag/1.8.15-rc.1). Its single attached extension ZIP is byte-identical to the package validated below. This report records the original package run; later GitHub presentation changes did not change the extension or its ZIPs.
+Publication follow-up: the user subsequently authorized the [GitHub prerelease](https://github.com/roedoeroe/Gather/releases/tag/1.8.15-rc.1), then delegated the Compare & pull request workflow to synchronize main with the reviewed 1.8.15 RC source. Its single attached extension ZIP is byte-identical to the package validated below. This report records the original package run; later GitHub presentation and branch integration did not change the extension, tag or ZIPs, or promote the prerelease to stable.
 
 Prepared October 8, 2026 (America/Los_Angeles). Suitable for a **small controlled coworker pilot**, with the platform-specific limits below. This is an unpacked browser extension, not a hosted application.
 
@@ -43,6 +43,6 @@ There is no encryption/legal certification/forensic erasure claim. Manual redact
 
 Use the extension ZIP and select **account-id-tool** in Edge's Load unpacked dialog, where organization policy allows it. For updates, finish capture, close Gather windows, retain a private backup if needed, replace **all files in the same installed folder**, then Reload at edge://extensions and confirm 1.8.15. Do not uninstall or clear storage. Keep the immutable 1.8.14 ZIP and a matching backup; test rollback in a separate clean profile before changing the working installation.
 
-Development publication remains on develop/1.8.0-r3. Main and repository visibility stay unchanged; no GitHub Release object is created. Only fictional/sanitized evidence is published. Root README and release DELIVERY provide download links and verification receipts.
+At the original package run, publication was limited to develop/1.8.0-r3: main and repository visibility stayed unchanged and no GitHub Release object was created. See the publication follow-up above for the subsequent prerelease and main integration. Only fictional/sanitized evidence is published. Root README and release DELIVERY provide download links and verification receipts.
 
 Cloud startup instructions must reference the final published development HEAD and restart the authenticated display when native tests need it. **Saving the configuration draft does not publish the environment**; review/save settings and use Publish environment when offered. A fresh restored task has not been verified by this run.

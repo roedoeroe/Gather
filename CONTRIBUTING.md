@@ -4,7 +4,7 @@ Gather is a local browser extension for account lookup, screenshots and delibera
 
 ## Choose the right source
 
-Work from `develop/1.8.0-r3` or the relevant release tag. The default `main` application remains at 1.8.11; its README directs users to the current release candidate. Inspect existing changes before editing and keep published versioned ZIPs immutable.
+The default `main` branch contains the 1.8.15 release-candidate source. Continue development on `develop/1.8.0-r3`, or use the relevant immutable release tag to reproduce a published package. Inspect existing changes before editing and keep published versioned ZIPs immutable. Merging source into `main` does not promote a prerelease to stable or update installed extensions.
 
 | Location | Purpose |
 | --- | --- |

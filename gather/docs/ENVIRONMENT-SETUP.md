@@ -1,6 +1,6 @@
 # Cloud environment setup — Gather 1.8.15 RC
 
-Use the existing `/workspace/Gather` checkout. Cloud tasks are already isolated: do not create a worktree unless the user asks. Inspect Git status and newer edits before changing anything. Read NEXT-RUN-HANDOFF, TESTING, RELEASE-CANDIDATE-1.8.15 and R4-WORKFLOW-RECONCILIATION. Preserve source edits and immutable release ZIPs. Development-branch publication, the 1.8.15 GitHub prerelease and GitHub presentation updates are authorized. Main’s application baseline remains independent; no app merge or visibility change is authorized.
+Use the existing `/workspace/Gather` checkout. Cloud tasks are already isolated: do not create a worktree unless the user asks. Inspect Git status and newer edits before changing anything. Read NEXT-RUN-HANDOFF, TESTING, RELEASE-CANDIDATE-1.8.15 and R4-WORKFLOW-RECONCILIATION. Preserve source edits and immutable release ZIPs. Development-branch publication, the 1.8.15 GitHub prerelease and GitHub presentation updates are authorized. The user subsequently delegated the Compare & pull request workflow; main now contains the reviewed 1.8.15 RC source. The release remains a prerelease. Do not treat that integration as authorization for arbitrary future releases or visibility changes.
 
 The extension needs no runtime dependencies, install script, bundler, server or case-storage credential. Node 24 and Python 3 run tests/packaging. Supplied Playwright 1.62.1 is at `/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules`; browser tests require that path as NODE_PATH. Run from `/workspace/Gather/gather`:
 
@@ -54,7 +54,7 @@ The test assigns a normal extension action shortcut through Edge's settings in i
 
 ## Publication and the setup dialog
 
-Branch `develop/1.8.0-r3` is historical naming; main retains the independent 1.8.11 merge. Use existing HTTPS proxy authentication rather than requesting a token because GH_TOKEN is absent. Only sanitized fictional evidence belongs in public packages. Versioned ZIPs and download receipts are in releases/1.8.15; prior releases stay immutable.
+Branch `develop/1.8.0-r3` is historical naming; main and development were synchronized after the 1.8.15 RC pull request. Inspect current remote refs before starting new work. Use existing HTTPS proxy authentication rather than requesting a token because GH_TOKEN is absent. Only sanitized fictional evidence belongs in public packages. Versioned ZIPs and download receipts are in releases/1.8.15; prior releases stay immutable.
 
 Choose **Done** in “Configure setup instructions.” **Install script — Not set** is expected, because no runtime installation step is needed. **Start skill** is the saved cloud startup guide, not another extension to install. Review/save environment settings and use **Publish environment** when offered to snapshot installed tools and activate the final repository ref. A saved configuration draft does not publish itself. This is separate from updating Gather on the user's computer.
 

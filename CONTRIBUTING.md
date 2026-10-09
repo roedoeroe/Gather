@@ -41,3 +41,7 @@ Use the [bug form](https://github.com/roedoeroe/Gather/issues/new?template=bug-r
 PRs should explain the concrete problem, resulting behavior and relevant validation. Avoid unrelated redesigns in a stabilization fix. Keep generated `profile-reader.js` consistent with its local adapter sources.
 
 Public examples must use fictional names, URLs and images. Do not commit real cases, profile identifiers, page source, cookies, credentials, case backups or private organization reference packs. See [Security](SECURITY.md).
+
+## Attach a prepared release package
+
+The manual **Attach verified extension** GitHub Actions workflow accepts an existing version tag. It verifies the release target, package receipt, SHA-256, ZIP integrity and manifest version, then attaches only the extension ZIP. It does not rebuild packages, execute their contents or overwrite an existing asset. Publication of a new release still requires maintainer authorization.

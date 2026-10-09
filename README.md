@@ -7,7 +7,7 @@
 <p align="center">Account lookup. Screenshots. Organized research.</p>
 
 <p align="center">
-  <strong><a href="https://raw.githubusercontent.com/roedoeroe/Gather/ef8836502afade34c6e489ce182bc5a80a0aad0e/releases/1.8.15/Gather-1.8.15-extension.zip">Download Gather 1.8.15 RC</a></strong>
+  <strong><a href="https://github.com/roedoeroe/Gather/releases/download/1.8.15-rc.1/Gather-1.8.15-extension.zip">Download Gather 1.8.15 RC</a></strong>
   · <a href="#install-or-update">Install or update</a>
   · <a href="https://github.com/roedoeroe/Gather/releases/tag/1.8.15-rc.1">Release notes</a>
 </p>
@@ -36,7 +36,7 @@ Edits are saved separately from the original. Choose what to mark, review the re
 
 **You only need the extension ZIP.**
 
-1. [Download Gather](https://raw.githubusercontent.com/roedoeroe/Gather/ef8836502afade34c6e489ce182bc5a80a0aad0e/releases/1.8.15/Gather-1.8.15-extension.zip) and extract the ZIP into a permanent folder.
+1. [Download Gather](https://github.com/roedoeroe/Gather/releases/download/1.8.15-rc.1/Gather-1.8.15-extension.zip) and extract the ZIP into a permanent folder.
 2. In Edge, open `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select **account-id-tool**. Your organization must allow unpacked extensions.
 3. Pin Gather in the browser toolbar, open a supported profile, and click Gather. **Help** is available in the popup, side panel and workspace.
 

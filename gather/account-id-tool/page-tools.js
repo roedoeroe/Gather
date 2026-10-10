@@ -41,6 +41,7 @@ async function refresh({reset=false}={}){
   if(!valid){$('captureScan').append(new Option('Scan unavailable — choose another',frozen.context.scanId));status('This scan is no longer available. Choose where to save.',true);}
   $('captureScan').value=frozen.context.scanId||'';
   $('captureAutoCopy').checked=settings.automaticCopy;
+  $('sourceAutoCopy').checked=settings.automaticSourceCopy===true;
   $('captureSubjectRow').hidden=!frozen.context.projectId;
   $('captureSubjectLabel').textContent=settings.subjectLabel;
   $('toolbarSubject').replaceChildren(new Option('Unassigned',''),...subjects.map(s=>new Option(s.name===s.roleId?s.roleId:s.name+' · '+s.roleId,s.id)));
@@ -58,6 +59,7 @@ export async function pageToolsContext(){await ready;const chosen=frozen();retur
 async function init(){
   if(!globalThis.chrome?.runtime?.id)return;
   windowId=(await chrome.windows.getCurrent()).id;
+  $('sourceAutoCopy').onchange=run(async()=>{const checked=$('sourceAutoCopy').checked;try{await updateCaptureSettings({automaticSourceCopy:checked});}catch(error){$('sourceAutoCopy').checked=!checked;throw error;}});
   $('captureAutoCopy').onchange=run(async()=>{const checked=$('captureAutoCopy').checked;try{await updateCaptureSettings({automaticCopy:checked});}catch(error){$('captureAutoCopy').checked=!checked;throw error;}});
   $('captureScan').onchange=run(async()=>{
     const chosen=frozen(),scanId=$('captureScan').value||null;

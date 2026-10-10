@@ -3,7 +3,7 @@ import {updateCaseSession} from './case-session.js';
 // Capture binaries deliberately live outside the 4 MiB workspace JSON.
 export const CAPTURE_DB = 'gather-captures-v1';
 export const CAPTURE_LIMITS = Object.freeze({assetBytes:64*1024*1024,captureBytes:192*1024*1024,totalBytes:512*1024*1024,records:20000});
-const DEFAULTS = {subjectLabel:'SOC',automaticExport:false,automaticCopy:true};
+const DEFAULTS = {subjectLabel:'SOC',automaticExport:false,automaticCopy:true,automaticSourceCopy:false};
 let connection;
 const uid=()=>crypto.randomUUID();
 const fail=message=>{throw new Error(message);};
@@ -33,7 +33,7 @@ async function writeOne(store,value){const db=await openCaptureDB(),tx=db.transa
 export async function getCaptureSettings(projectId=null){const settings={...DEFAULTS,...(await readOne('settings','preferences'))?.value};if(projectId){captureId(projectId);const label=(await readOne('settings','project-label:'+projectId))?.value;if(label)settings.subjectLabel=label;}return settings;}
 export async function updateCaptureSettings(changes,{projectId=null}={}){
   if(projectId&&Object.hasOwn(changes,'subjectLabel')){captureId(projectId);const label=cleanText(changes.subjectLabel,30);if(!label)fail('Enter a subject display label.');await writeOne('settings',{key:'project-label:'+projectId,value:label});const rest={...changes};delete rest.subjectLabel;if(Object.keys(rest).length)await updateCaptureSettings(rest);return getCaptureSettings(projectId);}
-  const approved={};for(const key of ['automaticCopy','automaticExport'])if(Object.hasOwn(changes,key)){if(typeof changes[key]!=='boolean')fail('Invalid capture preference.');approved[key]=changes[key];}
+  const approved={};for(const key of ['automaticCopy','automaticSourceCopy','automaticExport'])if(Object.hasOwn(changes,key)){if(typeof changes[key]!=='boolean')fail('Invalid capture preference.');approved[key]=changes[key];}
   if(Object.hasOwn(changes,'subjectLabel')){approved.subjectLabel=cleanText(changes.subjectLabel,30);if(!approved.subjectLabel)fail('Enter a subject display label.');}
   // Read/merge/write in one transaction: simultaneous preferences cannot erase each other.
   const db=await openCaptureDB(),tx=db.transaction('settings','readwrite'),done=finish(tx),store=tx.objectStore('settings');let settings;
@@ -77,7 +77,7 @@ export async function resolveCaptureDestination(workspace,scanId,subjectId=undef
 export async function beginCapture(input){
   const destination=frozenDestination(input.context),source={url:cleanText(input.source?.url||'',4096),title:cleanText(input.source?.title||'',500),tabId:input.source?.tabId??null,windowId:input.source?.windowId??null};
   let url;try{url=new URL(source.url);}catch{fail('Choose an http or https page to capture.');}if(!['http:','https:'].includes(url.protocol)||url.username||url.password)fail('Choose an http or https page without URL credentials.');
-  if(!['visible','selection','full-page'].includes(input.mode))fail('Choose a capture mode.');
+  if(!['visible','selection','full-page','source-image'].includes(input.mode))fail('Choose a capture mode.');
   const refs={};for(const key of ['accountId','sourceId','searchId'])refs[key]=captureId(input.refs?.[key],true);
   if(destination.subjectId){const subject=await readOne('subjects',destination.subjectId);if(!subject||subject.projectId!==destination.projectId)fail('Choose a subject in this project.');}
   const startedAt=input.startedAt??Date.now();if(!Number.isFinite(startedAt)||startedAt<=0)fail('Invalid capture start time.');
@@ -89,7 +89,7 @@ export async function completeCapture(id,details){
   captureId(id);if(!['complete','partial'].includes(details.status||'complete'))fail('Invalid capture completion state.');
   if(!Array.isArray(details.assets)||!details.assets.length||details.assets.length>128)fail('Capture needs original image bytes.');
   let total=0;const assets=[];
-  for(const input of details.assets){if(!(input.blob instanceof Blob)||!input.blob.size||input.blob.size>CAPTURE_LIMITS.assetBytes||!['image/png','image/jpeg','image/webp'].includes(input.blob.type))fail('Unsupported or oversized capture image.');if(!['original','tile','derivative'].includes(input.role||'original'))fail('Invalid capture asset role.');total+=input.blob.size;if(total>CAPTURE_LIMITS.captureBytes)fail('Capture exceeds the 192 MiB capture limit.');const {blob,...metadata}=input;assets.push({...safeMetadata(metadata),id:input.id?captureId(input.id):uid(),captureId:id,role:input.role||'original',mime:blob.type,bytes:blob.size,sha256:await hashBytes(blob),blob});}
+  for(const input of details.assets){if(!(input.blob instanceof Blob)||!input.blob.size||input.blob.size>CAPTURE_LIMITS.assetBytes||!['image/png','image/jpeg','image/webp','image/avif','image/gif'].includes(input.blob.type))fail('Unsupported or oversized capture image.');if(!['original','tile','derivative'].includes(input.role||'original'))fail('Invalid capture asset role.');total+=input.blob.size;if(total>CAPTURE_LIMITS.captureBytes)fail('Capture exceeds the 192 MiB capture limit.');const {blob,...metadata}=input;assets.push({...safeMetadata(metadata),id:input.id?captureId(input.id):uid(),captureId:id,role:input.role||'original',mime:blob.type,bytes:blob.size,sha256:await hashBytes(blob),blob});}
   if(!assets.some(a=>a.role==='original'||a.role==='tile'))fail('Preserve at least one original capture image.');
   const estimate=await globalThis.navigator?.storage?.estimate?.();if(estimate?.quota&&estimate.usage+total>estimate.quota*0.95)fail('Browser storage is almost full. Export a backup before another capture.');
   const db=await openCaptureDB(),tx=db.transaction(['captures','assets'],'readwrite'),done=finish(tx),records=tx.objectStore('captures'),images=tx.objectStore('assets');

@@ -1,49 +1,48 @@
-# Gather 1.8.15 RC
+# Gather 1.8.16 RC
 
-Gather is a local browser extension for account lookup, screenshots and deliberate research. **Open a profile → Gather → inspect or copy.** A case is optional. Edge on Windows is the primary target; Chromium-based Chrome is also supported.
+A local Edge extension for exact account IDs, screenshots and deliberate research. **Open a page → Gather → inspect or copy.** A case is optional. Blue/white controls keep routine work in the toolbar; the full workspace has Research, Captures, Case, Reference and Settings.
 
 ## What changed
 
-- Instagram gets a conditional **two-second readiness buffer** when its profile metadata is still arriving. Gather reads immediately, checks missing metadata every 250 ms until the deadline, then uses the existing source/public fallback. Already-loaded profiles return immediately. One lookup operation; no second click required for the tested delayed-page scenarios.
-- Loading tabs remain usable when their explicit URL identifies the intended profile. Pinned-document, account-conflict, pending-navigation and cancellation guards preserve exact string IDs. The extractor itself is unchanged.
-- **Help** is available from the popup, side panel, workspace and full account tools. It has local, focused search and plain-language guidance. A [Coworker Quick Start](account-id-tool/COWORKER-QUICK-START.md) ships with the extension.
+- Supported video/post URLs can resolve their explicitly bound author. TikTok videos, Instagram posts/reels, Threads posts, YouTube videos/Shorts and supported Facebook videos/reels return a clean canonical owner profile. Exact IDs remain strings; ambiguous/missing author structures fail visibly.
+- **Save source image to Gather** is available by right-clicking an image. It preserves the exact returned PNG/JPEG/WebP/AVIF/GIF bytes, source URL, dimensions and hash under the frozen Case/SOC. No guessed CDN rewrites or screenshot fallback. Auto-copy source images is a separate option.
+- **Reverse image** starts with a selected local file or stored capture. Preview, change/remove, then Copy & open the chosen provider. The image is not uploaded automatically. Manual upload options remain when clipboard/provider support differs.
+- **Reference** imports a local Markdown folder or transparent versioned JSON pack, searches titles/sections/paths/text/aliases with conservative typo matching, and copies exact source wording. No proprietary content, remote AI, email composition or live OneNote dependency.
+- Static gray search completions support Tab/Enter acceptance and Escape dismissal without retaining queries. Enter runs pasted account links; Shift+Enter adds a line.
 
-Case/SOC and **Select area · Full page · Visible area** remain in the popup's fixed bottom area. Selection guides/scrolling capture, Crop handles, red arrows/circles, manual redaction, five recent batches, local cases/history and binary backups are retained. No new permissions, runtime dependency, storage schema, retention policy or cloud endpoint.
+The existing two-second conditional Instagram readiness check, exact selection pixels, scrolling selection, crop handles, red arrows/circles, manual black redaction, original/derivative separation, five Recents and guarded backup/deletion remain.
 
-## Install or update
+## Install, update and rollback
 
-1. Extract `Gather-1.8.15-extension.zip` into a permanent directory.
-2. Open `edge://extensions` (or `chrome://extensions`), enable Developer mode and choose **Load unpacked**. Select its **account-id-tool** directory containing `manifest.json`.
-3. Pin Gather, open a supported profile and click Gather. Use Copy IDs, or choose the Case/SOC and Select area, Full page or Visible area. The side panel is optional.
+You need only **Gather-1.8.16-extension.zip**. Extract it to a permanent folder; in `edge://extensions`, enable Developer mode and Load unpacked → **account-id-tool**. Your organization must allow unpacked extensions. Pin Gather and open Help for workflow guidance.
 
-**Updating:** finish captures and close Gather windows. Keep your existing installation folder and an optional private backup. Replace **all files at the same installed path**, then Reload on the Extensions page; confirm **1.8.15**. Do not uninstall or clear browser storage. Reload releases legacy ephemeral session values; durable findings/images remain. Updating trims unsaved recent lookup batches to the newest five.
+To update, finish captures and close Gather windows. Preserve a private backup as appropriate. Replace all files at the **same installed account-id-tool path**, then Reload; confirm **1.8.16**. Do not uninstall or clear browser storage. Keep the immutable 1.8.15 ZIP and a matching pre-update backup. Test rollback in a separate profile: old builds cannot understand all new source-image formats or Reference features. Reference has its own collection export, separate from case backups.
 
-**Rollback:** keep the immutable 1.8.14 package and a matching pre-update backup. Test them in a separate clean browser profile before changing your working profile. Earlier builds do not enforce all current fixes or history retention. Backup restore is deliberate; deletion without a backup cannot be undone.
+## Local work and deliberate external actions
 
-## Local data and copying
+Cases, SOCs, findings, lookup history, images and Reference remain in this browser profile. Another profile using Gather has a separate store. Gather has no case cloud, storage.sync work data, telemetry or analytics. Lookups contact their platforms; explicit web searches contact their selected service. Search queries are not retained by Gather. Source-image retrieval requests only the clicked image URL; external reverse search is explicit and does not automatically upload an image.
 
-Cases, SOCs, findings and image blobs stay in this browser on this computer. Gather has no case server, cloud sync or analytics. Source code is public by the user's choice; case data is separate. Web/image searches open the chosen service without saving query text or automatic search history in Gather. User-requested profile lookups contact the selected platform; explicitly enabled browser fallback remains supported. Reverse-image providers receive an image only when you choose/upload it on their site.
+Red deletion controls remove local records and image blobs in the selected scope. They cannot delete browser/provider history, clipboard history, exported files or endpoint backups. Manual redaction creates a derivative and leaves the original intact. Private `.gather` backups are unencrypted and include originals. Reference exports contain original source wording. This is not forensic erasure, encryption or legal certification.
 
-Settings → **Data & Privacy** has red case deletion and recent-history clearing controls. Capture history supports individual and selected-image deletion. These logically delete Gather records/blobs, including original/derivative images in the selected scope. Browser history, OS clipboard history, downloaded files and external-site records are separate. This is not forensic erasure.
+[Storage/deletion](docs/PRIVACY-DATA-FLOW.md) · [Network inventory](docs/NETWORK-EGRESS.md) · [Provider capabilities](docs/REVERSE-IMAGE-PROVIDERS.md)
 
-Redaction is manual. Copy, Save image and ordinary image exports use the selected flattened derivative when one exists. Source captions are optional and do not alter originals. **Private `.gather` backups are unencrypted and include originals**, which may show more than a selected crop or redacted export. Anyone with the backup can read it. Auto-copy is optional; Gather does not inspect or automatically hide names in pixels.
+## Limits and verification
 
-## Capabilities and limits
+This is a controlled release candidate. Supported URL recognition does not guarantee a platform exposes a reliable author/ID. Opaque short links, ambiguous content and login/security challenges do not produce guessed identities. X remains search-only. Full-page capture is bounded to 24 tiles, 48 million pixels, 24,000 CSS pixels and 60 seconds; changing feeds/sticky content can cause partial output. Check completion status.
 
-Five extractors: Instagram, Facebook, Threads, TikTok and YouTube. X is search-only. IDs remain exact strings. Login, network, conflicting-ID and missing-markup failures stay uncertain; no identity or threat inference. Current-profile reads use packaged isolated-world parsing and return small structured results. Public fetches omit credentials; same-page source reads use the page's normal session. [Hardening details](docs/HARDENING-REVIEW-1.8.12.md).
+Storage limits: 4 MiB workspace JSON; 64 MiB image asset, 192 MiB capture and 512 MiB image total. Source-image access can fail on authenticated, redirected, temporary/blob, canvas-only or CORS-blocked resources. Clipboard conversion to PNG can flatten animation to a still frame; original bytes remain unchanged. Reference: 2,000 files, 2 MiB/file, 20 MiB/collection, 100 MiB total. Imports exclude common unsafe folders/credential markers but do not replace review of approved source material.
 
-Filing freezes at capture start. Global case switches cannot redirect it. Only browser-provided relationships carry tab context; names, timing and similar URLs never establish related tabs. Renames preserve record IDs. Case and SOC labels stay local; SOC has no assumed expansion.
+[TESTING](docs/TESTING.md) separates deterministic, rendered/mocked, native Linux Edge and external-provider checks. Windows signed-in sessions, native Windows scaling, OS dialogs and application clipboard integrations remain unverified. No universal browser/site reliability guarantee is claimed.
 
-Visible, selected and bounded full-page captures retain original PNGs/tiles in IndexedDB, geometry, source, timestamps/timezone, status and SHA-256 integrity hashes. A hash does not establish authenticity. Limits: 4 MiB workspace JSON, 512 MiB image storage, 192 MiB/capture, 64 MiB/asset; browser quotas can be lower. Full page is bounded to 24 tiles, 48 million pixels, 24,000 CSS pixels and 60 seconds. Dynamic feeds, sticky elements and lazy loading can produce partial images or seams; limitations are recorded. Scroll and temporary changes are restored on completion/cancellation.
+[Product Audit](docs/PRODUCT-AUDIT-1.8.16.md) · [Future Plans](docs/FUTURE-PLANS.md) · [Quick Start](account-id-tool/COWORKER-QUICK-START.md) · [Handoff](docs/NEXT-RUN-HANDOFF.md)
 
-Downloads-relative folder export is optional. **Saved in Gather** and **Exported to folder** are separate; failed export retains the image and offers Retry. This API does not write arbitrary absolute paths. PNG/JPEG Save image and selected-image Print / Save PDF remain; native dialogs/pagination require local browser checks. Nested scrolling, pinch zoom and custom roots are not supported. Source-image acquisition and the local Reference Library remain unshipped, behind R4's native correctness gate.
+## Development
 
-## Verification and development
+Runtime: `account-id-tool`, plain packaged modules with no server, bundler or runtime install. Node 24/Python 3 run checks. From `gather`:
 
-**214 Node tests; 116 rendered workflow groups; 11 pixel-selection groups; 10 worker groups; five isolated-world reader groups passed.** Rendered tests use real DOM/canvas/clipboard/IndexedDB with extension API doubles. The 17 image-tool groups also passed at 2× simulated DPR; pixel checks cover five simulated scales, not native Windows zoom.
+```sh
+python3 scripts/build-profile-reader.py --check
+node --test tests/*.test.mjs
+```
 
-**Actual installed Linux Edge passed 36 groups:** 23 lookup/toolbar/capture/editor/Help, 10 workspace, three same-folder update. Real toolbar invocation, activeTab, screenshot acquisition, scrolling selection, cancellation, clipboard, editing and 1.8.14 → 1.8.15 data preservation were exercised. A live signed-out lookup of the original chat-authorized profile returned an exact ID on its first operation in **271 ms**, with no account details published.
-
-Signed-in Windows Edge, native zoom/Windows scaling, native side-panel opening and OS image-save/print dialogs remain unverified. This is a **controlled coworker pilot release candidate**, not a universal reliability guarantee. [Detailed results](docs/TESTING.md) · [Release scope and limitations](docs/RELEASE-CANDIDATE-1.8.15.md) · [R4 status](docs/R4-WORKFLOW-RECONCILIATION.md).
-
-Runtime is `account-id-tool`, with no install, bundler or server. From this directory run `node --test tests/*.test.mjs` and `python3 scripts/package.py`. Browser setup is in TESTING and ENVIRONMENT-SETUP. Generated `profile-reader.js` must match local adapter modules (`python3 scripts/build-profile-reader.py --check`). The package privacy scanner checks common patterns; it is not general sensitive-data detection or legal certification.
+See TESTING and ENVIRONMENT-SETUP for browser commands. Do not edit runtime/tests while suites run. Package only into a new immutable version directory after final verification. Public evidence must remain fictional; scanner pattern checks are not a universal sensitive-data detector.

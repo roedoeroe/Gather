@@ -1,0 +1,27 @@
+{
+  "version": "1.8.16",
+  "tag": "1.8.16-rc.1",
+  "release_url": "https://github.com/roedoeroe/Gather/releases/tag/1.8.16-rc.1",
+  "release_id": 408841762,
+  "target_commit": "855d66c1646ad67fe06e20603086395e655bac89",
+  "prerelease": true,
+  "verified_at_utc": "2026-10-10T09:32:57.468009+00:00",
+  "public_download": {
+    "url": "https://github.com/roedoeroe/Gather/releases/download/1.8.16-rc.1/Gather-1.8.16-extension.zip",
+    "status": 200,
+    "bytes": 243294,
+    "sha256": "f1692dc02c8dce0faffdae1aa8530de2d40078cb29995f30fdb30d8407cf1f0e",
+    "zip_crc": "passed",
+    "runtime_matches_tested_source": true
+  },
+  "uploaded_assets": [
+    "Gather-1.8.16-extension.zip"
+  ],
+  "upload_workflow_run": 38041687231,
+  "upload_workflow_attempt": 2,
+  "upload_note": "First attempt stopped before uploading because the not-yet-created tag returned HTTP 422. Created the immutable tag at the tested commit, then reran successfully. No package rebuild or overwrite.",
+  "implementation_ci_run": 38041650106,
+  "implementation_ci_result": "success",
+  "native_package_tests": "23 groups passed; see package-native-results.json",
+  "verification_limits": "Real Linux Edge with fictional controlled platform responses; no signed-in Windows claim."
+}

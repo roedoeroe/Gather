@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Gather — Workspace</title><link rel="icon" href="icon.svg"><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="capture-ui.css"><link rel="stylesheet" href="case-ui.css"><link rel="stylesheet" href="workspace-layout.css"><link rel="stylesheet" href="capture-viewer.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Gather — Workspace</title><link rel="icon" href="icon.svg"><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="capture-ui.css"><link rel="stylesheet" href="case-ui.css"><link rel="stylesheet" href="workspace-layout.css"><link rel="stylesheet" href="capture-viewer.css"><link rel="stylesheet" href="search-completion.css"><link rel="stylesheet" href="reference.css"><link rel="stylesheet" href="reverse-image.css"></head>
 <body>
-<header class="bar"><a class="brand" href="workspace.html"><img src="icon.svg" width="28" height="28" alt="">Gather<span>Workspace</span></a><nav><a class="help-link" href="help.html" target="_blank" rel="noopener">Help</a><button id="openCaseStart">New case</button><a href="index.html" target="_blank">Quick lookup ↗</a><button id="expand" class="subtle" hidden>Open full workspace ↗</button></nav></header>
+<header class="bar"><a class="brand" href="workspace.html"><img src="icon.svg" width="28" height="28" alt="">Gather<span>Workspace</span></a><nav><a class="panel-reference-link" href="reference.html" target="_blank">Reference</a><a class="help-link" href="help.html" target="_blank" rel="noopener">Help</a><button id="openCaseStart">New case</button><a href="index.html" target="_blank">Quick lookup ↗</a><button id="expand" class="subtle" hidden>Open full workspace ↗</button></nav></header>
 <div class="layout" inert>
 <aside>
   <button id="libraryToggle" aria-expanded="false" aria-controls="libraryContents">Library ▾</button>
@@ -28,12 +28,14 @@
     <button id="tab-research" type="button" role="tab" data-section="research" aria-controls="view-research" aria-selected="true">Research</button>
     <button id="tab-captures" type="button" role="tab" data-section="captures" aria-controls="view-captures" aria-selected="false" tabindex="-1">Captures</button>
     <button id="tab-case" type="button" role="tab" data-section="case" aria-controls="view-case" aria-selected="false" tabindex="-1">Case</button>
+    <button id="tab-reference" type="button" role="tab" data-section="reference" aria-controls="view-reference" aria-selected="false" tabindex="-1">Reference</button>
     <button id="tab-settings" type="button" role="tab" data-section="settings" aria-controls="view-settings" aria-selected="false" tabindex="-1">Settings</button>
   </div>
   <section id="view-research" class="workspace-view" role="tabpanel" aria-labelledby="tab-research" tabindex="0">
   <section class="composer" aria-label="Search and save">
     <div class="section-heading"><div class="search-modes" role="group" aria-label="Search type"><button id="webSearchMode" type="button" aria-pressed="true">Search the web</button><button id="imageSearchMode" type="button" aria-pressed="false">Reverse image</button></div><span id="saveDestination" class="quiet">Destination: Inbox</span></div>
     <form id="searchForm" class="search-form" autocomplete="off"><div id="queryField" class="search-field"><label for="query">Search query</label><input id="query" placeholder='e.g. "alex.example" site:instagram.com' maxlength="2000" required spellcheck="false"></div><div class="provider-field"><label for="provider">Search provider</label><select id="provider"><option value="google">Google</option><option value="bing">Bing</option><option value="instagram">Instagram · Google</option><option value="facebook">Facebook · Google</option><option value="tiktok">TikTok · Google</option><option value="threads">Threads · Google</option><option value="youtube">YouTube</option><option value="x">X search</option></select></div><button id="launchSearch" class="primary" type="submit">Search ↗</button></form>
+    <section id="reverseImage" hidden aria-label="Reverse image search"></section>
     <div class="add-actions"><button id="savePage">Save current page</button><details class="add-menu"><summary>Add to this scan</summary><div><button id="addSource">Link or excerpt</button><button id="addNote">Note</button><button id="addTask">Task</button></div></details></div>
     <p id="searchHelp" class="micro">Opens a new tab. Gather does not save your query or search history. Your browser and the search service may keep their own history.</p>
   </section>
@@ -53,6 +55,7 @@
     <section id="subjectManagement" aria-label="Manage subjects"><h3>Subjects</h3><p class="quiet">Choose a subject above. Names never create account associations automatically.</p></section>
     <section id="caseTools" aria-label="Search plan and coverage"></section>
   </section>
+  <section id="view-reference" class="workspace-view" role="tabpanel" aria-labelledby="tab-reference" tabindex="0" hidden><section id="referenceLibrary"></section></section>
   <section id="view-settings" class="workspace-view" role="tabpanel" aria-labelledby="tab-settings" tabindex="0" hidden>
     <h2>Settings</h2>
     <section id="privacyTools"></section>
@@ -67,4 +70,5 @@
 <script type="module" src="workspace.js"></script>
 <script type="module" src="capture-ui.js"></script>
 <script type="module" src="case-ui.js"></script>
+<script type="module" src="reference-ui.js"></script>
 </body></html>

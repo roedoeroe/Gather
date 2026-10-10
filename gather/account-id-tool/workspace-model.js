@@ -1,6 +1,6 @@
 import {reduceResearch,validateResearch,remapResearch,emptyResearch} from './case-model.js';
 import {accountState,ADAPTER_VERSION} from './account-state.js';
-import {normalizeProfile, isCopyableId, idCheck} from './core.js';
+import {normalizeProfile, normalizeLookup, isCopyableId, idCheck} from './core.js';
 export const SCHEMA = 1;
 export const WORKSPACE_KEY = 'gather.workspace.v1';
 export const MAX_BYTES = 4 * 1024 * 1024;
@@ -56,11 +56,12 @@ function cleanEntry(entry) {
   const p=normalizeProfile(entry.url);
   if(entry.platform!==p.platform)fail('Account platform differs from its URL.');
   const originalUrl=text(entry.originalUrl||entry.url,2048,true);
-  if(normalizeProfile(originalUrl).key!==p.key)fail('Original URL differs from this account.');
+  const original=normalizeLookup(originalUrl);
+  if(original.content?original.platform!==p.platform||entry.canonicalProfileUrl!==p.url||!entry.verifiedAt:original.key!==p.key)fail('Original URL differs from this account.');
   const id=entry.id??'';
   if(typeof id!=='string'||(id&&!(p.platform==='youtube'?/^UC[\w-]{22}$/ : /^[1-9]\d{0,29}$/).test(id)))fail('Account IDs must be exact strings.');
   if(!['resolved','gone','ready','error','stopped'].includes(entry.status))fail('Wait for this lookup to finish before saving.');
-  const clean={...p,id,status:entry.status,originalUrl,displayName:text(entry.displayName||'',500),suppliedName:text(entry.suppliedName||'',500),method:text(entry.method||'',500),message:text(entry.message||'',2000),verifiedAt:Number.isFinite(entry.verifiedAt)&&entry.verifiedAt>0?entry.verifiedAt:null,verificationSource:['live','source','url'].includes(entry.verificationSource)?entry.verificationSource:'',providedIds:[],reviewedId:text(entry.reviewedId||'',30),notes:[]};
+  const clean={...p,id,status:entry.status,originalUrl,...(original.content?{canonicalProfileUrl:p.url,sourcePageUrl:originalUrl}:{}),displayName:text(entry.displayName||'',500),suppliedName:text(entry.suppliedName||'',500),method:text(entry.method||'',500),message:text(entry.message||'',2000),verifiedAt:Number.isFinite(entry.verifiedAt)&&entry.verifiedAt>0?entry.verifiedAt:null,verificationSource:['live','source','url'].includes(entry.verificationSource)?entry.verificationSource:'',providedIds:[],reviewedId:text(entry.reviewedId||'',30),notes:[]};
   if(!Array.isArray(entry.providedIds||[])||!Array.isArray(entry.notes||[]))fail('Invalid account notes or supplied IDs.');
   clean.providedIds=(entry.providedIds||[]).map(v=>text(v,30,true));
   clean.notes=(entry.notes||[]).map(v=>text(v,500));

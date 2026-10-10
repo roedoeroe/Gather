@@ -1,6 +1,6 @@
-# Cloud environment setup — Gather 1.8.15 RC
+# Cloud environment setup — Gather 1.8.16 RC
 
-Use the existing `/workspace/Gather` checkout. Cloud tasks are already isolated: do not create a worktree unless the user asks. Inspect Git status and newer edits before changing anything. Read NEXT-RUN-HANDOFF, TESTING, RELEASE-CANDIDATE-1.8.15 and R4-WORKFLOW-RECONCILIATION. Preserve source edits and immutable release ZIPs. Development-branch publication, the 1.8.15 GitHub prerelease and GitHub presentation updates are authorized. The user subsequently delegated the Compare & pull request workflow; main now contains the reviewed 1.8.15 RC source. The release remains a prerelease. Do not treat that integration as authorization for arbitrary future releases or visibility changes.
+Use the existing `/workspace/Gather` checkout. Cloud tasks are already isolated: do not create a worktree unless the user asks. Inspect Git status and newer edits before changing anything. Read NEXT-RUN-HANDOFF, TESTING, RELEASE-CANDIDATE-1.8.16, PRODUCT-AUDIT-1.8.16 and FUTURE-PLANS. Preserve source edits and immutable release ZIPs. Development-branch publication, the 1.8.15 GitHub prerelease and GitHub presentation updates are authorized. The user delegated the earlier Compare & pull request workflow for 1.8.15. Inspect current main/development refs before assuming a newer integration. The 1.8.16 implementation and GitHub release were separately authorized. Preserve older tags/packages; the release remains a prerelease. Do not treat that integration as authorization for arbitrary future releases or visibility changes.
 
 The extension needs no runtime dependencies, install script, bundler, server or case-storage credential. Node 24 and Python 3 run tests/packaging. Supplied Playwright 1.62.1 is at `/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules`; browser tests require that path as NODE_PATH. Run from `/workspace/Gather/gather`:
 
@@ -26,7 +26,7 @@ GATHER_BROWSER_ARTIFACTS=/workspace/Gather/artifacts/native-workspace node tests
 GATHER_BROWSER_ARTIFACTS=/workspace/Gather/artifacts/native-update node tests/browser-native-update.mjs
 ```
 
-The update test reads the immutable releases/1.8.14 extension ZIP. `GATHER_EXTENSION_ROOT` and `GATHER_PREVIOUS_PACKAGE` allow exact extracted-package verification without changing source.
+The update test reads the immutable releases/1.8.15 extension ZIP. `GATHER_EXTENSION_ROOT` and `GATHER_PREVIOUS_PACKAGE` allow exact extracted-package verification without changing source.
 
 ## Restart the display for native toolbar/capture checks
 
@@ -54,8 +54,12 @@ The test assigns a normal extension action shortcut through Edge's settings in i
 
 ## Publication and the setup dialog
 
-Branch `develop/1.8.0-r3` is historical naming; main and development were synchronized after the 1.8.15 RC pull request. Inspect current remote refs before starting new work. Use existing HTTPS proxy authentication rather than requesting a token because GH_TOKEN is absent. Only sanitized fictional evidence belongs in public packages. Versioned ZIPs and download receipts are in releases/1.8.15; prior releases stay immutable.
+Branch `develop/1.8.0-r3` is historical naming; main and development were synchronized after the 1.8.16 RC pull request. Inspect current remote refs before starting new work. Use existing HTTPS proxy authentication rather than requesting a token because GH_TOKEN is absent. Only sanitized fictional evidence belongs in public packages. Versioned ZIPs and download receipts are in releases/1.8.15; prior releases stay immutable.
 
 Choose **Done** in “Configure setup instructions.” **Install script — Not set** is expected, because no runtime installation step is needed. **Start skill** is the saved cloud startup guide, not another extension to install. Review/save environment settings and use **Publish environment** when offered to snapshot installed tools and activate the final repository ref. A saved configuration draft does not publish itself. This is separate from updating Gather on the user's computer.
 
 Keep network, secrets and the absent install script unchanged. Published Git source/ZIPs are independently reproducible; the locally installed browser tools also require the environment snapshot. Never claim a restored environment was tested merely because this instance passed.
+
+## R6/R9 native analyst journey
+
+Run `node tests/browser-r6.mjs` with the Edge path for headless local-storage/content/Reference checks. For the complete native context-menu and three-mode capture journey, use the authenticated display variables above and `GATHER_R6_HEADED=1 node tests/browser-r6.mjs`. Run one headed suite per display. A stale snapshot hostname can make Xauthority fail; stop only your own display and create a fresh mode-600 cookie using `/usr/bin/xauth` with cookie input on stdin, then restart and verify. Do not disable display authentication.

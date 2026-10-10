@@ -1,4 +1,5 @@
-import {IMAGE_PROVIDERS} from './image-search.js';
+import {attachSearchCompletion} from './search-completion-ui.js';
+import {mountReverseImage} from './reverse-image.js';
 import {getCapture} from './capture-store.js';
 import {retainFocus} from './workspace-focus.js';
 import {initNavigation,selectSection,setCaseAvailable} from './workspace-navigation.js';
@@ -117,20 +118,19 @@ $('addSource').onclick=()=>{const scanId=currentScan();openEditor('Save a source
 $('addNote').onclick=()=>{const scanId=currentScan();openEditor('Add a note',[{name:'title',label:'Title',value:'Note'},{name:'body',label:'Your note',type:'textarea',max:20000}],v=>action({type:'item.save',kind:'note',scanId,...v}),scanId);};
 $('addTask').onclick=()=>{const scanId=currentScan();openEditor('New task',[{name:'title',label:'What needs to happen?',placeholder:'e.g. Review the saved profile tomorrow'}],v=>action({type:'task.create',scanId,...v}),scanId);};
 $('savePage').onclick=()=>safely(async()=>{const scanId=currentScan(),sourceTabId=tabId;if(!sourceTabId)throw new Error('Open a web page and use the Gather toolbar button.');const response=await request('workspace.capture',{scanId,tabId:sourceTabId});update(response.state);message('Page saved to '+(response.result?.destinationLabel||label(response.result?.scanId??scanId))+'.');});
-function clearSearchInput(){$('query').value='';}
+const completion=attachSearchCompletion($('query'),$('provider'));
+function clearSearchInput(){$('query').value='';completion?.clear();}
+let reverseTool;
 function setSearchMode(mode){
   searchMode=mode;const image=mode==='image';
   $('webSearchMode').setAttribute('aria-pressed',String(!image));$('imageSearchMode').setAttribute('aria-pressed',String(image));
-  $('queryField').hidden=image;$('query').disabled=image;$('query').required=!image;
-  $('provider').replaceChildren(...Object.entries(image?IMAGE_PROVIDERS:PROVIDERS).map(([id,value])=>new Option(image?value.name:value,id)));
-  $('launchSearch').textContent=image?'Open image search ↗':'Search ↗';
-  $('searchHelp').textContent=image?'Opens the provider’s website. Use its camera or upload button to choose an image there. Gather does not upload images or save image-search history.':'Opens a new tab. Gather does not save your query or search history. Your browser and the search service may keep their own history.';
-  (image?$('provider'):$('query')).focus();
+  $('searchForm').hidden=image;$('query').disabled=image;$('query').required=!image;$('reverseImage').hidden=!image;$('searchHelp').hidden=image;
+  if(image){reverseTool||=mountReverseImage($('reverseImage'));reverseTool.focus();}else $('query').focus();
 }
 $('webSearchMode').onclick=()=>setSearchMode('web');$('imageSearchMode').onclick=()=>setSearchMode('image');
 $('searchForm').addEventListener('submit',event=>{
   event.preventDefault();const scanId=currentScan(),query=$('query').value,provider=$('provider').value,image=searchMode==='image',submit=$('launchSearch');
-  if(submit.disabled)return;submit.disabled=true;
+  if(submit.disabled||image)return;submit.disabled=true;
   safely(async()=>{
     const r=await request(image?'workspace.imageSearch':'workspace.search',{action:{scanId,provider,...(image?{}:{query})}});update(r.state);
     if(!image&&$('query').value===query)clearSearchInput();

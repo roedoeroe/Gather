@@ -1,6 +1,6 @@
 import {accountState} from './account-state.js';
 import {cleanLookupContext} from './lookup-context.js';
-import {normalizeProfile, cleanName, suppliedIds} from './core.js';
+import {normalizeProfile, normalizeLookup, cleanName, suppliedIds} from './core.js';
 import {cleanProfileStatus} from './profile-status.js';
 
 const PREFIX = 'gather.batch.';
@@ -29,7 +29,8 @@ export function restoreBatch(value) {
   for (const item of value.entries.slice(0,100)) {
     try {
       const originalUrl = item.originalUrl || item.url;
-      const profile = normalizeProfile(originalUrl);
+      const profile = normalizeLookup(originalUrl);
+      if(profile.content&&item.canonicalProfileUrl&&item.verifiedAt){const owner=normalizeProfile(item.canonicalProfileUrl);if(owner.platform!==profile.platform||(owner.directId&&owner.directId!==item.id))continue;Object.assign(profile,{url:owner.url,handle:owner.handle,canonicalProfileUrl:owner.url,sourcePageUrl:originalUrl});}
       const validId = typeof item.id === 'string' && (profile.platform === 'youtube' ? /^UC[\w-]{22}$/ : /^[1-9]\d{0,29}$/).test(item.id);
       const interrupted = item.status === 'loading';
       const status = item.status==='gone'&&accountState(item)!=='GONE'?'error':interrupted ? 'stopped' : ['resolved','gone','ready','error','stopped'].includes(item.status) ? item.status : 'ready';

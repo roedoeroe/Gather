@@ -22,19 +22,19 @@ for index, name in enumerate(modules):
         raise ValueError('Unsupported module syntax')
     if not index: parts.append('const modules = [];\n')
     parts.append('modules.push((() => {\n' + code + '\nreturn {' + ','.join(exports) + '};\n})());\n')
-parts.append('''const {extractId, normalizeProfile} = modules[2];
+parts.append('''const {extractLookup, normalizeLookup} = modules[2];
 const {readProfileSource} = modules[3];
 Object.defineProperty(globalThis, '__gatherProfileReader', {configurable: true, value: async (url, source, includeName) => {
   let profile;
-  try {profile = normalizeProfile(url);} catch {return {error: 'Invalid profile link.'};}
+  try {profile = normalizeLookup(url);} catch {return {error: 'Invalid profile link.'};}
   const before = location.href;
   let result;
   if (source) {
     const snapshot = await readProfileSource();
     if (snapshot.error) return snapshot;
-    result = extractId(snapshot.html, profile, snapshot.url);
+    result = extractLookup(snapshot.html, profile, snapshot.url);
   } else {
-    result = extractId(document.documentElement.outerHTML.slice(0, 15000001), profile, before);
+    result = extractLookup(document.documentElement.outerHTML.slice(0, 15000001), profile, before);
   }
   if (location.href !== before) return {error: 'The page changed during lookup. Open the intended profile and retry.'};
   if (!includeName) delete result.displayName;

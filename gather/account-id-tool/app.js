@@ -111,8 +111,8 @@ function renderResults() {
     name.append(caption,document.createTextNode(entry.displayName||entry.suppliedName||(entry.status==='loading'?'Finding…':'Unavailable')));
     if(!entry.displayName&&entry.suppliedName){const note=document.createElement('span');note.className='name-note';note.textContent='Supplied · not checked';name.append(note);}
     const linkLine=document.createElement('div');linkLine.className='link-line';
-    const link=document.createElement('a');link.className='account-link';link.textContent=entry.originalUrl||entry.url;
-    link.href=/^https?:\/\//i.test(entry.originalUrl||'')?entry.originalUrl:'https://'+(entry.originalUrl||entry.url.replace(/^https:\/\//,''));
+    const link=document.createElement('a');link.className='account-link';link.textContent=entry.url;
+    link.href=entry.url;
     link.target='_blank';link.rel='noopener noreferrer';link.title=link.textContent;
     linkLine.append(link);
     if(annotation.notes.length){const note=document.createElement('span');note.className='account-notes';note.textContent=' '+annotation.notes.join(' ');note.title=statusDescription(annotation);linkLine.append(note);}
@@ -323,7 +323,7 @@ $('links').addEventListener('paste',event=>{
   // insertText preserves the browser's native Undo history for the paste.
   insertInputText(text);
 });
-$('links').addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key==='Enter'&&!$('start').disabled){event.preventDefault();startBatch();}});
+$('links').addEventListener('keydown',event=>{if(event.key!=='Enter'||event.isComposing||event.keyCode===229||event.altKey||event.shiftKey)return;event.preventDefault();if(!event.repeat&&$('links').value.trim()&&!$('start').disabled)$('start').click();});
 $('start').addEventListener('click',startBatch);
 $('newBatch').addEventListener('click',newBatch);
 $('recentButton').addEventListener('click',openRecent);

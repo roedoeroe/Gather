@@ -1,4 +1,4 @@
-import {extractId, normalizeProfile, pageAccessIssue} from './core.js';
+import {extractLookup, normalizeLookup, pageAccessIssue} from './core.js';
 import {readProfileInPage} from './profile-read-client.js';
 
 export const isExtension = Boolean(globalThis.chrome?.runtime?.id && globalThis.chrome?.scripting);
@@ -6,7 +6,7 @@ const ownedTabs = new Set();
 const abortError = () => new DOMException('Lookup stopped', 'AbortError');
 function check(signal) { if (signal?.aborted) throw abortError(); }
 const SETTLE_MS = 2000, SETTLE_INTERVAL_MS = 250;
-function matchesProfile(url, profile) { try { return normalizeProfile(url).key === profile.key; } catch { return false; } }
+function matchesProfile(url, profile) { try { return normalizeLookup(url).key === profile.key; } catch { return false; } }
 async function sameCurrentProfile(tabId, profile) {
   const tab = await chrome.tabs.get(tabId);
   return matchesProfile(tab.url, profile) && (!tab.pendingUrl || matchesProfile(tab.pendingUrl, profile));
@@ -31,7 +31,7 @@ async function fetchSource(profile, signal) {
   try {
     check(signal);
     // Only normalized, allowlisted profile URLs ever reach this function.
-    const response = await fetch(profile.url, {credentials: 'omit', signal: controller.signal, redirect: 'follow', cache: 'no-store'});
+    const response = await fetch(profile.content?normalizeLookup(profile.originalUrl||profile.sourcePageUrl||profile.url).url:profile.url, {credentials: 'omit', signal: controller.signal, redirect: 'follow', cache: 'no-store'});
     if (!response.ok) return {error: `The site returned HTTP ${response.status}. Open the profile to check its response, then retry.`};
     if (!response.body) return {error: 'The site returned no page source'};
     const reader = response.body.getReader(), decoder = new TextDecoder(); let html = '';
@@ -44,7 +44,7 @@ async function fetchSource(profile, signal) {
       }
       html += decoder.decode();
     } finally { reader.releaseLock(); }
-    return extractId(html, profile, response.url);
+    return extractLookup(html, profile, response.url);
   } catch (error) {
     check(signal);
     return {error: error.name === 'AbortError' ? 'The site took too long to respond' : 'The site could not be reached'};
@@ -53,7 +53,7 @@ async function fetchSource(profile, signal) {
 
 async function readBrowserPage(profile, signal, onStage, tabOwner, includeName) {
   check(signal);
-  const tab = await chrome.tabs.create({url: profile.url, active: false});
+  const tab = await chrome.tabs.create({url: profile.content?normalizeLookup(profile.originalUrl||profile.sourcePageUrl||profile.url).url:profile.url, active: false});
   ownedTabs.add(tab.id);
   try {
     if (tabOwner) await tabOwner.track(tab.id);
@@ -67,7 +67,7 @@ async function readBrowserPage(profile, signal, onStage, tabOwner, includeName) 
       const state = await chrome.tabs.get(tab.id);
       if (state.status !== 'complete') continue;
       let actual;
-      try { actual = normalizeProfile(state.url); } catch { return {error: pageAccessIssue('',state.url)||'The browser page did not return a supported profile URL. Open the intended profile and retry.'}; }
+      try { actual = normalizeLookup(state.url); } catch { return {error: pageAccessIssue('',state.url)||'The browser page did not return a supported profile URL. Open the intended profile and retry.'}; }
       if (actual.platform !== profile.platform) return {error: 'The profile redirected outside its platform'};
       const snapshot = await readProfileInPage(tab.id, profile, {includeName});
       check(signal);
@@ -104,7 +104,7 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
         tab=await chrome.tabs.get(currentTabId);
       }
       let actual;
-      try {actual=normalizeProfile(tab.url);} catch {return {error:'The current page changed. Open the profile and run it again.'};}
+      try {actual=normalizeLookup(tab.url);} catch {return {error:'The current page changed. Open the profile and run it again.'};}
       if(actual.key!==profile.key||tab.pendingUrl&&!matchesProfile(tab.pendingUrl,profile))return {error:'The current page changed. Open the profile and run it again.'};
       let snapshot=await readProfileInPage(currentTabId,profile,{includeName});
       check(signal);
@@ -121,7 +121,7 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
         if(result.id||result.accountState==='GONE')return {...result,method:'Current page · '+result.method};
         // Authentication, conflicting IDs and a different profile are explicit
         // failures. Only missing hydrated data triggers an automatic source read.
-        if(!result.error?.startsWith('No matching account ID'))return result;
+        if(!result.error?.startsWith('No matching account ID')&&!(profile.content&&result.error?.startsWith('Could not determine the owner')))return result;
         onStage?.('Reading profile source automatically…');
         const source=await readProfileInPage(currentTabId,profile,{source:true,includeName,documentId:snapshot.documentId});
         check(signal);

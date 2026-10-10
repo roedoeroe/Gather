@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "kind": "physical-native-Edge-context-menu",
+  "responsiveSource": true,
+  "modal": true,
+  "originalHashVerified": true,
+  "dimensions": {
+    "width": 600,
+    "height": 360
+  }
+}

@@ -1,15 +1,17 @@
-# Gather 1.8.15 RC engineering notes
+# Gather 1.8.16 RC engineering notes
 
-The lookup change is a conditional **two-second readiness buffer**. It does not rewrite the extractor, add endpoints or change storage.
+Plain MV3 extension modules; no runtime dependencies/build server. Manifest permissions and host patterns are unchanged. New entry pages and modules are included directly by the deterministic ZIP packager. `profile-reader.js` is generated from local adapters; run `python3 scripts/build-profile-reader.py --check`.
 
-- Read the intended Instagram profile immediately. If the account-bound ID exists, return it immediately.
-- On missing metadata only, recheck every 250 ms within a two-second deadline. Reuse the packaged reader in the pinned document. If data still has not arrived, use the existing bounded same-origin/public fallback from 1.8.14.
-- Permit a still-loading tab when its explicit URL or pending URL identifies the requested profile. Reject a different pending destination. Check the account and document again before accepting a result. Cancellation stops waiting; sign-in, security checks and conflicting IDs do not trigger hydration polling.
-- Existing exact string IDs, all five adapters and source parsing remain unchanged. No mandatory sleep for a successful read. No new HTTP request type, credential behavior, temporary tab or lookup batch. Successful hydration can avoid a fallback request.
-- One local Help page serves popup, side panel, workspace and full account tools. Search is ephemeral and local. Account-tools Settings retains its existing browser-fallback preference. Coworker Quick Start ships in the extension ZIP.
+Content lookup keeps profile normalization strict and adds a separate allowlisted content descriptor. Extraction requires the requested content ID/code and explicit User/Page/channel author structure. Conflicting owners/IDs fail. Exact string IDs survive parsing, result copy and backup. Accepted content output is rebuilt from canonical profile identity; the originally requested URL remains separate local provenance. Instagram profile readiness stays conditional, bounded to two seconds before the existing source/public fallbacks.
 
-Permissions, host permissions, storage schema, retention, capture engine, export behavior and case-data network behavior are unchanged. No new dependency, analytics, cloud endpoint, automatic redaction, identity inference or background collection.
+Source-image jobs freeze workspace/tab context and selected subject before asynchronous acquisition. One-use session jobs launch a visible controller. An explicit exact-URL request has no credentials/referrer, rejects redirects, enforces byte/time/pixel limits and preserves the original response Blob. The existing binary store supplies hashes, guarded completion/deletion and backup/restore. Added asset MIME types are WebP/AVIF/GIF alongside PNG/JPEG; old releases cannot safely restore all new formats. Blob/canvas/blocked sources do not silently become screenshots.
 
-The new native test environment uses Microsoft-signed Edge 155.0.4283.45 and the matching official WebDriver download. Tests drive Edge through Playwright; WebDriver is installed/version-checked but is not the test driver. Chromium's managed policy remains intact. Edge loads this unpacked extension normally with its sandbox enabled. An authenticated local X display allows normal OS keyboard/mouse action invocation without overriding activeTab permissions. No unsafe extension-debugging, policy, TLS or sandbox switches were used.
+Reverse selection is transient UI state. Local files are not filed or logged. Saved assets are verified again before use; selected derivatives cannot silently revert to originals. Clipboard output is PNG because the browser clipboard interface requires it. Providers share one allowlisted landing configuration. No private upload endpoints, browser permission expansion or automatically transmitted source URLs.
 
-See TESTING and RELEASE-CANDIDATE-1.8.15 for exact completed tests, timing, known limitations and the distinction between native Linux Edge, mocked APIs, live signed-out access and untested signed-in Windows behavior.
+Reference uses its own origin-scoped IndexedDB. Imports are bounded, validated and committed atomically with revision checks; malformed/stale updates retain the prior pack. Original file text and slice offsets preserve exact sections. Markdown is inert text. Loaded immutable packs use a prepared WeakMap index; keystrokes do not reparse all files. Collection JSON is inspectable/versioned and exported separately from case backup. No real organization corpus is bundled.
+
+Autocomplete uses static operator/domain candidates only. It honors provider capabilities, quote/caret boundaries, paste/IME behavior and explicit acceptance. No query-learning storage. The main account input follows the same button execution path for Enter and preserves Shift+Enter.
+
+Same-folder updates preserve the extension ID and local data; never uninstall to update. Run regression on source and selected suites on the **exact extracted ZIP**. The release upload workflow reads the immutable committed package, verifies receipt/hash/CRC/manifest and attaches it without rebuilding. Preserve older tags and ZIPs. GitHub Releases carries only the extension asset; source/checksum receipts remain available for developers.
+
+See [TESTING](TESTING.md), [Network Egress](NETWORK-EGRESS.md), [Product Audit](PRODUCT-AUDIT-1.8.16.md), and [Future Plans](FUTURE-PLANS.md).

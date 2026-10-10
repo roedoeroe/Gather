@@ -2,7 +2,7 @@ import {recentBatches} from './batches.js';
 import {clearHistoryDialog} from './history-ui.js';
 import {formerAliasButton} from './account-state-ui.js';
 import {saveAccountButton,captureLookupContext} from './workspace-integration.js';
-import {parseInput, normalizeProfile, formatIds, formatDetails, accountTitle, suppliedIds, idCheck, isCopyableId} from './core.js';
+import {parseInput, normalizeLookup, formatIds, formatDetails, accountTitle, suppliedIds, idCheck, isCopyableId} from './core.js';
 import {accountState,orderAccounts,accountSummary} from './account-state.js';
 import {notesInfo} from './profile-status.js';
 import {recoverPastedLinks} from './paste.js';
@@ -63,7 +63,7 @@ function render() {
     if(entry.handle)row.append(line('username-line','Username: @'+entry.handle));
     if(!entry.displayName&&entry.suppliedName)row.append(line('name-note','Supplied · not checked'));
     const annotation=notesInfo(entry),linkLine=line('link-line',''),link=document.createElement('a');
-    link.className='account-link';link.textContent=entry.originalUrl||entry.url;link.href=/^https?:\/\//i.test(entry.originalUrl||'')?entry.originalUrl:'https://'+(entry.originalUrl||entry.url.replace(/^https:\/\//,''));link.target='_blank';link.rel='noopener noreferrer';linkLine.append(link);
+    link.className='account-link';link.textContent=entry.url;link.href=entry.url;link.target='_blank';link.rel='noopener noreferrer';linkLine.append(link);
     if(annotation.notes.length){const note=document.createElement('span');note.className='account-notes';note.textContent=' '+annotation.notes.join(' ');linkLine.append(note);}row.append(linkLine);
     const check=idCheck(entry),provided=suppliedIds(entry);
     if(provided.length&&check.state!=='matched')row.append(line('supplied-line',(check.state==='corrected'?'Previously supplied: ':provided.length>1?'Supplied IDs: ':'Supplied ID: ')+provided.join(', ')));
@@ -173,7 +173,7 @@ async function updateCurrentPage() {
   try {
     [tab]=await chrome.tabs.query({active:true,currentWindow:true});
     const candidate=tab?.pendingUrl||tab?.url;
-    normalizeProfile(candidate);url=candidate;hint=tab?.status==='loading'?'Find IDs as this profile finishes loading':'Find and copy IDs from '+url;
+    normalizeLookup(candidate);url=candidate;hint=tab?.status==='loading'?'Find IDs as this profile finishes loading':'Find and copy IDs from '+url;
   }catch{}
   if(request===pageRequest){currentPage=url;currentTabId=tab?.id??null;$('usePage').title=hint;renderInput();}
   return request===pageRequest?{url:currentPage,tabId:currentTabId}:null;
@@ -203,7 +203,7 @@ $('quickLinks').addEventListener('keydown',event=>{
   if(event.key!=='Enter'||event.isComposing||event.keyCode===229||event.altKey)return;
   if(event.shiftKey&&!event.ctrlKey&&!event.metaKey)return;
   event.preventDefault();
-  if(!event.repeat)$('getIds').click();
+  if(!event.repeat&&$('quickLinks').value.trim())$('getIds').click();
 });
 $('getIds').addEventListener('click',()=>useCurrentPage()?runCurrentPage():act({type:'quick.start',input:$('quickLinks').value}));
 $('stopQuick').addEventListener('click',()=>act({type:'quick.stop'}));
@@ -211,7 +211,7 @@ $('retryQuick').addEventListener('click',async()=>{
   if(submitting||state.busy)return;
   const batch=state.batch;if(!batch)return;
   const page=await updateCurrentPage();let currentTabId;
-  if(page?.url&&batch.entries.length===1&&normalizeProfile(page.url).key===batch.entries[0].key)currentTabId=page.tabId;
+  if(page?.url&&batch.entries.length===1&&normalizeLookup(page.url).key===batch.entries[0].key)currentTabId=page.tabId;
   await act({type:'quick.retry',batchId:batch.id,...(Number.isInteger(currentTabId)?{currentTabId}:{})});
 });
 $('copyQuick').addEventListener('click',()=>copyAll());

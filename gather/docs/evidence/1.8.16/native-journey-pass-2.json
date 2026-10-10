@@ -1,0 +1,33 @@
+{
+  "status": "passed",
+  "version": "1.8.16",
+  "kind": "native-installed-Edge-fictional-network",
+  "passed": [
+    "Full account tools use Enter once for pasted content links, preserve Shift+Enter and prevent a parallel duplicate run.",
+    "Five native content-URL lookups resolve only bound fictional authors, retain exact string IDs and output canonical profile links.",
+    "Physical Edge context-menu invocation saves the clicked image and grants normal activeTab access.",
+    "One native analyst journey captures visible, scrolling selection and full page into the same Case/SOC with restored page position.",
+    "Native Edge zoom 80/100/125/150/200% retains exact selected-image dimensions; Windows display scaling remains separate.",
+    "Native source-image acquisition preserves exact original bytes, MIME, dimensions and provenance for PNG/JPEG/WebP/AVIF/GIF.",
+    "Deliberate duplicate saves get distinct records; an 8-megapixel source remains full size.",
+    "Cross-origin CDN fixture succeeds through CORS without new host permissions.",
+    "Changing the global case during delayed acquisition leaves the original Case/SOC frozen.",
+    "Denied/CORS-blocked/blob sources fail visibly with no fake saved image or screenshot substitute.",
+    "Reverse search selects a saved asset or local file, copies its pixels and explicitly opens the shared provider with no automatic upload.",
+    "Source-image manual redaction and Save & Copy use a derivative while the original byte hash stays unchanged.",
+    "Source-image auto-copy works independently of screenshot auto-copy, converting only the clipboard copy to PNG.",
+    "Native keyboard si → Tab → site: → inst → Enter → instagram.com → Enter launches exactly the requested query with no retained query.",
+    "Escape dismisses completion, Tab releases focus, and unsupported provider operators are not suggested.",
+    "Native local folder import excludes Login-Info, preserves hierarchy, ranks aliases and copies exact section wording.",
+    "Reference and five-tab workspace remain usable at desktop and 400px without horizontal page overflow.",
+    "Compact side-panel content fits 400px and exposes the local Reference link.",
+    "A second native Edge profile using the identical extension has no Profile A cases, SOCs, images or Reference data.",
+    "Offline reload preserves local cases, source-image bytes and Reference search without a work-data backend.",
+    "Binary backup validates and merge-restores all source-image formats, original hashes and remapped Case/scan/SOC relationships.",
+    "Reference JSON round-trip, replacement, stale-write protection and local deletion preserve exact source text.",
+    "Private Case/SOC/note canaries never occur in captured outbound URL, headers or request bodies."
+  ],
+  "errors": [],
+  "requests": 47,
+  "limits": "Physical Edge invocation and screenshots; fictional platform responses. No Windows OS dialogs or live platform claim."
+}

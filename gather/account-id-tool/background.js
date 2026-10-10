@@ -1,3 +1,4 @@
+import {launchSourceImage} from './source-image-launch.js';
 import {validateMessage,restrictStorageAccess} from './message-boundary.js';
 import {handleWorkspace, readWorkspace, dispatch, updateSaveMenu} from './workspace-store.js';
 import {trackTemporary, untrackTemporary, tabRemoved} from './tab-ownership.js';
@@ -73,6 +74,7 @@ if(chrome.tabs.query)pruneTabContexts().catch(()=>{});
 chrome.runtime.onInstalled.addListener(()=>{
   chrome.contextMenus.removeAll(()=>{
     chrome.contextMenus.create({id:'gather-save',title:'Save to Gather · Inbox',contexts:['page','link','selection'],documentUrlPatterns:['http://*/*','https://*/*']},()=>{if(!chrome.runtime.lastError)updateSaveMenu().catch(()=>{});});
+    chrome.contextMenus.create({id:'gather-source-image',title:'Save source image to Gather',contexts:['image'],documentUrlPatterns:['http://*/*','https://*/*']});
     chrome.contextMenus.create({id:'gather-screenshot',title:'Capture visible page in Gather',contexts:['page'],documentUrlPatterns:['http://*/*','https://*/*']});
   });
 });
@@ -82,6 +84,7 @@ chrome.storage.onChanged.addListener((changes,area)=>{
 });
 chrome.contextMenus.onClicked.addListener(async(info,tab)=>{
   if(await storageReady){chrome.action.setBadgeText({text:'!'}).catch(()=>{});return;}
+  if(info.menuItemId==='gather-source-image'){launchSourceImage(info,tab).catch(async error=>{await chrome.storage.session.set({gatherCaptureError:error.message});chrome.action.setBadgeText({text:'!'}).catch(()=>{});});return;}
   if(info.menuItemId==='gather-screenshot'){launchCapture({mode:'visible',tabId:tab.id}).catch(async error=>{await chrome.storage.session.set({gatherCaptureError:error.message});chrome.action.setBadgeText({text:'!'}).catch(()=>{});});return;}
   if(info.menuItemId!=='gather-save')return;
   // Enqueue the context read immediately, before any tab work.

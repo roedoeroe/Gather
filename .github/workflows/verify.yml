@@ -1,0 +1,25 @@
+name: Verify Gather
+on:
+  push:
+    branches: [main, develop/1.8.0-r3]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  deterministic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify packaged profile reader
+        working-directory: gather
+        run: python3 scripts/build-profile-reader.py --check
+      - name: Test adapters, storage and privacy rules
+        working-directory: gather
+        run: node --test tests/*.test.mjs
+      - name: Check public source and package candidates
+        working-directory: gather
+        run: python3 scripts/check-public.py

@@ -1,0 +1,54 @@
+[
+  {
+    "provider": "google",
+    "url": "https://images.google.com/",
+    "status": 200,
+    "finalURL": "https://images.google.com/"
+  },
+  {
+    "provider": "lenso",
+    "url": "https://lenso.ai/en",
+    "status": 200,
+    "finalURL": "https://lenso.ai/en"
+  },
+  {
+    "provider": "bing",
+    "url": "https://www.bing.com/visualsearch",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "provider": "yandex",
+    "url": "https://yandex.com/images/",
+    "status": 200,
+    "finalURL": "https://yandex.com/images/"
+  },
+  {
+    "provider": "baidu",
+    "url": "https://image.baidu.com/",
+    "status": 200,
+    "finalURL": "https://image.baidu.com/"
+  },
+  {
+    "provider": "sogou",
+    "url": "https://pic.sogou.com/",
+    "status": 200,
+    "finalURL": "https://pic.sogou.com/"
+  },
+  {
+    "provider": "tineye",
+    "url": "https://tineye.com/",
+    "status": 200,
+    "finalURL": "https://tineye.com/"
+  },
+  {
+    "provider": "shutterstock",
+    "url": "https://www.shutterstock.com/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "provider": "google-help",
+    "url": "https://support.google.com/websearch/answer/1325808?hl=en",
+    "status": 200,
+    "finalURL": "https://support.google.com/websearch/answer/1325808?hl=en"
+  }
+]

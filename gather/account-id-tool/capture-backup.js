@@ -23,7 +23,7 @@ export async function validateCaptureBundle(bundle,workspace){
     frozenDestination(record.context);scope(record);scope(record.context);
     for(const key of ['scanId','projectId','subjectId'])if(record[key]!==record.context[key])fail('Capture assignment differs from its frozen destination.');
     if(record.subjectId&&subjects.get(record.subjectId)?.projectId!==record.projectId)fail('Capture subject is missing or in another project.');
-    if(!['visible','selection','full-page'].includes(record.mode)||!['capturing','complete','partial','failed','cancelled','interrupted'].includes(record.status)||!Array.isArray(record.assetIds)||!Number.isFinite(record.startedAt)||record.startedAt<=0)fail('Invalid capture record.');
+    if(!['visible','selection','full-page','source-image'].includes(record.mode)||!['capturing','complete','partial','failed','cancelled','interrupted'].includes(record.status)||!Array.isArray(record.assetIds)||!Number.isFinite(record.startedAt)||record.startedAt<=0)fail('Invalid capture record.');
     const url=new URL(record.source?.url);if(!['http:','https:'].includes(url.protocol)||url.username||url.password)fail('Invalid capture URL.');
     for(const [key,kind] of [['accountId','account'],['sourceId','source']])if(record.refs?.[key]&&!workspace.items.some(i=>i.id===record.refs[key]&&i.kind===kind))fail('Capture observation reference is missing.');
     if(record.refs?.searchId&&!workspace.searches.some(s=>s.id===record.refs.searchId&&s.scanId===record.scanId))fail('Capture search reference is missing.');
@@ -31,7 +31,7 @@ export async function validateCaptureBundle(bundle,workspace){
   }
   let total=0;
   for(const asset of bundle.assets){
-    if(!captures.has(asset.captureId)||!['original','tile','derivative'].includes(asset.role)||!['image/png','image/jpeg','image/webp'].includes(asset.mime)||!(asset.blob instanceof Blob)||asset.blob.size!==asset.bytes||asset.bytes>CAPTURE_LIMITS.assetBytes||!asset.bytes||! /^[a-f0-9]{64}$/.test(asset.sha256))fail('Invalid capture asset.');
+    if(!captures.has(asset.captureId)||!['original','tile','derivative'].includes(asset.role)||!['image/png','image/jpeg','image/webp','image/avif','image/gif'].includes(asset.mime)||!(asset.blob instanceof Blob)||asset.blob.size!==asset.bytes||asset.bytes>CAPTURE_LIMITS.assetBytes||!asset.bytes||! /^[a-f0-9]{64}$/.test(asset.sha256))fail('Invalid capture asset.');
     total+=asset.bytes;if(total>CAPTURE_LIMITS.totalBytes)fail('Capture backup exceeds the storage limit.');
     if(await hashBytes(asset.blob)!==asset.sha256)fail('Capture backup image failed its SHA-256 integrity check.');assets.set(asset.id,asset);
   }
@@ -49,7 +49,7 @@ export async function validateCaptureBundle(bundle,workspace){
   }
   for(const asset of assets.values())if(!captures.get(asset.captureId).assetIds.includes(asset.id))fail('Orphan image in backup.');
   for(const asset of assets.values())if(asset.parentAssetId&&(asset.parentAssetId===asset.id||assets.get(asset.parentAssetId)?.captureId!==asset.captureId))fail('Invalid derivative parent.');
-  const keys=new Set();for(const setting of bundle.settings){if(keys.has(setting.key))fail('Duplicate capture setting.');keys.add(setting.key);if(setting.key==='preferences'){if(typeof setting.value?.automaticExport!=='boolean'||typeof setting.value?.subjectLabel!=='string'||setting.value.subjectLabel.length>30)fail('Invalid capture preferences.');}else if(setting.key.startsWith('subject:')){const scanId=setting.key.slice(8);if(scanId!=='null'&&!workspace.scans.some(s=>s.id===scanId))fail('Missing selected scan.');const scan=workspace.scans.find(s=>s.id===scanId);if(setting.value&&subjects.get(setting.value)?.projectId!==scan?.projectId)fail('Invalid selected subject.');}else if(setting.key.startsWith('project-label:')){if(!workspace.projects.some(p=>p.id===setting.key.slice(14))||typeof setting.value!=='string'||!setting.value.trim()||setting.value.length>30)fail('Invalid subject display label.');}else fail('Unknown capture backup setting.');}
+  const keys=new Set();for(const setting of bundle.settings){if(keys.has(setting.key))fail('Duplicate capture setting.');keys.add(setting.key);if(setting.key==='preferences'){if(typeof setting.value?.automaticExport!=='boolean'||['automaticCopy','automaticSourceCopy'].some(key=>setting.value?.[key]!==undefined&&typeof setting.value[key]!=='boolean')||typeof setting.value?.subjectLabel!=='string'||setting.value.subjectLabel.length>30)fail('Invalid capture preferences.');}else if(setting.key.startsWith('subject:')){const scanId=setting.key.slice(8);if(scanId!=='null'&&!workspace.scans.some(s=>s.id===scanId))fail('Missing selected scan.');const scan=workspace.scans.find(s=>s.id===scanId);if(setting.value&&subjects.get(setting.value)?.projectId!==scan?.projectId)fail('Invalid selected subject.');}else if(setting.key.startsWith('project-label:')){if(!workspace.projects.some(p=>p.id===setting.key.slice(14))||typeof setting.value!=='string'||!setting.value.trim()||setting.value.length>30)fail('Invalid subject display label.');}else fail('Unknown capture backup setting.');}
   return bundle;
 }
 export async function createFullBackup(workspaceBackup,{projectId=null}={}){

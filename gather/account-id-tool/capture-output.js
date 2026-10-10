@@ -30,8 +30,8 @@ export function copyCaptureImage(id){
   return navigator.clipboard.write([new ClipboardItem({'image/png':bytes})]);
 }
 export async function saveCaptureImage(id,format='png'){
-  const {record,asset}=await shareImage(id),blob=await imageFormat(asset.blob,format);
+  const {record,asset}=await shareImage(id),blob=format==='original'?asset.blob:await imageFormat(asset.blob,format);
   const current=await getCapture(id);if(!current||preferredCaptureAsset(current)?.id!==asset.id)throw new Error('The selected image changed. Try Save again.');
-  return downloadVerifiedBlob(blob,captureExportPath(record,format).split('/').at(-1),{saveAs:true});
+  return downloadVerifiedBlob(blob,captureExportPath(record,format==='original'?({'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/avif':'avif','image/gif':'gif'}[blob.type]):format).split('/').at(-1),{saveAs:true});
 }
 export function printCaptureLink(id){return chrome.runtime.getURL('capture-print.html?id='+encodeURIComponent(id));}

@@ -4,7 +4,7 @@ Gather is a local browser extension for account lookup, screenshots and delibera
 
 ## Choose the right source
 
-The default `main` branch contains the 1.8.15 release-candidate source. Continue development on `develop/1.8.0-r3`, or use the relevant immutable release tag to reproduce a published package. Inspect existing changes before editing and keep published versioned ZIPs immutable. Merging source into `main` does not promote a prerelease to stable or update installed extensions.
+The default `main` branch contains the 1.8.16 release-candidate source. Continue development on `develop/1.8.0-r3`, or use the relevant immutable release tag to reproduce a published package. Inspect existing changes before editing and keep published versioned ZIPs immutable. Merging source into `main` does not promote a prerelease to stable or update installed extensions.
 
 | Location | Purpose |
 | --- | --- |
@@ -24,7 +24,7 @@ python3 scripts/build-profile-reader.py --check
 node --test tests/*.test.mjs
 ```
 
-Run browser checks relevant to the changed workflow. [TESTING](https://github.com/roedoeroe/Gather/blob/e718086513f61d2889498d843a7ba9cf39ecd2b5/gather/docs/TESTING.md) describes the dependencies and distinguishes rendered API doubles from actual installed Edge tests. State what ran, what passed and what remains untested. Do not label simulated display scaling as native zoom.
+Run browser checks relevant to the changed workflow. [TESTING](https://github.com/roedoeroe/Gather/blob/1.8.16-rc.1/gather/docs/TESTING.md) describes the dependencies and distinguishes rendered API doubles from actual installed Edge tests. State what ran, what passed and what remains untested. Do not label simulated display scaling as native zoom.
 
 Before publication, from the repository root:
 

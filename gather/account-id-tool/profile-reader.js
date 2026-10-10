@@ -252,7 +252,7 @@ function parseInput(text) {
     let current = null;
     try {
       if (match.index && /[\w@./]/.test(source[match.index-1])) throw new Error('Profile link has an unclear start; put it on its own line');
-      const profile = normalizeProfile(token);
+      const profile = normalizeLookup(token);
       const marker = [...before.matchAll(/\u0001NAME(\d+)\u0001/g)].at(-1);
       const suppliedName = marker ? names[Number(marker[1])] || '' : '';
       if (seen.has(profile.key)) {
@@ -337,6 +337,12 @@ function isCopyableId(entry) {
   return ['none', 'matched', 'corrected'].includes(idCheck(entry).state);
 }
 function applyLookup(entry, result, source = 'live') {
+  if(result.id&&result.canonicalProfileUrl){
+    const owner=normalizeProfile(result.canonicalProfileUrl);
+    if(owner.platform!==entry.platform||(owner.directId&&owner.directId!==result.id))throw new Error('The content owner did not match the requested platform.');
+    entry.sourcePageUrl=entry.originalUrl||entry.url;
+    entry.url=owner.url;entry.handle=owner.handle;entry.canonicalProfileUrl=owner.url;
+  }
   entry.accountState=result.accountState|| (result.id ? result.profileStatus?.privacy==='private'?'PRIVATE_INACCESSIBLE':'AVAILABLE' : 'UNKNOWN_TECHNICAL');
   entry.adapterVersion=result.adapterVersion||ADAPTER_VERSION;entry.stateReason=result.stateReason||result.error||'';
   if(result.accountState==='GONE'&&result.verifiedAt&&result.stateReason){
@@ -388,7 +394,7 @@ function jsonObjects(html) {
     if (/^[{[]/.test(body)) { try { roots.push(parseJson(body)); } catch {} }
     // Known data assignments contain JSON, not executable extraction logic.
     // Read their balanced JSON value without evaluating the surrounding script.
-    const marker = /(?:\b(?:var\s+)?ytInitialData\s*=|\bwindow\._sharedData\s*=|\bwindow\.__additionalDataLoaded\s*\(\s*["'][^"']+["']\s*,)\s*/g;
+    const marker = /(?:\b(?:var\s+)?(?:ytInitialData|ytInitialPlayerResponse)\s*=|\bwindow\._sharedData\s*=|\bwindow\.__additionalDataLoaded\s*\(\s*["'][^"']+["']\s*,)\s*/g;
     let start;
     while ((start = marker.exec(body))) {
       const tail = body.slice(start.index + start[0].length);
@@ -564,7 +570,8 @@ function formatDetails(entries, platform = null, {includeNames = true} = {}) {
     const name = e.displayName || (e.suppliedName ? e.suppliedName + ' (supplied; not checked)' : 'Unavailable');
     const annotation = notesInfo(e);
     const lines = includeNames ? ['Display name:  ' + name] : [];
-    lines.push([e.originalUrl || e.url, ...annotation.notes].join(' '));
+    lines.push('Username: '+(e.handle?'@'+e.handle:'Unavailable'));
+    lines.push(['URL: '+e.url, ...annotation.notes].join(' '));
     const ids = suppliedIds(e), check = idCheck(e);
     if (['mismatch', 'conflict', 'unverified'].includes(check.state)) {
       lines.push('Supplied ID' + (ids.length > 1 ? 's' : '') + ': ' + ids.join(', '));
@@ -593,7 +600,62 @@ function formatIds(entries, platform, separator = 'newline') {
   }).map(e => e.id).join(delimiter);
 }
 
-return {PLATFORMS,LABELS,normalizeProfile,parseInput,suppliedIds,idCheck,isCopyableId,applyLookup,pageAccessIssue,extractId,cleanName,accountTitle,formatDetails,formatIds};
+// Recognize content routes without pretending an opaque content ID is an account.
+// A content descriptor is not a successful account result.
+function normalizeLookup(value) {
+  try { return normalizeProfile(value); } catch (profileError) {
+    if(typeof value!=='string'||value.length>2048)throw profileError;
+    let url;try{url=new URL(/^https?:\/\//i.test(value)?value:'https://'+value);}catch{throw profileError;}
+    if(!['http:','https:'].includes(url.protocol)||url.username||url.password||url.port)throw profileError;
+    const host=url.hostname.replace(/^(www|m|mobile|web)\./,''),path=url.pathname;
+    let platform,contentId,kind,owner='';
+    let match;
+    if(host==='tiktok.com'&&(match=path.match(/^\/@([\w.]{1,30})\/video\/([1-9]\d{0,29})\/?$/))){platform='tiktok';owner=match[1];contentId=match[2];kind='video';}
+    else if(host==='instagram.com'&&(match=path.match(/^\/(p|reel)\/([\w-]{1,64})\/?$/))){platform='instagram';kind=match[1];contentId=match[2];}
+    else if(['threads.com','threads.net'].includes(host)&&(match=path.match(/^\/@([\w.]{1,30})\/post\/([\w-]{1,64})\/?$/))){platform='threads';owner=match[1];kind='post';contentId=match[2];}
+    else if(host==='youtube.com'&&((match=path.match(/^\/shorts\/([\w-]{11})\/?$/))||(path==='/watch'&&/^[\w-]{11}$/.test(url.searchParams.get('v')||'')))){platform='youtube';kind=match?'shorts':'watch';contentId=match?.[1]||url.searchParams.get('v');}
+    else if(host==='facebook.com'&&((match=path.match(/^\/(reel|videos)\/([1-9]\d{0,29})\/?$/))||(/^\/watch\/?$/.test(path)&&numeric(url.searchParams.get('v'))))){platform='facebook';kind=match?.[1]||'watch';contentId=match?.[2]||url.searchParams.get('v');}
+    else throw profileError;
+    const cleanUrl=platform==='youtube'?`https://www.youtube.com/watch?v=${contentId}`:platform==='facebook'&&kind==='watch'?`https://www.facebook.com/watch/?v=${contentId}`:`https://www.${platform}.com${path.replace(/\/$/,'')}`;
+    return {platform,handle:owner,directId:'',url:cleanUrl,key:'content:'+platform+':'+owner.toLowerCase()+':'+contentId,content:{kind,id:contentId,owner},...(owner?{ownerProfileUrl:normalizeProfile(`https://www.${platform}.com/@${owner}`).url}:{})};
+  }
+}
+
+function extractLookup(html, lookup, pageUrl=lookup.url) {
+  if(!lookup.content)return extractId(html,lookup,pageUrl);
+  if(typeof html!=='string'||html.length>15000000)return {error:'Page source is empty or too large'};
+  let current;try{current=normalizeLookup(pageUrl);}catch{return {error:pageAccessIssue(html,pageUrl)||'This page is not supported for content-owner lookup.'};}
+  if(current.key!==lookup.key||current.content?.owner?.toLowerCase()!==lookup.content.owner.toLowerCase())return {error:'The content page changed. Open the intended page and retry.'};
+  const roots=jsonObjects(html),access=pageAccessIssue(html,pageUrl,roots);if(access)return {error:access};
+  const candidates=new Map();let conflict=false;
+  function add(owner,url){
+    let profile;try{profile=normalizeProfile(url);}catch{return;}
+    if(profile.platform!==lookup.platform)return;
+    if(lookup.content.owner&&lower(profile.handle)!==lower(lookup.content.owner)){conflict=true;return;}
+    const result=extractId(JSON.stringify(owner),profile,profile.url);
+    if(result.id){const key=profile.key+':'+result.id;candidates.set(key,{...result,canonicalProfileUrl:profile.url,method:'Content owner · '+result.method});}
+    else if(/Multiple account IDs|different account ID/.test(result.error||''))conflict=true;
+  }
+  walk(roots,(obj,key)=>{
+    if(lookup.platform==='tiktok'&&asId(obj.id)===lookup.content.id&&obj.author&&typeof obj.author==='object')add(obj.author,'https://www.tiktok.com/@'+(obj.author.uniqueId||obj.author.unique_id||''));
+    if(lookup.platform==='instagram'&&(obj.shortcode===lookup.content.id||obj.code===lookup.content.id)){
+      for(const owner of [obj.owner,obj.user])if(owner?.username)add(owner,'https://www.instagram.com/'+owner.username+'/');
+    }
+    if(lookup.platform==='threads'&&(obj.code===lookup.content.id||obj.shortcode===lookup.content.id)&&obj.user?.username)add(obj.user,'https://www.threads.com/@'+obj.user.username);
+    if(lookup.platform==='youtube'&&key==='videoDetails'&&obj.videoId===lookup.content.id&&channel(obj.channelId)){
+      const profile=normalizeProfile('https://www.youtube.com/channel/'+obj.channelId);
+      candidates.set(profile.key+':'+obj.channelId,{id:obj.channelId,displayName:cleanName(obj.author),canonicalProfileUrl:profile.url,method:'Content owner · videoDetails',verifiedAt:Date.now()});
+    }
+    if(lookup.platform==='facebook'&&['post_id','video_id','legacy_fbid'].some(k=>asId(obj[k])===lookup.content.id)){
+      for(const owner of [obj.author,obj.owner])if(owner&&/^(User|Page)$/.test(owner.__typename)&&numeric(asId(owner.id)))add(owner,'https://www.facebook.com/profile.php?id='+asId(owner.id));
+    }
+  });
+  if(conflict||candidates.size>1)return {error:'Multiple owner accounts or conflicting IDs found. Gather did not choose an owner.'};
+  if(candidates.size===1)return [...candidates.values()][0];
+  return {error:'Could not determine the owner account from this page. Open the owner profile and retry.'};
+}
+
+return {PLATFORMS,LABELS,normalizeProfile,parseInput,suppliedIds,idCheck,isCopyableId,applyLookup,pageAccessIssue,extractId,cleanName,accountTitle,formatDetails,formatIds,normalizeLookup,extractLookup};
 })());
 modules.push((() => {
 // Serialized by chrome.scripting: this function must have no module closures.
@@ -617,19 +679,19 @@ async function readProfileSource(){
 
 return {readProfileSource};
 })());
-const {extractId, normalizeProfile} = modules[2];
+const {extractLookup, normalizeLookup} = modules[2];
 const {readProfileSource} = modules[3];
 Object.defineProperty(globalThis, '__gatherProfileReader', {configurable: true, value: async (url, source, includeName) => {
   let profile;
-  try {profile = normalizeProfile(url);} catch {return {error: 'Invalid profile link.'};}
+  try {profile = normalizeLookup(url);} catch {return {error: 'Invalid profile link.'};}
   const before = location.href;
   let result;
   if (source) {
     const snapshot = await readProfileSource();
     if (snapshot.error) return snapshot;
-    result = extractId(snapshot.html, profile, snapshot.url);
+    result = extractLookup(snapshot.html, profile, snapshot.url);
   } else {
-    result = extractId(document.documentElement.outerHTML.slice(0, 15000001), profile, before);
+    result = extractLookup(document.documentElement.outerHTML.slice(0, 15000001), profile, before);
   }
   if (location.href !== before) return {error: 'The page changed during lookup. Open the intended profile and retry.'};
   if (!includeName) delete result.displayName;

@@ -1,0 +1,72 @@
+[
+  {
+    "suite": "generated",
+    "exit": 0,
+    "seconds": 0.04
+  },
+  {
+    "suite": "node",
+    "exit": 0,
+    "seconds": 32.9
+  },
+  {
+    "suite": "toolbar",
+    "exit": 0,
+    "seconds": 46.34
+  },
+  {
+    "suite": "capture",
+    "exit": 0,
+    "seconds": 54.84
+  },
+  {
+    "suite": "case",
+    "exit": 0,
+    "seconds": 15.48
+  },
+  {
+    "suite": "stabilization",
+    "exit": 0,
+    "seconds": 35.15
+  },
+  {
+    "suite": "case-clipboard",
+    "exit": 0,
+    "seconds": 4.31
+  },
+  {
+    "suite": "installed-ui",
+    "exit": 0,
+    "seconds": 4.67
+  },
+  {
+    "suite": "image-tools",
+    "exit": 0,
+    "seconds": 10.41
+  },
+  {
+    "suite": "selection-pixels",
+    "exit": 0,
+    "seconds": 9.87
+  },
+  {
+    "suite": "worker",
+    "exit": 0,
+    "seconds": 1.67
+  },
+  {
+    "suite": "profile-reader",
+    "exit": 0,
+    "seconds": 0.93
+  },
+  {
+    "suite": "help",
+    "exit": 0,
+    "seconds": 1.56
+  },
+  {
+    "suite": "image-tools-2x",
+    "exit": 0,
+    "seconds": 8.71
+  }
+]

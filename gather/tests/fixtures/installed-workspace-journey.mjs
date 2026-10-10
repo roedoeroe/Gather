@@ -9,9 +9,9 @@ export async function workspaceJourney(context, baseURL, artifacts) {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(baseURL + '/workspace.html');
   await page.locator('.layout:not([inert])').waitFor();
-  assert.equal(await page.getByRole('tab').count(), 4);
+  assert.equal(await page.getByRole('tab').count(), 5);
   await page.getByRole('heading', {name: 'Inbox', exact: true}).waitFor();
-  passed.push('Current workspace starts in Inbox with four task tabs and a worker/storage response.');
+  passed.push('Current workspace starts in Inbox with five task tabs and a worker/storage response.');
 
   const createCase = async (name, scan) => {
     await page.getByRole('button', {name: 'New case', exact: true}).click();
@@ -85,12 +85,16 @@ export async function workspaceJourney(context, baseURL, artifacts) {
   await page.getByText('No matching activity', {exact: true}).waitFor();
   await page.getByRole('button',{name:'Reverse image',exact:true}).click();
   assert.equal(await page.locator('#query').isVisible(),false);
-  assert.equal(await page.evaluate(()=>document.activeElement.id),'provider');
-  assert.deepEqual(await page.locator('#provider option').allTextContents(),['Google Lens','Lenso.ai','Bing Visual Search','Yandex Images','Baidu Images','Sogou Images','TinEye','Shutterstock']);
-  await page.locator('#provider').selectOption('tineye');
+  assert.equal(await page.evaluate(()=>document.activeElement.textContent),'Choose image…');
+  const imageProvider=page.getByLabel('Reverse image provider');
+  assert.deepEqual(await imageProvider.locator('option').allTextContents(),['Google Lens','Lenso.ai','Bing Visual Search','Yandex Images','Baidu Images','Sogou Images','TinEye','Shutterstock']);
+  await imageProvider.selectOption('tineye');
+  await page.locator('#reverseImage input[type=file]').setInputFiles({name:'fictional.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAFElEQVR4nGNkYPjPAANMDEgANwcAMdMBB1sLEtoAAAAASUVORK5CYII=','base64')});
+  await page.getByText('Selected locally. Nothing uploaded.',{exact:true}).waitFor();
   await page.screenshot({path:path.join(artifacts,'reverse-image.png'),fullPage:true});
-  await page.getByRole('button',{name:'Open image search ↗',exact:true}).click();
-  await page.getByText('Image search opened. Choose an image on the provider’s website.',{exact:true}).waitFor();
+  await page.getByText('Upload options',{exact:true}).click();
+  await page.getByRole('button',{name:'Open provider without copying ↗',exact:true}).click();
+  await page.getByText('Provider opened. Use its image upload control to choose the selected file. Gather did not upload it.',{exact:true}).waitFor();
   await launched(url=>url==='https://tineye.com/');
   await page.getByRole('button',{name:'Search the web',exact:true}).click();
   assert.equal(await page.evaluate(()=>document.activeElement.id),'query');

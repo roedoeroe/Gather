@@ -1,9 +1,11 @@
-# Gather direction — 1.8.13 / R4
+# Gather product direction — R6 with R9 workflow review
 
-Make the everyday path short: open a page → Gather → inspect/copy or capture → see its Case/SOC. A case is optional. Blue/white, clear labels, keyboard access and progressive disclosure serve that workflow; do not add empty management controls.
+Make the everyday path short: open a profile or supported post/video → Gather → inspect/copy the exact ID. For imagery: choose Case/SOC once → Select area → drag/release → Copy or Edit. Cases remain optional. Blue/white controls, readable labels and keyboard access support those paths.
 
-The four workspace views keep research, image history, case management and settings separate. New cases are simple filing structures. Recents retain five batches; automatic web/image queries are never logged. The public repository is separate from local case data. Saved originals, exact IDs, frozen filing, explicit associations and guarded deletion/backup are invariants.
+The workspace has Research, Captures, Case, Reference and Settings. Case > SOC is the normal filing model; legacy project/scan IDs preserve existing work. All Captures is a filter, never a destination. No intake parser or coverage-management interface is being reintroduced.
 
-Read [R4 reconciliation](R4-WORKFLOW-RECONCILIATION.md) for completed work, native Edge evidence gaps and the narrow remaining order. Source-image acquisition follows the P0 native gate; Reference follows that as exact local search/preview/copy. R4 explicitly supersedes older intake/coverage and communication-composer proposals. Historical goals in GOALS-AUDIT and QUICK-PARTS-DIRECTION do not authorize reintroducing them as current features.
+Source images use the exact clicked source and the existing binary capture store. Reverse search begins with a local image selection, then an explicit copy/provider launch. Reference imports a local Markdown hierarchy or transparent pack and retrieves exact source wording; it does not compose or send communication. Default aliases help retrieval, not judgments about people or threats.
 
-No hosted replacement, passive browsing collection, case cloud, name-based identity inference, automatic redaction, threat scoring or email sending. SOC has no assumed expansion. Reference packs remain local, inspectable and separate from case data; preserve source wording and template/example distinctions. No corpus was available for a real taxonomy review.
+Preserve: exact string IDs and bound owners, clean profile output plus separate provenance, two-second conditional Instagram readiness, immutable original pixels, manual derivatives, frozen filing, separate Saved/Exported states, guarded deletion/restore, five recent batches and query-free web searching. No work-data cloud/sync/telemetry or passive browsing collection.
+
+[Future Plans](FUTURE-PLANS.md) is the consolidated backlog. [Product Audit](PRODUCT-AUDIT-1.8.16.md) records release findings, and [TESTING](TESTING.md) distinguishes real Edge from controlled/mocked coverage. Earlier composer, intake and automated coverage ideas are historical proposals, not current requirements. The real organization reference corpus has not been supplied/inspected; the generic engine ships without it.

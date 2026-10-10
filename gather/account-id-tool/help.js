@@ -1,5 +1,21 @@
 // Local product guidance only. No case reads, remote requests or saved searches.
 const topics = [
+  {id:'source-images',title:'Save a source image',tags:'original image png jpeg webp avif gif context menu right click',paragraphs:[
+    'Right-click a webpage image and choose Save source image to Gather. The browser supplies the clicked image URL, including its selected responsive source. Gather saves the returned bytes and format to the Case/SOC selected when the action began. Source image badges distinguish them from screenshots.',
+    'Original bytes stay in Gather; edits are separate derivatives. Source links can expire, but the locally saved bytes remain. Blocked, protected, temporary blob/canvas or redirected sources can fail visibly; Gather never substitutes a screenshot. Open the source image itself and try again, or deliberately use Select area.',
+    'Auto-copy source images is a separate option under the popup’s Page options. The browser clipboard requires PNG conversion for other formats; the stored original is unchanged. Copy failure does not discard a saved image. Save image preserves the selected source image’s format. Animated sources remain stored unchanged; editing/copying uses a decoded frame.'
+  ]},
+  {id:'reference',title:'Import and search a local Reference Library',tags:'glossary client communications markdown template example import alias offline',paragraphs:[
+    'Workspace → Reference → Manage local library imports a Markdown folder or a transparent Gather reference JSON pack. Imports and searches stay in this browser profile, separate from cases. No AI, OneNote connection or cloud index is needed.',
+    'Type a few words, use Down/Up to choose a result and Enter to preview it. Copy exact text keeps source wording. Open full reference shows its full Markdown page. Examples stay marked as examples, not approved templates. Review wording before using it.',
+    'Login-Info, ARCHIVED-DONT-USE, media and duplicate export folders are excluded, as is recognizable credential content. A pattern filter cannot identify every secret: review your folder before importing. HTML, images and links are displayed as text rather than fetched or executed.',
+    'Choose a collection to edit local aliases, export it, replace it with a newer version or delete it. Reference exports are separate unencrypted files. Case backups do not contain your Reference Library. Limits: 2,000 files, 2 MiB per file, 20 MiB per collection and 100 MiB total.'
+  ]},
+  {id:'content-owner',title:'Look up the owner of a video or post',tags:'tiktok video instagram reel youtube shorts facebook threads canonical clean url',paragraphs:[
+    'Open Gather on a supported content page, or paste its URL. TikTok videos, Instagram posts/reels, YouTube videos/Shorts, Threads posts and supported Facebook videos/reels are recognized. A result requires content-specific author data tied to that content. Supported URL recognition does not guarantee a site exposes usable owner data.',
+    'The four-field account result shows the owner’s clean profile URL. Tracking parameters are removed; identity-critical Facebook profile.php?id values remain. The original requested content link stays in local lookup provenance. Commenters, viewers, recommendations and conflicting owners never substitute for an author.',
+    'If the site exposes no reliable author binding, open the owner’s profile and retry. Opaque short/share links are not automatically followed.'
+  ]},
   {id:'start',title:'Start with the page you are viewing',tags:'quick start install beginner how to use',steps:[
     'Open a profile on Instagram, Facebook, Threads, TikTok or YouTube, then click Gather in your browser toolbar.',
     'Gather starts a current-page lookup automatically when there is no pasted draft. Find IDs on this page starts it manually; Retry this page runs another check.',
@@ -9,25 +25,25 @@ const topics = [
   {id:'accounts',title:'What is an account ID? Which platforms work?',tags:'identifier username platform instagram facebook threads tiktok youtube x',paragraphs:[
     'An account ID is the platform’s identifier for an account or channel. It is different from a display name or username. An ID does not confirm who operates an account or whether two accounts belong to one person.',
     'Gather extracts IDs from Instagram, Facebook, Threads, TikTok and YouTube. X is available for launching searches, but has no ID extractor.',
-    'Open Paste profile links for one link or a list. Open account tools provides mixed batches of up to 100 accounts. IDs remain exact text, including long numbers.'
+    'Open Paste profile links for one link or a list. Enter runs the list; Shift+Enter adds a new line. Open account tools provides mixed batches of up to 100 accounts. IDs remain exact text, including long numbers.'
   ]},
   {id:'copy',title:'Copy IDs, account details and annotations',tags:'clipboard auto-copy poss priv empty batch recent history names',paragraphs:[
-    'IDs only copies checked identifiers. Account details includes links and available names; Display names can be switched off. Auto-copy IDs and screenshot auto-copy are separate remembered choices.',
+    'IDs only copies checked identifiers. Account details includes links and available names; Display names can be switched off. Auto-copy IDs, screenshots and source images are three separate remembered choices.',
     'POSS is your annotation. PRIV and EMPTY appear only when the platform exposes clear account-bound evidence. Missing data does not establish that an account is private, empty or gone. Review conflicting supplied IDs before accepting a correction.',
     'The five most recent lookup batches stay in this browser. Clear recent lookups removes that history; deliberately saved findings and captures remain. Copied text or images can remain in your operating system’s clipboard history.'
   ]},
   {id:'lookup-trouble',title:'Why did an ID take a moment—or fail?',tags:'instagram retry first click loading error missing sign in restricted private unavailable',paragraphs:[
     'An available ID returns immediately. If Instagram metadata has not arrived yet, Gather checks briefly for up to about two seconds, then tries its bounded source and public-profile fallbacks. This remains one action; it is not a permanent background scan.',
     'A site may require sign-in, show a security check, limit requests, change its markup or provide conflicting data. Gather reports the problem rather than guessing. Private profiles can still expose an ID; an ID never grants access to private posts.',
-    'Keep the intended profile open while checking. If it fails, read the error, complete any site sign-in or security check yourself, and use Retry this page. A genuine network interruption may require a later retry. Unsupported posts, feeds and other pages are not profile lookups.'
+    'Keep the intended profile open while checking. If it fails, read the error, complete any site sign-in or security check yourself, and use Retry this page. A genuine network interruption may require a later retry. Supported content routes resolve only explicitly bound authors. Ambiguous posts and unsupported short links ask you to open the owner profile instead.'
   ]},
   {id:'web-search',title:'Search the web without saving a search log',tags:'query dork google bing youtube x history searching',paragraphs:[
     'Workspace → Research → Search the web opens your query in the selected service in a new tab. Gather launches the search; it does not passively crawl the web.',
-    'Gather does not keep automatic search queries, drafts or search history. Your browser and the provider may keep their own history. Findings, notes and plans you explicitly save are separate.'
+    'Gray completions are local suggestions. Tab or Enter accepts; Enter launches when no suggestion remains. Escape dismisses; pasted queries are not rewritten. No partial query is sent or saved. Gather does not keep automatic search queries, drafts or search history. Your browser and the provider may keep their own history. Findings, notes and plans you explicitly save are separate.'
   ]},
   {id:'reverse-image',title:'Reverse-image search',tags:'google lens lenso bing yandex baidu sogou tineye shutterstock upload photo image provider',paragraphs:[
-    'In Research, choose Reverse image, select a provider and open it. Gather opens the provider’s website; it does not upload an image for you.',
-    'Choose what to submit on that site. The provider receives whatever you upload or paste there, under its own terms. Availability, sign-in requirements and paid features can vary. Shutterstock opens its stock-image site; look for its image-search control if available.'
+    'In Research → Reverse image, choose or drop a local image. From a saved image inspector, Reverse image search loads that selected asset. Review the preview, choose a provider, then Copy & open search. The chosen image is copied as PNG; paste or upload it on the provider’s website. Gather does not automatically upload it.',
+    'Change or Remove clears the temporary selection. Local files chosen here are not automatically saved to a case. If copying fails, Upload options lets you save the selected image and open the provider. The provider receives whatever you upload or paste there, under its own terms. Availability, sign-in requirements and paid features can vary. Shutterstock opens its stock-image site; look for its image-search control if available.'
   ]},
   {id:'screenshots',title:'Take a screenshot without opening the side panel',tags:'visible full page select area copy crosshair dotted scroll selection capture',paragraphs:[
     'Visible area captures the current view. Full page scrolls and stitches a bounded page capture. Select area shows dotted crosshair guides: drag a rectangle and release to capture. Scroll while dragging to extend it; Escape cancels and restores the page position.',
@@ -50,7 +66,7 @@ const topics = [
     'Choose Case/SOC before saving or capturing; Unassigned is available. New cases get an internal scan automatically. Existing cases can contain multiple scans, which remain distinct. Rename or manage subjects in Case; browsing a capture filter does not change the saving destination.'
   ]},
   {id:'workspace',title:'Find your way around the Workspace',tags:'research findings tasks changes settings filters review export',paragraphs:[
-    'Research contains search launching, deliberately saved findings, tasks and changes. Captures holds screenshots and image exports. Case manages the selected case and subjects. Settings contains Data & Privacy, backups and capture export preferences.',
+    'Research contains search launching, deliberately saved findings, tasks and changes. Captures holds screenshots and image exports. Case manages the selected case and subjects. Reference searches locally imported wording. Settings contains Data & Privacy, backups and capture export preferences.',
     'Use filters to narrow a list and clear them to see everything in the selected scan. Reports contain the items you explicitly include. Review findings and images before sharing.'
   ]},
   {id:'privacy',title:'Does Gather upload my cases?',tags:'local cloud analytics school student names network private data identity threat affiliation',paragraphs:[

@@ -1,5 +1,5 @@
 // UI navigation only: changing views never changes the filing destination.
-const sections=['research','captures','case','settings'];
+const sections=['research','captures','case','reference','settings'];
 let active='research';const scrollPositions=new Map();
 const panel=new URLSearchParams(location.search).has('panel');
 export function selectSection(next,{focus=false}={}){
@@ -11,8 +11,8 @@ export function selectSection(next,{focus=false}={}){
   if(previous!==next){const message=document.getElementById('message');if(!message.classList.contains('error'))message.hidden=true;for(const status of document.querySelectorAll('#workspaceStatus .workspace-status'))status.textContent='';}
   const url=new URL(location.href);url.hash=next==='research'?'':next;history.replaceState(null,'',url);
   if(previous!==next)window.scrollTo(0,scrollPositions.get(next)||0);
-  if(focus)document.getElementById('tab-'+next).focus();
   document.dispatchEvent(new CustomEvent('gather:view-changed',{detail:next}));
+  if(focus)document.getElementById('tab-'+next).focus();
 }
 export function setCaseAvailable(available){document.body.classList.toggle('has-case',available);}
 export function initNavigation(){

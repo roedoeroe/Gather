@@ -25,14 +25,14 @@ try{
   await page.evaluate(({origin})=>__seedTabs([{id:10,windowId:1,url:origin+'/fixture',title:'Northbridge fictional page',active:true}]),{origin});
   await page.getByRole('tab',{name:'Research',exact:true}).waitFor();
   await page.locator('#items .empty').waitFor();
-  assert.equal(await page.getByRole('tab').count(),4);assert.equal(await page.locator('#captureTools').isVisible(),false);
+  assert.equal(await page.getByRole('tab').count(),5);assert.equal(await page.locator('#captureTools').isVisible(),false);
   assert.equal(await page.getByRole('button',{name:'Delete case…'}).isVisible(),false);
   assert.ok((await page.locator('#items .empty').boundingBox()).y<650);
   await page.screenshot({path:path.join(artifacts,'inbox-desktop.png'),fullPage:true});
   await page.setViewportSize({width:1440,height:900});await page.screenshot({path:path.join(artifacts,'inbox-wide.png'),fullPage:true});
   const navigationEntries=await page.evaluate(()=>history.length);
   await page.getByRole('tab',{name:'Research',exact:true}).focus();
-  for(const name of ['Captures','Case','Settings']){await page.keyboard.press('ArrowRight');assert.equal(await page.getByRole('tab',{name,exact:true}).getAttribute('aria-selected'),'true');assert.equal(await page.locator('.workspace-view:visible').count(),1);assert.equal(await page.evaluate(()=>document.activeElement.textContent),name);}
+  for(const name of ['Captures','Case','Reference','Settings']){await page.keyboard.press('ArrowRight');assert.equal(await page.getByRole('tab',{name,exact:true}).getAttribute('aria-selected'),'true');assert.equal(await page.locator('.workspace-view:visible').count(),1);assert.equal(await page.evaluate(()=>document.activeElement.textContent),name);}
   await page.keyboard.press('Home');assert.equal(await page.evaluate(()=>document.activeElement.id),'tab-research');await page.keyboard.press('End');assert.equal(await page.evaluate(()=>document.activeElement.id),'tab-settings');
   assert.equal(await page.evaluate(()=>history.length),navigationEntries);
   await page.reload();await page.getByRole('tab',{name:'Settings',exact:true}).waitFor();await page.waitForFunction(()=>document.body.dataset.section==='settings');

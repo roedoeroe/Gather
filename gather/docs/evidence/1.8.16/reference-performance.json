@@ -1,0 +1,9 @@
+{
+  "files": 1000,
+  "bytes": 10158890,
+  "sections": 1000,
+  "indexMs": 101.99113899999999,
+  "p50Ms": 12.699632999999949,
+  "p95Ms": 16.812288999999964,
+  "environment": "Node 24, fictional corpus; measurements not a latency guarantee"
+}

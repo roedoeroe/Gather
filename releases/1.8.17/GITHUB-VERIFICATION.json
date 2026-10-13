@@ -1,0 +1,18 @@
+{
+  "verified_at_utc": "2026-10-13T19:52:37.283313+00:00",
+  "release": "https://github.com/roedoeroe/Gather/releases/tag/1.8.17-rc.1",
+  "tag": "1.8.17-rc.1",
+  "immutable_target_commit": "ba122ec7e1b823a0af144e7eae8f29cfe688b636",
+  "public_download": "https://github.com/roedoeroe/Gather/releases/download/1.8.17-rc.1/Gather-1.8.17-extension.zip",
+  "http_status": 200,
+  "bytes": 246386,
+  "sha256": "d846cd303e5202eb70e6113e1b2d527766de58f677ee09dbca7ea8f78229c9cb",
+  "crc": "passed",
+  "manifest": "1.8.17",
+  "runtime_files_matching_tested_source": 102,
+  "uploaded_assets": [
+    "Gather-1.8.17-extension.zip"
+  ],
+  "attach_workflow": 38458108571,
+  "old_releases": "not modified"
+}

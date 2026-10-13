@@ -4,7 +4,7 @@ export {validateBackup} from './backup-validation.js';
 import {bindTabContext, detachTabContext, resolveTabContext, removeTabContext, removeProjectTabContexts} from './tab-context.js';
 // MV3 service workers forbid dynamic import. Every worker dependency must load
 // statically, including recovery, image restore and case closure paths.
-import {readCaptureSetting,removeCaptureSetting,listSubjects,selectedSubject,snapshotCaptureBundle,importCaptureBundle,purgeProjectAssets,hashBytes} from './capture-store.js';
+import {readCaptureSetting,removeCaptureSetting,listSubjects,selectedSubject,snapshotCaptureBundle,importCaptureBundle,purgeProjectAssets,detachFindingReferences,hashBytes} from './capture-store.js';
 import {validateCaptureBundle} from './capture-backup.js';
 import {forgetSearchText,forgetSearchDrafts} from './search-privacy.js';
 import {imageSearchUrl} from './image-search.js';
@@ -48,7 +48,10 @@ export function dispatch(action){
   const operation=queue.catch(()=>{}).then(async()=>{
     const previous=await readWorkspace();if(['research.coverage','research.associate'].includes(action.type)&&action.subjectId){const projectId=action.type==='research.coverage'?previous.scans.find(s=>s.id===action.scanId)?.projectId:previous.items.find(i=>i.id===action.itemId)?.projectId;if(!(await listSubjects(projectId)).some(s=>s.id===action.subjectId))throw new Error('Choose a role in this project.');}
     const {state,result}=reduceWorkspace(previous,action);
-    await chrome.storage.local.set({[WORKSPACE_KEY]:state});return {state,result};
+    if(action.type==='item.delete'){
+      await detachFindingReferences(action.id,{writes:{[WORKSPACE_KEY]:state},previous:{[WORKSPACE_KEY]:previous}});
+      await recoverBinaryRestore();
+    }else await chrome.storage.local.set({[WORKSPACE_KEY]:state});return {state,result};
   });queue=operation;return operation;
 }
 export async function openSearch(action){

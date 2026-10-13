@@ -29,7 +29,7 @@ export function openCaptureDB(){
 }
 async function readOne(store,id){const db=await openCaptureDB();return request(db.transaction(store).objectStore(store).get(id));}
 async function readAll(store){const db=await openCaptureDB();return request(db.transaction(store).objectStore(store).getAll());}
-async function writeOne(store,value){const db=await openCaptureDB(),tx=db.transaction(store==='subjects'?['subjects','settings']:store,'readwrite'),done=finish(tx);try{if((store==='subjects'&&value.projectId&&await request(tx.objectStore('settings').get('closed-project:'+value.projectId)))||(store==='settings'&&value.key.startsWith('project-label:')&&await request(tx.objectStore('settings').get('closed-project:'+value.key.slice(14))))||(store==='settings'&&value.key.startsWith('subject:')&&await request(tx.objectStore('settings').get('closed-scan:'+value.key.slice(8)))))fail('This project was closed.');tx.objectStore(store).put(value);}catch(e){tx.abort();await done.catch(()=>{});throw e;}await done;changed();return value;}
+async function writeOne(store,value){const db=await openCaptureDB(),tx=db.transaction(store==='subjects'?['subjects','settings']:store,'readwrite'),done=finish(tx);try{if((store==='subjects'&&value.projectId&&await request(tx.objectStore('settings').get('closed-project:'+value.projectId)))||(store==='settings'&&value.key.startsWith('project-label:')&&await request(tx.objectStore('settings').get('closed-project:'+value.key.slice(14))))||(store==='settings'&&value.key.startsWith('subject:')&&await request(tx.objectStore('settings').get('closed-scan:'+value.key.slice(8)))))fail('This project was closed.');if(store==='subjects')for(const id of value.accountObservationIds||[])if(await request(tx.objectStore('settings').get('closed-finding:'+id)))fail('A linked finding was deleted. Refresh the account associations.');tx.objectStore(store).put(value);}catch(e){tx.abort();await done.catch(()=>{});throw e;}await done;changed();return value;}
 export async function getCaptureSettings(projectId=null){const settings={...DEFAULTS,...(await readOne('settings','preferences'))?.value};if(projectId){captureId(projectId);const label=(await readOne('settings','project-label:'+projectId))?.value;if(label)settings.subjectLabel=label;}return settings;}
 export async function updateCaptureSettings(changes,{projectId=null}={}){
   if(projectId&&Object.hasOwn(changes,'subjectLabel')){captureId(projectId);const label=cleanText(changes.subjectLabel,30);if(!label)fail('Enter a subject display label.');await writeOne('settings',{key:'project-label:'+projectId,value:label});const rest={...changes};delete rest.subjectLabel;if(Object.keys(rest).length)await updateCaptureSettings(rest);return getCaptureSettings(projectId);}
@@ -82,7 +82,7 @@ export async function beginCapture(input){
   if(destination.subjectId){const subject=await readOne('subjects',destination.subjectId);if(!subject||subject.projectId!==destination.projectId)fail('Choose a subject in this project.');}
   const startedAt=input.startedAt??Date.now();if(!Number.isFinite(startedAt)||startedAt<=0)fail('Invalid capture start time.');
   const recordId=input.id?captureId(input.id):uid();const record={id:recordId,evidenceId:'E-'+recordId.replace(/-/g,'').toUpperCase(),...destination,context:{...destination},source,mode:input.mode,refs,startedAt,startedAtISO:new Date(startedAt).toISOString(),timezone:cleanText(input.timezone||Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC',100),timezoneOffsetMinutes:new Date(startedAt).getTimezoneOffset(),status:'capturing',review:'unreviewed',included:false,savedState:'pending',assetIds:[],bytes:0,limitations:[],export:{status:'not-exported',attempts:0},automaticExport:(await getCaptureSettings()).automaticExport};
-  const db=await openCaptureDB(),tx=db.transaction(['captures','settings'],'readwrite'),done=finish(tx);try{if(await request(tx.objectStore('settings').get('closed-capture:'+recordId)))fail('This capture was deleted. Start a new capture.');if(destination.projectId&&(await request(tx.objectStore('settings').get('closed-project:'+destination.projectId))))fail('This project was closed. Choose a current destination.');tx.objectStore('captures').add(record);}catch(e){tx.abort();await done.catch(()=>{});throw e;}await done;return record;
+  const db=await openCaptureDB(),tx=db.transaction(['captures','settings'],'readwrite'),done=finish(tx);try{if(await request(tx.objectStore('settings').get('closed-capture:'+recordId)))fail('This capture was deleted. Start a new capture.');if(destination.projectId&&(await request(tx.objectStore('settings').get('closed-project:'+destination.projectId))))fail('This project was closed. Choose a current destination.');for(const key of ['accountId','sourceId'])if(record.refs[key]&&await request(tx.objectStore('settings').get('closed-finding:'+record.refs[key])))record.refs[key]=null;tx.objectStore('captures').add(record);}catch(e){tx.abort();await done.catch(()=>{});throw e;}await done;return record;
 }
 function safeMetadata(value){if(value===undefined)return undefined;const raw=JSON.stringify(value);if(raw.length>256000)fail('Capture metadata is too large.');return JSON.parse(raw);}
 export async function completeCapture(id,details){
@@ -152,6 +152,19 @@ export async function snapshotCaptureBundle(){const db=await openCaptureDB(),tx=
 export const readCaptureSetting=key=>readOne('settings',key);
 export const writeCaptureSetting=(key,value)=>writeOne('settings',{key,value});
 export async function removeCaptureSetting(key){const db=await openCaptureDB(),tx=db.transaction('settings','readwrite'),done=finish(tx);tx.objectStore('settings').delete(key);await done;}
+// Disconnect only relationship pointers. Original image bytes and source metadata
+// remain intact. The existing journal completes the workspace removal on restart.
+export async function detachFindingReferences(id,pendingRestore){
+  captureId(id);const db=await openCaptureDB(),tx=db.transaction(['captures','subjects','settings'],'readwrite'),done=finish(tx);
+  try{
+    const settings=tx.objectStore('settings');
+    if((await request(settings.getAll())).some(s=>s.key==='pending-workspace-restore'||s.key.startsWith('restore-stage:')))fail('Finish the pending backup restore before deleting a finding.');
+    const subjects=tx.objectStore('subjects'),captures=tx.objectStore('captures');
+    for(const subject of await request(subjects.getAll()))if(subject.accountObservationIds.includes(id)){subject.accountObservationIds=subject.accountObservationIds.filter(x=>x!==id);subjects.put(subject);}
+    for(const record of await request(captures.getAll())){let changed=false;for(const key of ['accountId','sourceId'])if(record.refs?.[key]===id){record.refs[key]=null;changed=true;}if(changed)captures.put(record);}
+    settings.put({key:'closed-finding:'+id,value:true});settings.put({key:'pending-workspace-restore',value:pendingRestore});
+  }catch(error){tx.abort();await done.catch(()=>{});throw error;}await done;changed();
+}
 // Call only after validating the complete archive. Assets and their records commit together.
 export async function importCaptureBundle(bundle,{idMap=new Map(),pendingRestore=null}={}){
   const current=await snapshotCaptureBundle(),mapping=new Map(idMap),used=new Set([...current.captures,...current.assets,...current.subjects].map(x=>x.id));

@@ -23,3 +23,22 @@ test('search provider cannot become arbitrary executable URL',()=>{assert.throws
 test('tasks can be done, dismissed or reopened without losing history',()=>{const f=fixture(),id=f.run({type:'task.create',scanId:f.a,title:'Check archived source'}).id;for(const status of ['done','open','dismissed'])f.run({type:'task.status',id,status});assert.equal(f.state.tasks[0].status,'dismissed');assert.equal(f.state.activity.filter(a=>a.kind==='task.updated').length,3);validateWorkspace(f.state);});
 test('common pasted links without a scheme save with their original spelling',()=>{const f=fixture();f.run({type:'item.save',kind:'account',scanId:f.a,entry:{...entry(),originalUrl:'instagram.com/northbridge/'}});assert.equal(f.state.items[0].entry.originalUrl,'instagram.com/northbridge/');validateWorkspace(f.state);});
 test('renaming project and scan preserves existing observation associations',()=>{const f=fixture();f.run({type:'item.save',kind:'account',scanId:f.a,entry:entry()});const before=structuredClone(f.state.items[0]);f.run({type:'context.rename',scanId:f.a,projectName:'Northbridge Archive',scanName:'October follow-up'});assert.deepEqual(f.state.items[0],before);assert.equal(f.state.scans.find(s=>s.id===f.a).name,'October follow-up');validateWorkspace(f.state);});
+test('finding deletion scrubs its text, undo and association while preserving other work',()=>{
+ const f=fixture(),id=f.run({type:'item.save',kind:'note',scanId:null,title:'Delete canary',body:'private note canary'}).id;
+ f.run({type:'item.annotate',id,annotation:'annotation canary'});f.run({type:'item.save',kind:'source',scanId:f.a,url:'https://example.test/keep'});f.run({type:'task.create',scanId:null,title:'Keep task'});
+ const before=f.state,other=structuredClone(before.items[1]);f.run({type:'item.delete',id,snapshot:JSON.stringify(before.items[0])});
+ assert.deepEqual(f.state.items,[other]);assert.deepEqual(f.state.tasks,before.tasks);assert.deepEqual(f.state.projects,before.projects);assert.doesNotMatch(JSON.stringify(f.state),/canary/);validateWorkspace(f.state);
+});
+test('finding delete rejects stale confirmation and repeated deletion',()=>{
+ const f=fixture(),id=f.run({type:'item.save',kind:'note',scanId:null,title:'Note',body:'fictional'}).id,snapshot=JSON.stringify(f.state.items[0]);f.run({type:'item.review',id,review:'reviewed'});
+ assert.throws(()=>f.run({type:'item.delete',id,snapshot}),/changed/);f.run({type:'item.delete',id,snapshot:JSON.stringify(f.state.items[0])});assert.throws(()=>f.run({type:'item.delete',id,snapshot}),/no longer/);
+});
+test('deleting an account observation retains other observations and recomputes aliases',()=>{
+ const f=fixture();f.run({type:'item.save',kind:'account',scanId:f.a,entry:entry('old.example')});f.run({type:'item.save',kind:'account',scanId:f.a,entry:entry('new.example',undefined,at+1)});
+ const first=structuredClone(f.state.items[0]),last=f.state.items[1];f.run({type:'item.delete',id:last.id,snapshot:JSON.stringify(last)});assert.deepEqual(f.state.items,[first]);assert.deepEqual(f.state.entities[0].observedAliases,['old.example']);assert.equal(f.state.entities[0].currentUsername,'old.example');validateWorkspace(f.state);
+ f.run({type:'item.delete',id:first.id,snapshot:JSON.stringify(first)});assert.equal(f.state.entities.length,0);validateWorkspace(f.state);
+});
+test('finding deletion preserves an entity still used by another finding move undo',()=>{
+ const f=fixture();const id=f.run({type:'item.save',kind:'account',scanId:f.a,entry:entry()}).id;f.run({type:'item.move',id,scanId:f.b});const second=f.run({type:'item.save',kind:'account',scanId:f.a,entry:entry('old.example',undefined,at+1)}).id;
+ f.run({type:'item.delete',id:second,snapshot:JSON.stringify(f.state.items.find(x=>x.id===second))});validateWorkspace(f.state);const event=f.state.activity.find(x=>x.change?.type==='item.move');f.run({type:'undo',eventId:event.id});validateWorkspace(f.state);assert.equal(f.state.items[0].scanId,f.a);
+});

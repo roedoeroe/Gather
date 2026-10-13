@@ -1,0 +1,32 @@
+[
+  {
+    "suite": "generated",
+    "exit": 0,
+    "seconds": 0.13
+  },
+  {
+    "suite": "node",
+    "exit": 0,
+    "seconds": 37.66
+  },
+  {
+    "suite": "toolbar",
+    "exit": 0,
+    "seconds": 75.83
+  },
+  {
+    "suite": "worker",
+    "exit": 0,
+    "seconds": 8.82
+  },
+  {
+    "suite": "profile-reader",
+    "exit": 0,
+    "seconds": 3.24
+  },
+  {
+    "suite": "help",
+    "exit": 0,
+    "seconds": 7.33
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "kind": "rendered-browser-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [
+    "Copied role observations preserve Candidate/Confirmed, check date and exact IDs; rejected accounts stay omitted.",
+    "A clipboard denial is visible inside the preview and selects the text for manual copy.",
+    "Changing an analyst association clears the old preview and blocks stale copying.",
+    "Switching the global case during preview keeps the originally reviewed Northbridge block.",
+    "Cancel while freshness validation is delayed does not write to the clipboard afterwards.",
+    "An updated coverage result invalidates its open clipboard preview too.",
+    "Deleting the case in another workspace releases preview text and disables Copy."
+  ],
+  "failures": [],
+  "errors": []
+}

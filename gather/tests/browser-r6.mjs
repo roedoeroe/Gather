@@ -1,3 +1,5 @@
+import {inboxFindingJourney} from './fixtures/inbox-finding-journey.mjs';
+import {r10Journey} from './fixtures/r10-journey.mjs';
 // Real installed Edge, real local storage/IndexedDB/clipboard, fictional intercepted
 // web pages. Source launch is scripted here; physical context-menu checks are separate.
 import {createRequire} from 'node:module';import {execFileSync} from 'node:child_process';import fs from 'node:fs/promises';import path from 'node:path';import os from 'node:os';import assert from 'node:assert/strict';import crypto from 'node:crypto';
@@ -10,20 +12,23 @@ const passed=[],errors=[],requests=[],canaries=['PRIVATE_CASE_CANARY_84217','PRI
 const headed=process.env.GATHER_R6_HEADED==='1';
 const manifest=JSON.parse(await fs.readFile(path.join(root,'manifest.json'),'utf8'));
 async function open(profile){
- const ctx=await chromium.launchPersistentContext(path.join(temporary,profile),{executablePath:process.env.GATHER_CHROMIUM_PATH,headless:!headed,chromiumSandbox:true,acceptDownloads:true,viewport:{width:1280,height:900},ignoreDefaultArgs:['--disable-extensions'],args:['--disable-extensions-except='+root,'--load-extension='+root]});contexts.push(ctx);ctx.setDefaultTimeout(15000);ctx.on('weberror',event=>errors.push(event.error().message));
+ const ctx=await chromium.launchPersistentContext(path.join(temporary,profile),{executablePath:process.env.GATHER_CHROMIUM_PATH,headless:!headed,chromiumSandbox:true,acceptDownloads:true,viewport:{width:1280,height:900},ignoreDefaultArgs:['--disable-extensions'],args:['--disable-extensions-except='+root,'--load-extension='+root]});contexts.push(ctx);ctx.setDefaultTimeout(15000);ctx.on('weberror',event=>errors.push({message:event.error().message,stack:event.error().stack,url:event.page()?.url()}));
  await ctx.route(/^https?:\/\//,async route=>{
   const request=route.request(),url=new URL(request.url());requests.push({url:request.url(),method:request.method(),body:request.postData(),headers:request.headers()});
   if(url.pathname==='/delay.png')await new Promise(resolve=>releaseDelayed=resolve);
   if(url.pathname==='/denied.png'){await route.fulfill({status:403,body:'Access denied'});return;}
   const image=images.get(url.pathname==='/delay.png'?'/fixture.png':url.pathname);
   if(image){await route.fulfill({contentType:image.type,body:image.bytes,headers:url.hostname==='blocked.example.test'?{'Access-Control-Allow-Origin':'https://wrong.example.test'}:{'Access-Control-Allow-Origin':'*'}});return;}
+  // Native tabs can request provider resources as CDP attaches. Those resources
+  // are outside the mocked provider-navigation contract; never serve HTML as JS.
+  if(request.resourceType()==='script'){await route.fulfill({contentType:'application/javascript',body:''});return;}
   let data={username:'alex.example',id:'9007199254740993123',full_name:'Alex Example'};
   if(url.hostname.includes('tiktok'))data={itemInfo:{itemStruct:{id:'123456789',author:{uniqueId:'alex.example',id:'9007199254740993123',nickname:'Alex Example'}}}};
   if(url.pathname.includes('/reel/AB_example'))data={shortcode:'AB_example',owner:{username:'alex.example',id:'9007199254740993123',full_name:'Alex Example'}};
   if(url.hostname.includes('threads'))data={code:'AB_example',user:{username:'alex.example',id:'9007199254740993123'}};
   if(url.hostname.includes('youtube'))data={videoDetails:{videoId:'ABCDEFGHIJK',channelId:'UC1234567890123456789012',author:'Example Channel'}};
   if(url.hostname.includes('facebook'))data={video_id:'123456789',owner:{__typename:'Page',id:'9007199254740993123',name:'Example Page'}};
-  await route.fulfill({contentType:'text/html',body:'<!doctype html><title>Fictional image fixture</title><script type="application/json">'+JSON.stringify(data)+'</script><meta charset="utf-8"><style>body{min-height:2400px;background:white}</style><h1>Fictional public fixture</h1><img id="image" src="/fixture.png" width="160" height="100">'});
+  await route.fulfill({contentType:'text/html',body:'<!doctype html><title>Fictional image fixture</title><script type="application/json">'+JSON.stringify(data)+'</script><meta charset="utf-8"><style>body{min-height:2400px;background:white}</style><h1>Fictional public fixture</h1><picture><source srcset="/fixture.webp" type="image/webp"><img id="image" src="/fixture.jpg" width="160" height="100"></picture>'});
  });
  let worker=ctx.serviceWorkers().find(w=>w.url().endsWith('/background.js'));worker||=await ctx.waitForEvent('serviceworker',{predicate:w=>w.url().endsWith('/background.js')});
  const origin='chrome-extension://'+new URL(worker.url()).host,page=await ctx.newPage();await page.goto(origin+'/workspace.html');await page.locator('.layout:not([inert])').waitFor();return {ctx,worker,page,base:origin};
@@ -31,6 +36,7 @@ async function open(profile){
 const group=(message)=>{passed.push(message);console.log('PASS '+message);};
 try{
  ({ctx:context,page:api,base}=await open('profile-a'));
+ await inboxFindingJourney({api,group,out});
  const ids=await api.evaluate(async canaries=>{
   const send=action=>chrome.runtime.sendMessage({type:'workspace.action',action});const a=await send({type:'project.create',name:canaries[0],scanName:'October review'});if(a.error)throw Error(a.error);
   const store=await import('./capture-store.js'),subject=await store.createSubject({projectId:a.result.id,name:canaries[1]});await store.selectSubject(a.result.scanId,subject.id,a.result.id);
@@ -62,9 +68,12 @@ try{
   const record=await api.evaluate(async id=>(await import('./capture-store.js')).getCapture(id),id);assert.equal(record.savedState,'saved');return {page,record};
  }
  if(headed){
+  const nativeSourceOpened=context.waitForEvent('page');
   await source.bringToFront();await source.locator('#image').click({button:'right'});await source.waitForTimeout(200);
   execFileSync(process.env.GATHER_XDOTOOL,['key','--clearmodifiers','End','Up','Up','Up','Return']);
-  await api.waitForFunction(async()=>{const s=await import('./capture-store.js');return (await s.listCaptures()).some(r=>r.mode==='source-image'&&r.savedState==='saved');});
+  const nativeSource=await nativeSourceOpened;await nativeSource.waitForURL('**/source-image.html?*');await nativeSource.locator('#sourceActions').waitFor({state:'visible'});
+  const clicked=await api.evaluate(async id=>(await import('./capture-store.js')).getCapture(id),new URL(nativeSource.url()).searchParams.get('job'));
+  assert.equal(clicked.technical.imageUrl,'https://www.instagram.com/fixture.webp');assert.equal(clicked.assets[0].sha256,crypto.createHash('sha256').update(images.get('/fixture.webp').bytes).digest('hex'));assert.equal(clicked.subjectId,ids.subject);
   await api.evaluate(async()=>{for(const tab of await chrome.tabs.query({}))if(tab.url?.includes('/source-image.html?'))await chrome.tabs.remove(tab.id);});
   group('Physical Edge context-menu invocation saves the clicked image and grants normal activeTab access.');
   for(const mode of ['visible','selection','full-page']){
@@ -101,6 +110,7 @@ try{
  const reverseOpened=context.waitForEvent('page');await api.getByRole('button',{name:'Reverse image search',exact:true}).click();const reverse=await reverseOpened;await reverse.waitForURL('**/image-search.html?*');await reverse.getByText('Selected locally. Nothing uploaded.',{exact:true}).waitFor();await reverse.getByLabel('Reverse image provider').selectOption('tineye');const providerOpened=context.waitForEvent('page');await reverse.getByRole('button',{name:'Copy & open search ↗',exact:true}).click();const provider=await providerOpened;await provider.waitForURL('https://tineye.com/');assert.ok(!provider.url().includes('image'));await provider.close();await reverse.bringToFront();await reverse.screenshot({path:path.join(out,'reverse-image.png')});await reverse.getByRole('button',{name:'Remove',exact:true}).click();assert.ok(await reverse.getByRole('button',{name:'Copy & open search ↗',exact:true}).isDisabled());await reverse.locator('input[type=file]').setInputFiles(path.join(temporary,'fixture.webp'));await reverse.getByText('Selected locally. Nothing uploaded.',{exact:true}).waitFor();const localProviderOpened=context.waitForEvent('page');await reverse.getByRole('button',{name:'Copy & open search ↗',exact:true}).click();const localProvider=await localProviderOpened;await localProvider.waitForURL('https://tineye.com/');await localProvider.close();await reverse.close();await api.locator('.capture-inspector').getByRole('button',{name:'Close',exact:true}).click();group('Reverse search selects a saved asset or local file, copies its pixels and explicitly opens the shared provider with no automatic upload.');
  const edit=await context.newPage();await edit.goto(base+'/capture-edit.html?id='+captured[0].id);await edit.locator('#saveDerivative').waitFor();await edit.getByRole('button',{name:'Black redaction',exact:true}).click();const box=await edit.locator('#editCanvas').boundingBox();await edit.mouse.move(box.x+10,box.y+10);await edit.mouse.down();await edit.mouse.move(box.x+45,box.y+45);await edit.mouse.up();await edit.locator('#saveAndCopy').click();await edit.getByText('Copied the selected image.',{exact:true}).waitFor();const revised=await api.evaluate(async id=>{const s=await import('./capture-store.js'),r=await s.getCapture(id);return {original:(await s.getAsset(r.assets.find(a=>a.role==='original').id,{verify:true})).sha256,share:(await s.getAsset(r.shareAssetId,{verify:true})).sha256};},captured[0].id);assert.equal(revised.original,captured[0].assets[0].sha256);assert.notEqual(revised.share,revised.original);await edit.close();group('Source-image manual redaction and Save & Copy use a derivative while the original byte hash stays unchanged.');
  await api.evaluate(async()=>{await(await import('./capture-store.js')).updateCaptureSettings({automaticSourceCopy:true,automaticCopy:false});});const auto=await saveImage('https://www.instagram.com/fixture.jpg');await auto.page.getByText('Image copied to clipboard.',{exact:true}).waitFor();await auto.page.close();const prefs=await api.evaluate(async()=>{const s=await import('./capture-store.js'),p=await s.getCaptureSettings();await s.updateCaptureSettings({automaticSourceCopy:false});return p;});assert.equal(prefs.automaticCopy,false);assert.equal(prefs.automaticSourceCopy,true);group('Source-image auto-copy works independently of screenshot auto-copy, converting only the clipboard copy to PNG.');
+ await r10Journey({context,api,base,ids,saveImage,group,out});
  await api.getByRole('tab',{name:'Research',exact:true}).click();const query=api.locator('#query');await query.fill('');await query.pressSequentially('si');await api.locator('.search-ghost:not([hidden])').waitFor();await query.press('Tab');assert.equal(await query.inputValue(),'site:');await query.pressSequentially('inst');await query.press('Enter');assert.equal(await query.inputValue(),'site:instagram.com');await query.pressSequentially(' "Fictional Example"');const searchOpened=context.waitForEvent('page');await query.press('Enter');const searchPage=await searchOpened;await searchPage.waitForURL('**google.com/search?*');assert.equal(new URL(searchPage.url()).searchParams.get('q'),'site:instagram.com "Fictional Example"');await searchPage.close();await api.waitForFunction(()=>document.querySelector('#query').value==='');
  const state=await api.evaluate(async()=>JSON.stringify({local:await chrome.storage.local.get(null),session:await chrome.storage.session.get(null)}));assert.ok(!state.includes('Fictional Example'));group('Native keyboard si → Tab → site: → inst → Enter → instagram.com → Enter launches exactly the requested query with no retained query.');
  await query.fill('si');await query.press('Escape');assert.equal(await api.locator('.search-ghost').isVisible(),false);await query.press('Tab');assert.notEqual(await api.evaluate(()=>document.activeElement.id),'query');await api.locator('#provider').selectOption('youtube');await query.fill('si');assert.equal(await api.locator('.search-ghost').isVisible(),false);await query.fill('');group('Escape dismisses completion, Tab releases focus, and unsupported provider operators are not suggested.');

@@ -32,3 +32,7 @@ Network canary checks use fictional private Case/SOC/note values and inspect int
 - [Google image search](https://support.google.com/websearch/answer/1325808?hl=en): provider-owned upload/paste flow. No private upload endpoints used.
 
 See [provider capabilities](REVERSE-IMAGE-PROVIDERS.md), [storage and deletion](PRIVACY-DATA-FLOW.md), and [validation](TESTING.md).
+
+## 1.8.17 delta
+
+Add SOC and image paste create no network requests. Reverse Image still copies locally and opens the selected provider’s public page only on explicit action. The analyst performs any final paste/upload there; no Case/SOC/Reference metadata is sent. Live QA used only a generated geometric PNG. Yandex paste and TinEye upload returned results; Google’s network challenge was respected. Raw live diagnostics remain outside public inputs.

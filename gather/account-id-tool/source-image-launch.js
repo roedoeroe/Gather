@@ -10,7 +10,7 @@ export async function launchSourceImage(info,tab) {
   const job={id:crypto.randomUUID(),context,startedAt,imageUrl,source:{url:info.pageUrl||tab.url,title:String(tab.title||'Source image').slice(0,500),tabId:tab.id,windowId:tab.windowId},automaticCopy:settings.automaticSourceCopy===true};
   const key='gather.sourceImage.'+job.id;
   await chrome.storage.session.set({[key]:job});
-  try {await chrome.windows.create({url:chrome.runtime.getURL('source-image.html?job='+job.id),type:'popup',width:860,height:720,focused:true});}
+  try {await chrome.windows.create({url:chrome.runtime.getURL('source-image.html?job='+job.id),type:'popup',width:640,height:620,focused:true});}
   catch(error){await chrome.storage.session.remove(key);throw error;}
   return {id:job.id};
 }

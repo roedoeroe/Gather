@@ -1,8 +1,8 @@
-# Target-computer verification — 1.8.16 RC
+# Target-computer verification — 1.8.17 RC
 
 This is the small remaining real-computer check, not a request for the user to debug the extension's basic workflows. Development already ran automated, rendered and installed Linux Edge journeys; see TESTING for exact coverage.
 
-On an approved Windows Edge installation, update the same installed folder and Reload. Confirm 1.8.16. Use fictional data and an account you are authorized to inspect.
+On an approved Windows Edge installation, update the same installed folder and Reload. Confirm 1.8.17. Use fictional data and an account you are authorized to inspect.
 
 1. Open a supported profile and a supported post/video. Check ID and canonical owner URL, then Copy into the intended work application. Try normal Enter and Shift+Enter in pasted lists.
 2. Select a fictional Case/SOC. Capture an area, extend it by scrolling, then try Visible and Full page. Review the result at the actual Windows scaling/browser zoom used for work; cancel and repeat once.
@@ -12,3 +12,5 @@ On an approved Windows Edge installation, update the same installed folder and R
 6. Test native side-panel opening, same-folder update, and separate-profile privacy using fictional data. Deletion does not erase exported files or clipboard/browser history.
 
 Report a reproducible problem with version, browser/OS/zoom and fictional steps. Remove real names, URLs/IDs, captures, Reference wording, cookies and backups from anything public. No signed-in session or organization policy bypass is required for development; inaccessible platform behavior remains uncertain.
+
+Also try Inbox from Settings/Captures, Add SOC beside the case heading, Ctrl+V in Reverse Image, and cancelling/confirming Delete on a fictional finding. Its images/tasks should remain.

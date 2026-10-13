@@ -1,0 +1,73 @@
+[
+  {
+    "suite": "generated",
+    "exit": 0,
+    "seconds": 0.19
+  },
+  {
+    "suite": "node",
+    "exit": 0,
+    "seconds": 33.04
+  },
+  {
+    "suite": "toolbar",
+    "exit": 0,
+    "seconds": 49.64
+  },
+  {
+    "suite": "capture",
+    "exit": 0,
+    "seconds": 58.85
+  },
+  {
+    "suite": "case",
+    "exit": 0,
+    "seconds": 15.69
+  },
+  {
+    "suite": "stabilization",
+    "exit": 0,
+    "seconds": 36.37
+  },
+  {
+    "suite": "case-clipboard",
+    "exit": 0,
+    "seconds": 4.75
+  },
+  {
+    "suite": "installed-ui",
+    "exit": 0,
+    "seconds": 4.42
+  },
+  {
+    "suite": "image-tools",
+    "exit": 0,
+    "seconds": 10.59
+  },
+  {
+    "suite": "selection-pixels",
+    "exit": 0,
+    "seconds": 10.04
+  },
+  {
+    "suite": "worker",
+    "exit": 0,
+    "seconds": 2.25
+  },
+  {
+    "suite": "profile-reader",
+    "exit": 0,
+    "seconds": 1.45
+  },
+  {
+    "suite": "help",
+    "exit": 0,
+    "seconds": 1.4,
+    "note": "Rerun after updating exact topic count from 18 to 19 for new deletion help."
+  },
+  {
+    "suite": "image-tools-2x",
+    "exit": 0,
+    "seconds": 10.21
+  }
+]

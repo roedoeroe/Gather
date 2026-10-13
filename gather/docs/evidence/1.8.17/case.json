@@ -1,0 +1,26 @@
+{
+  "kind": "rendered-browser-with-extension-api-doubles",
+  "nativeExtension": false,
+  "passed": [
+    "New case needs only a case label and SOCs; same-named SOCs have separate stable IDs, selection survives reload, and history filtering does not change filing. Case deletion removes the local structure.",
+    "Legacy reviewed-intake records remain compatible: corrected fields, rejected terms and excluded contacts retain three roles with ephemeral names absent from durable context.",
+    "Editable queued search resolves ephemeral values only for launch; no automatic query log is saved; the deliberate plan and coverage record launch.",
+    "Result opener retains original scan after switching to Southridge; metadata-only save retains role and Evidence ID without image assets.",
+    "Manual searches in Ephemeral Case retain neither draft nor query in local or session storage.",
+    "Similar account name creates no association; actual review dialog explicitly confirms finding with supporting reason.",
+    "Clipboard account block preview preserves exact permanent string ID and requires deliberate copy.",
+    "Visible-image fixture persists in real IndexedDB with stable Evidence ID, role destination and filenames without friendly labels.",
+    "New captures require explicit inclusion; evidence sheet exports only the selected flattened derivative and a stable Evidence-ID crosswalk, excluding original image bytes/hash.",
+    "Ephemeral friendly-label rename changes session display only; role ID and capture history remain stable.",
+    "Full binary backup excludes ephemeral names; merge restore preserves/remaps role, seed, search, finding, association and capture relationships.",
+    "Simulated browser-session loss releases ephemeral names; durable role evidence survives and searches ask for approved values instead of guessing.",
+    "Close Case refuses a stale backup snapshot after new research is saved.",
+    "Cancel during a pending optional backup prevents later deletion; denied backup download also leaves the complete project and images intact.",
+    "Retry completes private backup download before project, roles, images and session labels are logically removed; other projects remain.",
+    "Clear history Cancel preserves data; confirmed clear removes open full-tool and popup contents, draft/archive copies and survives page-close flush, while restored case images remain.",
+    "Red Delete case actions require the typed name; Cancel preserves data, Delete without backup removes originals/derivatives without a download and leaves Southridge. Dialog fits 400 px.",
+    "After Close Case, Quick Lookup still opens focused and independent of projects.",
+    "Actual popup renders five usable accounts first, one technical review group, and two quiet gone accounts last without empty ID fields."
+  ],
+  "errors": []
+}

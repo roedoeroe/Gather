@@ -1,10 +1,10 @@
-# Gather 1.8.16 RC — Quick Start
+# Gather 1.8.17 RC — Quick Start
 
 Gather keeps deliberately saved work in this browser on this computer. A case is optional. It supports analyst judgment; it does not establish identity, account ownership or threat level.
 
 ## Install in Edge
 
-1. Extract `Gather-1.8.16-extension.zip` into a permanent folder.
+1. Extract `Gather-1.8.17-extension.zip` into a permanent folder.
 2. Open `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted **account-id-tool** folder. Your organization must permit this.
 3. Pin Gather through Edge’s Extensions menu. Choose **Help** in Gather whenever you need a reminder.
 
@@ -42,8 +42,16 @@ Backups are unencrypted and can include original, unredacted images. Keep them i
 
 ## Update safely
 
-Finish captures and close Gather windows. Preserve a private backup if needed. Replace all files in the **same installed account-id-tool folder**, then click **Reload** at `edge://extensions`. Confirm **1.8.16**. Do not uninstall or clear storage to update.
+Finish captures and close Gather windows. Preserve a private backup if needed. Replace all files in the **same installed account-id-tool folder**, then click **Reload** at `edge://extensions`. Confirm **1.8.17**. Do not uninstall or clear storage to update.
 
 Keep the previous ZIP and a matching backup. Test rollback in a separate Edge profile before replacing a newer working installation; older versions may not understand later data.
 
 This is a release candidate for a controlled pilot. See the accompanying QA report for the exact browser tests completed and remaining limits. Windows clipboard managers, printing/save dialogs and signed-in platform behavior can differ from the test environment.
+
+## Add an SOC or paste an image
+
+Use **+ Add SOC** beside the case heading (or beside the SOC selector in the side panel). Enter a label and Save. The new SOC is selected for future captures. Cancel adds nothing. SOC filters only change what you see; they do not change where new captures are filed.
+
+In **Reverse image**, focus the image area and press **Ctrl+V** (⌘V on Mac), choose a file, or drop an image. Check the preview, choose a provider, then **Copy & open search**. Complete that provider's paste/upload step. Gather keeps the selected image locally and does not upload it automatically. Use **Upload options → Save selected image** when a provider needs a file.
+
+Click **Inbox** in Library to return to Inbox Research at any time, including when there are no cases. To remove one saved finding, use its red **Delete** button and confirm. Images, tasks and other findings stay; external copies and old backups are unaffected.

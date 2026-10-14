@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "kind": "native-installed-update",
+  "from": "1.8.16",
+  "to": "1.8.17",
+  "passed": [
+    "1.8.16 creates fictional Inbox/case/SOC findings, screenshot/source originals, derivative, Reference, recent lookup and preferences in native storage.",
+    "Replacing files at the same installed folder and reloading the extension preserves extension ID, case, scan, SOC, capture and original bytes.",
+    "After update and actual Edge restart, the deleted Inbox finding stays gone; case finding, images, Reference, Recents and preferences were preserved exactly."
+  ],
+  "errors": []
+}

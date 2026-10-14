@@ -85,7 +85,7 @@ export async function workspaceJourney(context, baseURL, artifacts) {
   await page.getByText('No matching activity', {exact: true}).waitFor();
   await page.getByRole('button',{name:'Reverse image',exact:true}).click();
   assert.equal(await page.locator('#query').isVisible(),false);
-  assert.equal(await page.evaluate(()=>document.activeElement.textContent),'Choose image…');
+  assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('aria-label')),'Paste or drop an image');
   const imageProvider=page.getByLabel('Reverse image provider');
   assert.deepEqual(await imageProvider.locator('option').allTextContents(),['Google Lens','Lenso.ai','Bing Visual Search','Yandex Images','Baidu Images','Sogou Images','TinEye','Shutterstock']);
   await imageProvider.selectOption('tineye');

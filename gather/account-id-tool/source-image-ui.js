@@ -35,7 +35,7 @@ async function run(){
     if(controller.signal.aborted)throw new Error('Source image save cancelled.');
     record=await completeCapture(record.id,{status:'complete',dimensions:image.dimensions,scale:1,technical:{imageUrl:image.imageUrl,originalFilename:image.filename,mime:image.mime,acquisition:'browser context-menu srcUrl',urlMayExpire:true},assets:[{role:'original',blob:image.blob,dimensions:image.dimensions}]});
     $('sourceActions').append(imageSearchControl(record.id,text=>$('sourceCopyStatus').textContent=text));
-    finished=true;$('cancelSource').textContent='Done';$('sourceActions').hidden=false;status('Saved in Gather · '+$('sourceDestination').textContent);
+    finished=true;$('cancelSource').textContent='Done';$('sourceActions').hidden=false;status('Saved source image to '+$('sourceDestination').textContent);
     await refresh();
     if(job.automaticCopy)await action(async()=>{await copyCaptureImage(record.id);$('sourceCopyStatus').textContent='Image copied to clipboard.';});
     if(record.automaticExport)await action(()=>exportCapture(record.id));

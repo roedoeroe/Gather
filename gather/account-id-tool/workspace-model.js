@@ -145,6 +145,26 @@ export function reduceWorkspace(previous,action,at=Date.now()) {
       item.evidenceId='E-'+item.id.replace(/-/g,'').toUpperCase();if(action.metadataOnly===true)item.metadataOnly=true;if(action.filingSubjectId){item.filingSubjectId=text(action.filingSubjectId,100,true);item.filingRoleId=text(action.filingRoleId||'',50);}
       s.items.push(item);if(item.originatingSearchId){const row=s.research?.queue.find(q=>q.searchId===item.originatingSearchId);if(row)row.status='has-findings';}result={id:item.id};addActivity(s,'item.saved',c,'Saved '+item.kind+': '+item.title,at,item.id);break;
     }
+    case 'item.delete': {
+      const item=row('items');
+      if(action.snapshot!==JSON.stringify(item))fail('This finding changed. Reopen Delete to review it.');
+      s.items=s.items.filter(x=>x.id!==item.id);
+      // Remove the deleted text and undo payloads, not just the visible card.
+      s.activity=s.activity.filter(x=>x.refId!==item.id&&x.change?.id!==item.id);
+      if(s.research)s.research.associations=s.research.associations.filter(x=>x.itemId!==item.id);
+      const used=new Set(s.items.map(x=>x.entityId).filter(Boolean));
+      // An older Move undo can still refer to an entity in its original case.
+      for(const event of s.activity)if(event.change?.previous?.entityId)used.add(event.change.previous.entityId);
+      s.entities=s.entities.filter(x=>used.has(x.id));
+      if(item.entityId){const entity=s.entities.find(x=>x.id===item.entityId),observations=s.items.filter(x=>x.entityId===item.entityId);
+        if(entity&&observations.length){const latest=observations.slice().sort((a,b)=>(b.entry.verifiedAt||0)-(a.entry.verifiedAt||0))[0].entry;
+          entity.observedAliases=[...new Set(observations.map(x=>x.entry.handle).filter(Boolean))];entity.currentUsername=latest.handle||'';entity.canonicalUrl=latest.url;entity.lifecycleState=accountState(latest);entity.lastObservedAt=latest.verifiedAt||0;
+          delete entity.firstObservedGoneAt;delete entity.lastObservedAvailableAt;
+          for(const observation of observations)if(observation.entry.verifiedAt){const field=accountState(observation.entry)==='GONE'?'firstObservedGoneAt':'lastObservedAvailableAt';entity[field]=field==='firstObservedGoneAt'?Math.min(entity[field]||Infinity,observation.entry.verifiedAt):Math.max(entity[field]||0,observation.entry.verifiedAt);}
+        }
+      }
+      addActivity(s,'item.deleted',item,'Deleted a saved finding',at);result={deletedId:item.id};break;
+    }
     case 'item.review': {const item=row('items');if(!REVIEWS.includes(action.review))fail('Choose a review state.');item.review=action.review;addActivity(s,'item.reviewed',item,'Review: '+action.review,at,item.id);break;}
     case 'item.include': {const item=row('items');if(typeof action.included!=='boolean')fail('Invalid inclusion.');item.included=action.included;addActivity(s,'item.inclusion',item,action.included?'Included in report':'Left out of report',at,item.id);break;}
     case 'item.annotate': {const item=row('items');item.annotation=text(action.annotation,20000);addActivity(s,'item.annotated',item,'Edited analyst note',at,item.id);break;}

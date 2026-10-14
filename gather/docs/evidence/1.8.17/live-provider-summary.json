@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-13",
+  "browser": "Microsoft Edge 155.0.4283.45 on Linux",
+  "input": "Fictional 240x160 blue triangle PNG; no case or profile data",
+  "results": [
+    {
+      "provider": "Google Lens",
+      "landing": "200",
+      "submission": "Normal file upload reached an unusual-traffic check; search results blocked; no bypass."
+    },
+    {
+      "provider": "Yandex Images",
+      "landing": "200",
+      "submission": "Selected inside Gather, copied by Copy & open search, pasted in Image search using Ctrl+V; reached Similar images results."
+    },
+    {
+      "provider": "TinEye",
+      "landing": "200",
+      "submission": "Normal provider file input accepted the same fictional file selected in Gather; reached search results."
+    },
+    {
+      "provider": "Lenso.ai",
+      "landing": "403 challenge",
+      "submission": "Not attempted"
+    },
+    {
+      "provider": "Bing Visual Search",
+      "landing": "200; redirected to Microsoft Explore visual search",
+      "submission": "Not verified"
+    },
+    {
+      "provider": "Baidu Images",
+      "landing": "200",
+      "submission": "Not verified"
+    },
+    {
+      "provider": "Sogou Images",
+      "landing": "200",
+      "submission": "Not verified"
+    },
+    {
+      "provider": "Shutterstock",
+      "landing": "403",
+      "submission": "Not attempted"
+    }
+  ],
+  "limitations": "These observations verify only the stated UI paths, not result accuracy, universal availability, account entitlements or future behavior."
+}

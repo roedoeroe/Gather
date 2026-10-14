@@ -1,4 +1,4 @@
-# Gather 1.8.16 RC engineering notes
+# Gather 1.8.17 RC engineering notes
 
 Plain MV3 extension modules; no runtime dependencies/build server. Manifest permissions and host patterns are unchanged. New entry pages and modules are included directly by the deterministic ZIP packager. `profile-reader.js` is generated from local adapters; run `python3 scripts/build-profile-reader.py --check`.
 
@@ -14,4 +14,8 @@ Autocomplete uses static operator/domain candidates only. It honors provider cap
 
 Same-folder updates preserve the extension ID and local data; never uninstall to update. Run regression on source and selected suites on the **exact extracted ZIP**. The release upload workflow reads the immutable committed package, verifies receipt/hash/CRC/manifest and attaches it without rebuilding. Preserve older tags and ZIPs. GitHub Releases carries only the extension asset; source/checksum receipts remain available for developers.
 
-See [TESTING](TESTING.md), [Network Egress](NETWORK-EGRESS.md), [Product Audit](PRODUCT-AUDIT-1.8.16.md), and [Future Plans](FUTURE-PLANS.md).
+See [TESTING](TESTING.md), [Network Egress](NETWORK-EGRESS.md), [Product Audit](PRODUCT-AUDIT-1.8.17.md), and [Future Plans](FUTURE-PLANS.md).
+
+R10 keeps Add SOC alongside the visible case heading, moving the same control into compact panel context. Dialog scope is frozen; creation starts blank and states that it selects the new SOC. Filing-case navigation restores case-scoped history. Reverse paste uses a focusable target and ordinary paste events, ignoring text fields. Replacement invalidates the prior asset and serial-checks asynchronous reads; cancelling the picker preserves it. Busy Search freezes both image and provider. No permissions or storage schema changes.
+
+Continuation: Inbox selects the Research section explicitly. Guarded per-finding Delete removes workspace text/Undo and research associations, detaches subject/image links atomically with the existing recovery journal, and tombstones stale associations. No image bytes or unrelated records are removed. No storage schema/permission changes.

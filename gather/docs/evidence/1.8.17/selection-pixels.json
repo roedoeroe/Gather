@@ -1,0 +1,18 @@
+{
+  "kind": "rendered-Chromium-real-pixels-with-screenshot-adapter",
+  "nativeExtension": false,
+  "nativeZoom": false,
+  "passed": [
+    "Visible selection at simulated DPR 0.8: all four corners, four edge midpoints and center survive real screenshot/crop; outermost pixels, IndexedDB/hash verification, real PNG clipboard pixels, exact downloaded bytes/dimensions and restored page.",
+    "Scrolling selection at simulated DPR 0.8: all four corners, four edge midpoints and center survive real screenshot/crop/stitching; outermost pixels, IndexedDB/hash verification, real PNG clipboard pixels, exact downloaded bytes/dimensions and restored page.",
+    "Visible selection at simulated DPR 1: all four corners, four edge midpoints and center survive real screenshot/crop; outermost pixels, IndexedDB/hash verification, real PNG clipboard pixels, exact downloaded bytes/dimensions and restored page.",
+    "Scrolling selection at simulated DPR 1: all four corners, four edge midpoints and center survive real screenshot/crop/stitching; outermost pixels, IndexedDB/hash verification, real PNG clipboard pixels, exact downloaded bytes/dimensions and restored page.",
+    "Visible selection at simulated DPR 1.25: all four corners, four edge midpoints and center survive real screenshot/crop; outermost pixels, IndexedDB/hash verification, real PNG clipboard pixels, exact downloaded bytes/dimensions and restored page.",
+    "Scrolling selection at simulated DPR 1.25: all four corners, four edge midpoints and center survive real screenshot/crop/stitching; outermost pixels, IndexedDB/hash verification, real PNG clipboard pixels, exact downloaded bytes/dimensions and restored page.",
+    "Visible selection at simulated DPR 1.5: all four corners, four edge midpoints and center survive real screenshot/crop; outermost pixels, IndexedDB/hash verification, real PNG clipboard pixels, exact downloaded bytes/dimensions and restored page.",
+    "Scrolling selection at simulated DPR 1.5: all four corners, four edge midpoints and center survive real screenshot/crop/stitching; outermost pixels, IndexedDB/hash verification, real PNG clipboard pixels, exact downloaded bytes/dimensions and restored page.",
+    "Visible selection at simulated DPR 2: all four corners, four edge midpoints and center survive real screenshot/crop; outermost pixels, IndexedDB/hash verification, real PNG clipboard pixels, exact downloaded bytes/dimensions and restored page.",
+    "Scrolling selection at simulated DPR 2: all four corners, four edge midpoints and center survive real screenshot/crop/stitching; outermost pixels, IndexedDB/hash verification, real PNG clipboard pixels, exact downloaded bytes/dimensions and restored page.",
+    "Escape during a scrolled drag removes the overlay and restores the initial position at all five simulated scales. The former top-center HUD area accepts selection starts."
+  ]
+}

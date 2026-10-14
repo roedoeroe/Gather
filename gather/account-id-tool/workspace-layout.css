@@ -45,3 +45,10 @@ body:not(.panel) #captureLibrary{margin:0;padding:0;border:0}.capture-library-he
 @media print{#items>.card{content-visibility:visible;contain-intrinsic-size:none}}
 
 .capture-inspector .capture-viewer .inspector-image{height:auto;width:auto;max-width:100%;margin:0 auto;border-radius:0}.capture-inspector .capture-viewer[data-fit=image] .inspector-image{max-height:58vh}.capture-inspector .image-viewport{max-height:58vh}
+
+/* Frequent case actions stay beside the destination, including compact panels. */
+.heading>div{min-width:0}.heading h1{overflow-wrap:anywhere}.heading #addSubject{font-size:13px;flex-shrink:0}
+.panel #captureTools .capture-controls{flex-wrap:wrap}.panel #addSubject{font-size:12px;padding:7px 10px}
+@media(max-width:520px){.heading{flex-wrap:wrap}.heading #addSubject{margin-bottom:4px}}
+
+.finding-delete{margin-left:auto;color:#b42318;border-color:#e9c5c3;font-size:12px;padding:6px 10px;min-height:32px}.finding-delete:hover{background:#fff0ee;border-color:#b42318}.danger{background:#b42318;color:white;border-color:#b42318}.danger:hover{background:#921b12;color:white}

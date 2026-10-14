@@ -22,3 +22,7 @@ All captures offer guarded individual/bulk deletion. Case deletion removes that 
 Reference imports exclude Login-Info, ARCHIVED-DONT-USE, media and duplicate export folders, and reject common credential markers. This is not a universal secret detector: choose approved source folders and inspect the imported collection. Markdown previews use `textContent`, not HTML execution or live embeds. No Reference file or user query is sent to a remote index/AI.
 
 [Network-egress inventory](NETWORK-EGRESS.md) documents deliberate site requests, session use, permissions and verification limits. Actual work can contain personal information; Gather does not automatically redact, decide disclosure, determine threats or certify organizational/legal compliance.
+
+R10 image paste is a user-initiated event on the Reverse Image view. It does not monitor the clipboard or require clipboardRead. Selected bytes remain temporary/local until explicit copy, save or provider action. No new network path or permission was introduced in1.8.17.
+
+Individual finding deletion removes that finding, its prior activity/Undo payloads and relationship links. A generic deletion event and opaque tombstone remain for state integrity; no deleted title/body is retained in that event. Other observations and image source metadata remain because they are separately saved records. Recovery completes an interrupted metadata write from the existing journal. External copies/backups/clipboard/browser history are unaffected; logical deletion is not forensic erasure.

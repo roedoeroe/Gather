@@ -1,56 +1,52 @@
-# Gather 1.8.17 RC validation
+# Gather 1.8.18 RC validation
 
-Validation: October 13, 2026, America/Los_Angeles. Automated platform/account/case tests use deterministic fictional fixtures. No private organization corpus or signed-in Windows session was supplied.
+Validation: October 14, 2026, America/Los_Angeles. All account/case/image fixtures in this run are fictional. No private organization corpus, Windows computer or signed-in platform session was available.
 
 | Layer | Result | What it verifies |
 |---|---|---|
-| Node | 230 passed; zero failed/skipped | Exact account binding, IDs, URL handling, storage, capture, Reference and completion rules. |
-| Rendered workflows | 117 groups passed | Toolbar29, capture22, case19, stabilization10, case clipboard7, workspace9, image tools17, Help4. Real DOM/canvas/IndexedDB; controlled Chrome API doubles. |
-| Repeated image tools | 17 at 2× DPR | Same scenarios repeated, not additional unique tests. |
-| Pixel selection | 11 passed | Edge/corner markers and scrolling at simulated scales. |
-| Worker / isolated reader | 10 / 5 passed | Worker lifecycle and bounded page extraction in browser contexts with controlled APIs. |
-| Installed Linux Edge workspace | 10 passed | Genuine extension worker/storage, case/finding/task controls, query-free searching and navigation. |
-| Installed Linux Edge toolbar/capture/editor | 23 passed | Actual toolbar invocation and activeTab, three capture modes, scrolling, cancel/repeat, clipboard, crop/annotations/redaction and original-byte preservation. |
-| Same-folder native update | 3 passed | 1.8.16 → 1.8.17 preserves extension ID, Inbox/case/SOC findings, screenshot/source originals, edited derivative, Reference, Recents and preferences; finding deletion survives an actual Edge restart. |
-| Native analyst journey | 32 groups per clean pass | Existing content/source/Reference/privacy journey plus R10 SOC discovery, immediate filing/filtering, keyboard paste and actual selected-image clipboard pixels, Inbox routing and scoped finding deletion. |
-| Syntax / generation | 68 modules passed | Local generated profile reader checked; permissions, host patterns and CSP unchanged. |
+| Node | 230 passed; zero failed/skipped | Account binding, exact IDs, URL handling, local storage, capture, Reference and completion rules. |
+| Affected rendered workflows | 56 groups passed | Toolbar 30, capture 22, Help 4. Real DOM/canvas/IndexedDB with controlled Chrome API doubles; current-page action wording, readable labels, bounded popup, capture history and scoped deletion recovery. |
+| Installed Linux Edge analyst journey | 34 groups passed | Actual extension APIs, toolbar/context menu, all three capture modes, native zoom 80–200%, source formats, copy/edit, SOC/history, deletion, backup/restore, offline and profile isolation. Platform responses are fictional. |
+| Installed Edge toolbar/capture/editor | 23 groups passed | Real OS invocation, activeTab, capture, cancel/repeat, actual clipboard, annotations/redaction and original preservation. |
+| Installed Edge workspace | 10 groups passed | Genuine worker/storage, query-free search, case/finding/task controls and navigation. |
+| Same-folder Edge update | 3 groups passed | 1.8.17 → 1.8.18, supported extension Reload and subsequent real browser restart. |
+| Syntax / generation | 68 runtime modules passed | Local generated reader matches adapters; only version/version_name changed in manifest. No permission, host-pattern or CSP change. |
 
-Native layers total 68 groups (10 + 23 + 3 + 32), with overlapping product coverage. Repeated clean passes and extracted-package runs do not increase unique counts. Receipts: [evidence/1.8.17](evidence/1.8.17/README.md). Package receipts: [releases/1.8.17](../../releases/1.8.17).
+Native layers total 70 groups (34 + 23 + 10 + 3), with overlapping product coverage. The same-folder update preserves extension ID, Inbox/case/SOC findings, screenshot/source originals, edited derivatives, Reference, Recents and preferences; a deleted finding stays deleted after an actual browser restart.
 
-## Final native journeys
+See [receipts](evidence/1.8.18/README.md) and [packages](../../releases/1.8.18). Repeated extracted-package runs do not increase unique scenario counts. This is targeted current-release regression coverage; the broader 1.8.17 rendered/pixel/worker/reader results remain [historical evidence](https://github.com/roedoeroe/Gather/blob/1.8.17-rc.1/gather/docs/TESTING.md), not freshly rerun 1.8.18 claims.
 
-Two consecutive runs use fresh temporary profiles and real Microsoft Edge 155.0.4283.45 on Linux with sandboxing enabled. Playwright/CDP and authenticated Xvfb/xdotool drive normal extension/UI operations; Chrome APIs are not replaced. These are automated analyst simulations with visual inspection, not coworker usability sign-off.
+## Connected native journey
 
-The actual image context menu saves the selected responsive WebP source, with a JPEG fallback present. Its original hash, dimensions and frozen SOC are checked. Saved images become visible in the open case without reloading, appear only under the right SOC, and retain their history after renaming. All captures is a view, never a filing destination. Opening a new filing case leaves a previous All cases view and restores case scope.
+Microsoft Edge 155.0.4283.45 on Linux runs with sandboxing enabled. Playwright, authenticated Xvfb and ordinary OS input drive the extension. Chrome APIs are not replaced in native tests. The suite exercises bound fictional content owners on five platforms, exact string IDs, query-free keyboard search completion, all three screenshot modes, scrolling selection and pixel dimensions at native browser zoom 80/100/125/150/200%.
 
-Add SOC is exercised by keyboard, with cancel, blank labels, duplicate names, explicit new selection, frozen case during another surface's context change, focus return and 400/640/1280px layouts. Panel content is tested at400px; this does not claim native side-panel opening.
+It saves the clicked responsive image through Edge's real context menu, preserves PNG/JPEG/WebP/AVIF/GIF bytes and hashes, rejects blocked/temporary sources visibly, and keeps the original destination during delayed saving while the global case changes. Manual redaction produces a distinct derivative; the original hash remains unchanged. Reverse Image copies independently checked pixels after normal Ctrl+V/replacement without clipboardRead or hidden upload. Add SOC, same-name subjects, rename/history, narrow layout, Inbox and finding deletion remain covered.
 
-Reverse Image uses actual Ctrl+V image bytes without clipboardRead. Switching providers keeps image A; replacing it with B copies B's independently checked dimensions and pixel color. Non-image paste and invalid replacements cannot leave stale Search enabled. Cancelling a file picker preserves the prior selection. Two immediate file-change events retain the later image; unrelated text fields keep normal paste behavior.
+Offline access and a separate browser profile confirm local data boundaries. Binary backup merge-restore checks image bytes and Case/scan/SOC relationships. Reference folder exclusion, alias search, exact Copy, JSON round-trip, replacement and deletion are checked separately. Fictional private-field canaries are absent from observed outbound requests. These checks are not a legal certification or proof about the browser/OS's own services.
 
-The full journey also covers five bound fictional content owners, Enter/Shift+Enter/duplicate guard, three native capture modes, native zoom80/100/125/150/200% with pixel comparison, five source-image formats, blocked/CORS/blob paths, delayed frozen filing, editing/original preservation, local completion, Reference import/exclusions/exact Copy, profile isolation, offline access and image backup merge restore. Fractional pixel boundaries round outward. Windows display scaling is a separate unverified capability.
+## History and Reference measurement
 
-## Live provider checks
+The new journey stores 100 real fictional captures, verifies 12/24-card paging and search, and alternates Research/Captures ten times. Previous thumbnail URLs are revoked and none remain live after leaving history. This measures those URLs, not every browser memory allocation. The current scan's repeated heading is gone; All cases retains group headings and accessible region names remain.
 
-Only a generated blue triangle PNG was used. Yandex accepted Gather's copied image through its ordinary Image search paste flow and returned results. TinEye accepted the same selected file through its ordinary upload input and returned results. Google accepted the normal upload flow but reached an unusual-traffic check; it was not bypassed. Lenso and Shutterstock returned403. Bing redirected to its Microsoft Explore visual-search page; Baidu/Sogou opened. Their image submission was not verified.
+The final source run used 1,000 fictional Markdown files (10,139,890 bytes): warm search median 11.7 ms, p95 35.3 ms over 50 searches. Earlier isolated p95 was 180.5 ms. This is search-model timing, not complete UI latency or Windows performance. Headed history click-to-ready samples were 1.22–3.24 seconds, including automation/thumbnail scheduling; an earlier isolated run reached 7.21 seconds. Functional checks passed, but these variable cloud measurements do not establish the proposed 100 ms interaction target or justify a performance improvement claim. Reprofile on target hardware before adding caches/virtualization. Raw measurements are in the evidence folder.
 
-Reachability does not establish submission, result accuracy, universal access or account entitlement. Gather does not automate provider uploads. Raw challenge URLs, network identifiers and live screenshots remain outside public packages. [Provider matrix](REVERSE-IMAGE-PROVIDERS.md) and sanitized evidence record the exact boundary.
+Toolbar and history screenshots were visually inspected. The UI uses larger/darker secondary text while keeping direct screenshot actions anchored. Windows scaling, screen-reader acceptance and analyst usability sign-off remain separate.
 
-## Privacy and recovery
+## External boundaries and previous provider evidence
 
-Fictional Case/SOC/note canaries are checked against observed outbound URLs, headers and bodies. A second Edge profile has none of the first profile's local data. Binary restore verifies original image hashes and relationship remapping. Reference import/export and revision-checked replacement remain separate from case backup. Existing deletion, history clearing, export retry, worker recovery and selected-derivative guards are covered by the regression suites.
+No fresh live-provider image submission or signed-in account test occurred in 1.8.18; provider/extraction algorithms are unchanged. In 1.8.17, a generated triangle reached results through normal Yandex paste and TinEye upload. Google presented unusual-traffic protection and was not bypassed; Lenso/Shutterstock 403, other providers landing-only. See [provider matrix](REVERSE-IMAGE-PROVIDERS.md) for that historical boundary. Reachability is not successful submission or result accuracy.
 
-The public scanner checks credential/path/archive patterns; manual review covers the changed source and fictional screenshots. It is not a universal personal-data detector or legal certification. No permissions or remote work-data services were added.
-
-## Unverified boundaries
-
-Signed-in Windows/managed Edge, Windows display scaling, native side-panel opening, OS Save/Print dialogs, clipboard managers and every destination work application remain unverified. Live signed-in platform UserID/owner acceptance was not performed. External platforms, protected images and dynamic feeds can change or refuse access. No universal reliability claim.
-
-See [Product Audit](PRODUCT-AUDIT-1.8.17.md) for defects and harness corrections, [R10 acceptance](R10-ACCEPTANCE-1.8.17.md) for the scope ledger, and [Future Plans](FUTURE-PLANS.md) for remaining work.
+Managed Windows installation, live signed-in platform IDs, Windows display scaling, native side-panel opening, OS Save/Print dialogs, clipboard managers and destination work applications remain unverified. Protected sources may refuse access; dynamic feeds can yield explicitly partial captures. Keep the release a controlled RC. [Target-computer check](LOCAL-ACCEPTANCE.md).
 
 ## Reproduce
 
-From `gather`, use Node24, Python3 and the supplied Playwright via NODE_PATH. Run `python3 scripts/build-profile-reader.py --check`, `node --test tests/*.test.mjs`, and browser-toolbar, browser-capture, browser-case, browser-stabilization, browser-case-clipboard, browser-installed-ui, browser-image-tools (also GATHER_TEST_DPR=2), browser-selection-pixels, browser-worker, browser-profile-reader and browser-help from `tests/`.
+From `gather`, with Node 24 and Python 3:
 
-[Environment setup](ENVIRONMENT-SETUP.md) gives the native Edge/display commands. Run browser-acceptance.mjs, browser-native-update.mjs, browser-native-workflow.mjs and `GATHER_R6_HEADED=1 node tests/browser-r6.mjs`. The latter historical filename includes `fixtures/r10-journey.mjs`. Run only one headed/clipboard interaction journey at a time. GATHER_EXTENSION_ROOT selects extracted package bytes; GATHER_BROWSER_ARTIFACTS selects ignored output. Keep runtime/tests frozen while suites run.
+```sh
+python3 scripts/build-profile-reader.py --check
+node --test tests/*.test.mjs
+```
 
-Finding deletion additionally has a rendered fault-injection check: the workspace write fails after the IndexedDB link/journal transaction; recovery finishes exactly once and removes the journal. This is simulated write failure, separate from native restart verification.
+With supplied Playwright through NODE_PATH, run browser-toolbar.mjs, browser-capture.mjs and browser-help.mjs for affected rendered checks. [Environment setup](ENVIRONMENT-SETUP.md) gives the sandboxed Edge/authenticated-display commands. Run browser-acceptance.mjs, browser-native-workflow.mjs, browser-native-update.mjs and `GATHER_R6_HEADED=1 node tests/browser-r6.mjs`. The historical R6 filename includes R10, Inbox/finding-delete and polish journeys.
+
+Run one headed/clipboard suite at a time and keep runtime/tests unchanged while running. GATHER_EXTENSION_ROOT selects extracted package bytes; GATHER_PREVIOUS_PACKAGE overrides the previous release ZIP; GATHER_BROWSER_ARTIFACTS selects ignored output. Product Audit records the corrected page-event cleanup and new test's asynchronous thumbnail readiness issue. Neither required changing capture algorithms or removing assertions.

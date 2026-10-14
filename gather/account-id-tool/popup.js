@@ -30,7 +30,9 @@ function renderInput() {
   $('quickCount').textContent=count?count+' account'+(count===1?'':'s')+(parsed.duplicates?' · duplicates merged':'')+(parsed.invalid.length?' · '+parsed.invalid.length+' items skipped':''): $('quickLinks').value.trim()?'No supported profile links found':'Instagram, Facebook, Threads, TikTok, YouTube';
   renderSummary();
   $('getIds').disabled=!initialized||submitting||state.busy||checkingPage||(!count&&!fromPage);
-  $('getIds').textContent=state.busy?'Finding account IDs…':fromPage?(state.batch?.entries.length?'Retry this page':'Find IDs on this page'):'Find account IDs';
+  const pageResult=fromPage&&state.submittedInput===currentPage&&entries().length===1?entries()[0]:null;
+  const pageAction=pageResult?(['resolved','gone'].includes(pageResult.status)?'Find again':'Retry this page'):'Find IDs on this page';
+  $('getIds').textContent=state.busy?'Finding account IDs…':fromPage?pageAction:'Find account IDs';
   $('getIds').title=fromPage?'Find account IDs from '+currentPage:'';
   $('quickLinks').readOnly=submitting||state.busy||checkingPage;
   $('usePage').disabled=!initialized||submitting||state.busy||checkingPage||!currentPage;

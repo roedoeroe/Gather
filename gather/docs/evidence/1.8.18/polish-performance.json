@@ -1,0 +1,31 @@
+{
+  "environment": "Installed Linux Edge; synthetic corpus; browser-model search timing, not work-app or Windows latency",
+  "seedMs": 2146.0999999940395,
+  "history": {
+    "records": 100,
+    "cycles": 10,
+    "renderMs": [
+      1502.4985600000073,
+      1226.0163099999918,
+      2228.981998000003,
+      2350.182396999997,
+      2240.5300400000124,
+      2300.3484940000053,
+      3194.329798999999,
+      3237.571350000013,
+      2248.6326469999913,
+      1224.2009839999955
+    ],
+    "p95Ms": 3237.571350000013,
+    "retainedThumbnailURLs": 0
+  },
+  "reference": {
+    "files": 1000,
+    "bytes": 10139890,
+    "importMs": 323.79999999701977,
+    "indexMs": 424,
+    "warmP50Ms": 11.700000002980232,
+    "warmP95Ms": 35.30000000447035,
+    "matches": 2233
+  }
+}

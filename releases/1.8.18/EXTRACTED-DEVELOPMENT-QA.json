@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "version": "1.8.18",
+  "node": {
+    "passed": 230,
+    "failed": 0,
+    "skipped": 0
+  },
+  "generated_reader": "passed",
+  "runtime_equivalence": "102 files identical to tested source"
+}

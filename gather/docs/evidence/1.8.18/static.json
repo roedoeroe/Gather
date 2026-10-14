@@ -1,0 +1,10 @@
+{
+  "version": "1.8.18",
+  "runtime_modules_checked": 68,
+  "manifest_changed_fields": [
+    "version",
+    "version_name"
+  ],
+  "generated_reader_check": "passed",
+  "permissions_hosts_csp_unchanged": true
+}

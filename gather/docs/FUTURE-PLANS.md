@@ -9,14 +9,14 @@ Current direction: a fast local Edge utility for exact account IDs, Case > SOC f
 | P2 — Source-image access | Examine specific authenticated/redirected CDN failures with authorized fixtures; consider optional host access only when scope can remain narrow. | No broad host permissions, signed-URL rewriting or hidden screenshot fallback. | Exact clicked HTTP(S) source path shipped; blocked/temporary sources remain explicit failures. |
 | P2 — Reverse providers | Verify documented provider routes in the target region/session and add a supported direct handoff only if it needs no private API. | Provider policies/change; no hidden uploads or case metadata. | Local selection/copy + explicit provider opening shipped. Live Yandex paste and TinEye upload were verified with a fictional geometric image in1.8.17. Google challenged; other provider limitations remain. All submissions remain analyst-controlled. |
 | P2 — Reference corpus | Validate a private approved Markdown export locally: taxonomy, section labels, exclusions and ranking examples. | Real corpus not supplied to this run. Never publish organization wording; preserve exact source text. | Generic local importer/search shipped. |
-| P2 — Accessibility/performance | Broader assistive-technology walkthrough, long real-world labels and largest approved libraries. | No remote query learning. | Keyboard, narrow layout and fictional large-library checks in current QA. |
+| P2 — Accessibility/performance | Broader assistive-technology walkthrough, long real-world labels and largest approved libraries. | No remote query learning. | Keyboard, narrow layout and fictional large-library checks in current QA. Profile history click-to-ready latency on target hardware before optimization; cloud timings include automation and are variable. |
 | P3 — Capture | Nested scrolling-element selection after a reliable fixture/restore design. | Partial/truncated results, sticky content, zoom; must preserve originals. | Deferred; bounded page capture stays supported. |
 | P3 — Export | Evaluate explicit user-selected directory access and revoked-folder recovery. | Browser support/permission; Downloads API cannot write arbitrary absolute roots. | Deferred; Downloads-relative export remains. |
 | P3 — Repeated capture | Evaluate “Capture another area” only against observed click savings and activeTab lifecycle. | Avoid stale tab/destination or accidental captures. | Backlog, not a new release promise. |
 
 Not planned: cloud case storage, identity/relationship/threat conclusions, result scraping, coverage automation, intake/narrative parser revival, automated email sending, AI-dependent Reference or live OneNote searching. A composition feature would require a new explicit product decision; current Reference only retrieves/copies exact wording.
 
-Release blockers belong in [Product Audit](PRODUCT-AUDIT-1.8.17.md), not this backlog. Check [TESTING](TESTING.md) for evidence rather than treating historical ideas as shipped features.
+Release blockers belong in [Product Audit](PRODUCT-AUDIT-1.8.18.md), not this backlog. Check [TESTING](TESTING.md) for evidence rather than treating historical ideas as shipped features.
 
 ## Current-tool audit after R10
 
@@ -36,3 +36,7 @@ Implemented in 1.8.17: prominent Add SOC, normal image paste, stale replacement 
 | Tasks / Changes | Assess whether task editing materially saves work; keep activity distinct from web-search history. | No new controls this run. |
 | Backup / deletion | Human walkthrough of backup retention and external-file boundaries. | Never imply forensic erasure. |
 | Help | Review common pilot questions and add concise local answers. | No Help search telemetry. |
+
+## 1.8.18 stabilization
+
+Completed: successful current-page lookup wording, readable popup secondary text, and reduced repetition in a single-scan capture history. Existing direct capture actions remain. The native history/Reference measurements use fictional data; no speculative caching or new runtime service was introduced. Stale bundled documentation and the historical Quick Parts status were reconciled. Windows/work-app and external-provider boundaries above still apply.

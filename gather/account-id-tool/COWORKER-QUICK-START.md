@@ -1,16 +1,16 @@
-# Gather 1.8.17 RC — Quick Start
+# Gather 1.8.18 RC — Quick Start
 
 Gather keeps deliberately saved work in this browser on this computer. A case is optional. It supports analyst judgment; it does not establish identity, account ownership or threat level.
 
 ## Install in Edge
 
-1. Extract `Gather-1.8.17-extension.zip` into a permanent folder.
+1. Extract `Gather-1.8.18-extension.zip` into a permanent folder.
 2. Open `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted **account-id-tool** folder. Your organization must permit this.
 3. Pin Gather through Edge’s Extensions menu. Choose **Help** in Gather whenever you need a reminder.
 
 ## Find and copy an account ID
 
-Open an Instagram, Facebook, Threads, TikTok or YouTube profile, then open Gather. With no pasted draft, Gather checks that page automatically. **Find IDs on this page** runs it manually. Copy the result with **Copy IDs**.
+Open an Instagram, Facebook, Threads, TikTok or YouTube profile, then open Gather. With no pasted draft, Gather checks that page automatically. **Find IDs on this page** runs it manually. Copy the result with **Copy IDs**. A completed page lookup offers **Find again**; a failed check offers **Retry this page**.
 
 Already available IDs return immediately. Instagram data arriving late gets up to two seconds to settle before the existing source fallbacks. Keep the profile open. If the site requires sign-in or a security check, complete that yourself and retry. Gather never guesses an ID. Paste one or more profile or supported post/video links; Enter runs the list, Shift+Enter adds a line. Content pages return a verified owner’s clean profile URL when usable author data is exposed. Recent holds five local lookup batches.
 
@@ -42,7 +42,7 @@ Backups are unencrypted and can include original, unredacted images. Keep them i
 
 ## Update safely
 
-Finish captures and close Gather windows. Preserve a private backup if needed. Replace all files in the **same installed account-id-tool folder**, then click **Reload** at `edge://extensions`. Confirm **1.8.17**. Do not uninstall or clear storage to update.
+Finish captures and close Gather windows. Preserve a private backup if needed. Replace all files in the **same installed account-id-tool folder**, then click **Reload** at `edge://extensions`. Confirm **1.8.18**. Do not uninstall or clear storage to update.
 
 Keep the previous ZIP and a matching backup. Test rollback in a separate Edge profile before replacing a newer working installation; older versions may not understand later data.
 

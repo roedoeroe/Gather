@@ -8,6 +8,6 @@ Source images use the exact clicked source and the existing binary capture store
 
 Preserve: exact string IDs and bound owners, clean profile output plus separate provenance, two-second conditional Instagram readiness, immutable original pixels, manual derivatives, frozen filing, separate Saved/Exported states, guarded deletion/restore, five recent batches and query-free web searching. No work-data cloud/sync/telemetry or passive browsing collection.
 
-[Future Plans](FUTURE-PLANS.md) is the consolidated backlog. [Product Audit](PRODUCT-AUDIT-1.8.16.md) records release findings, and [TESTING](TESTING.md) distinguishes real Edge from controlled/mocked coverage. Earlier composer, intake and automated coverage ideas are historical proposals, not current requirements. The real organization reference corpus has not been supplied/inspected; the generic engine ships without it.
+[Future Plans](FUTURE-PLANS.md) is the consolidated backlog. [Product Audit](PRODUCT-AUDIT-1.8.18.md) records release findings, and [TESTING](TESTING.md) distinguishes real Edge from controlled/mocked coverage. Earlier composer, intake and automated coverage ideas are historical proposals, not current requirements. The real organization reference corpus has not been supplied/inspected; the generic engine ships without it.
 
 1.8.17 completes the R10 refinement: visible Add SOC, local image paste, safer replacement, case-scoped history and provider-specific handoff. These support the existing utility workflow; they do not expand Gather into case analysis or communication generation.

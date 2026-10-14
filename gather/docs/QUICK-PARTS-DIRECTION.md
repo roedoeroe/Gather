@@ -1,6 +1,14 @@
-> Current 1.8.13/R4 status: see [R4 reconciliation](R4-WORKFLOW-RECONCILIATION.md). Simple Case/SOC filing, five recents, direct selection and Crop handles are implemented. Native Edge reports remain open. Earlier intake/coverage and communication-composer proposals below are historical and superseded; current Reference direction is exact local retrieval only.
+# Reference Library — current scope and historical design
 
-# Quick Parts / Reference Library — proposed first implementation
+The local Reference engine shipped in 1.8.16 and remains available: Markdown/JSON import, collection search, aliases, labelled previews, exact text copying and separate collection export/removal. See [Product direction](PRODUCT-DIRECTION.md), [Future Plans](FUTURE-PLANS.md) and [Testing](TESTING.md) for current implementation and evidence.
+
+Later R4/R6 briefs narrowed this feature to exact local retrieval. The block composer, placeholder filling, case-aware suggestions and favorites described below are deferred historical proposals, not current release requirements. Coverage and intake parsing must not be revived to support them. Real organization wording is imported locally and is not bundled with Gather.
+
+## Historical proposal — preserved for future design decisions
+
+The remainder records the original 1.8.6-era proposal. Its future-tense implementation statements and proposed limits describe that design, not the current runtime.
+
+### Quick Parts / Reference Library — original proposed implementation
 
 Status: design/backlog after the 1.8.6 capture stabilization checkpoint; **no Reference Library engine or composer is shipped yet**. The supplied Optimized Design Engineering Steer R3 was read as product guidance; it does not turn every phase into this release's scope. The [goals audit](GOALS-AUDIT.md) preserves the later refinements and earlier product goals. The first implementation remains generic and local, with fictional language. Real reference exports are not present; their availability does not block engine/interaction work. Verify source labels and conversion fidelity before calling imported material approved.
 

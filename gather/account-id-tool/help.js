@@ -19,7 +19,7 @@ const topics = [
   ]},
   {id:'start',title:'Start with the page you are viewing',tags:'quick start install beginner how to use',steps:[
     'Open a profile on Instagram, Facebook, Threads, TikTok or YouTube, then click Gather in your browser toolbar.',
-    'Gather starts a current-page lookup automatically when there is no pasted draft. Find IDs on this page starts it manually; Retry this page runs another check.',
+    'Gather starts a current-page lookup automatically when there is no pasted draft. Find IDs on this page starts it manually. Find again repeats a completed lookup; Retry this page retries an unfinished check.',
     'Use Copy IDs or the Copy button beside an ID. Saving a result is a separate, deliberate action.',
     'For screenshots, choose the destination shown beside Case/SOC, then Select area, Full page or Visible area. Inbox works without creating a case.'
   ]},

@@ -1,8 +1,12 @@
-# Gather 1.8.17 RC
+# Gather 1.8.18 RC
 
 A local Edge extension for exact account IDs, screenshots and deliberate research. **Open a page → Gather → inspect or copy.** A case is optional. Blue/white controls keep routine work in the toolbar; the full workspace has Research, Captures, Case, Reference and Settings.
 
-## What changed
+## What changed in 1.8.18
+
+Successful current-page lookups now say **Find again**, while unsuccessful results keep **Retry this page**. Secondary toolbar text is larger and darker, with screenshot actions still anchored below lookup results. Capture History removes the repeated scan heading in a single-scan view and preserves headings in broader views. Current guidance now accurately describes the shipped Reference tools.
+
+## Available tools
 
 - Supported video/post URLs can resolve their explicitly bound author. TikTok videos, Instagram posts/reels, Threads posts, YouTube videos/Shorts and supported Facebook videos/reels return a clean canonical owner profile. Exact IDs remain strings; ambiguous/missing author structures fail visibly.
 - **Save source image to Gather** is available by right-clicking an image. It preserves the exact returned PNG/JPEG/WebP/AVIF/GIF bytes, source URL, dimensions and hash under the frozen Case/SOC. No guessed CDN rewrites or screenshot fallback. Auto-copy source images is a separate option.
@@ -14,9 +18,9 @@ The existing two-second conditional Instagram readiness check, exact selection p
 
 ## Install, update and rollback
 
-You need only **Gather-1.8.17-extension.zip**. Extract it to a permanent folder; in `edge://extensions`, enable Developer mode and Load unpacked → **account-id-tool**. Your organization must allow unpacked extensions. Pin Gather and open Help for workflow guidance.
+You need only **Gather-1.8.18-extension.zip**. Extract it to a permanent folder; in `edge://extensions`, enable Developer mode and Load unpacked → **account-id-tool**. Your organization must allow unpacked extensions. Pin Gather and open Help for workflow guidance.
 
-To update, finish captures and close Gather windows. Preserve a private backup as appropriate. Replace all files at the **same installed account-id-tool path**, then Reload; confirm **1.8.17**. Do not uninstall or clear browser storage. Keep the immutable 1.8.16 ZIP and a matching pre-update backup. Test rollback in a separate profile: much older builds may not understand newer source-image formats or Reference features. Reference has its own collection export, separate from case backups.
+To update, finish captures and close Gather windows. Preserve a private backup as appropriate. Replace all files at the **same installed account-id-tool path**, then Reload; confirm **1.8.18**. Do not uninstall or clear browser storage. Keep the immutable 1.8.17 ZIP and a matching pre-update backup. Test rollback in a separate profile: much older builds may not understand newer source-image formats or Reference features. Reference has its own collection export, separate from case backups.
 
 ## Local work and deliberate external actions
 
@@ -34,7 +38,7 @@ Storage limits: 4 MiB workspace JSON; 64 MiB image asset, 192 MiB capture and 51
 
 [TESTING](docs/TESTING.md) separates deterministic, rendered/mocked, native Linux Edge and external-provider checks. Windows signed-in sessions, native Windows scaling, OS dialogs and application clipboard integrations remain unverified. No universal browser/site reliability guarantee is claimed.
 
-[Product Audit](docs/PRODUCT-AUDIT-1.8.17.md) · [Future Plans](docs/FUTURE-PLANS.md) · [Quick Start](account-id-tool/COWORKER-QUICK-START.md) · [Handoff](docs/NEXT-RUN-HANDOFF.md)
+[Product Audit](docs/PRODUCT-AUDIT-1.8.18.md) · [Future Plans](docs/FUTURE-PLANS.md) · [Quick Start](account-id-tool/COWORKER-QUICK-START.md) · [Handoff](docs/NEXT-RUN-HANDOFF.md)
 
 ## Development
 
@@ -47,4 +51,4 @@ node --test tests/*.test.mjs
 
 See TESTING and ENVIRONMENT-SETUP for browser commands. Do not edit runtime/tests while suites run. Package only into a new immutable version directory after final verification. Public evidence must remain fictional; scanner pattern checks are not a universal sensitive-data detector.
 
-In 1.8.17, **+ Add SOC** stays beside the case heading and in compact panel content. Reverse image accepts Ctrl+V into its image area, as well as files and drops. Invalid replacement images clear the previous selection; opening a new filing case returns history to that case.
+**+ Add SOC** stays beside the case heading and in compact panel content. Reverse image accepts Ctrl+V into its image area, as well as files and drops. Invalid replacement images clear the previous selection; opening a new filing case returns history to that case.

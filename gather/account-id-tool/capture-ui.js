@@ -119,8 +119,14 @@ async function renderLibrary(){
   try{
     libraryCaption.textContent=records.length+' capture'+(records.length===1?'':'s')+' · '+(browse==='scan'?destinationLabel(state,frozen.scanId):browse==='all'?'All cases':browse==='case'?state.projects.find(p=>p.id===frozen.projectId)?.name||'Inbox':'Selected subject across this case');moreButton.hidden=records.length<=shown;
     if(!records.length){const empty=el('div',undefined,'empty');empty.append(el('strong',searchText||statusFilter!=='saved'?'No matching captures':'No captures here yet'),el('span','Use Gather on a page to capture its image, or choose another view.'));fragment.append(empty);}
+    // A single current scan is already named above the list. Keep group labels
+    // for broader views, including scans beyond the first displayed page.
+    const showGroupTitles=browse==='all'||records.some(record=>record.scanId!==frozen.scanId);
     for(const group of captureHistoryGroups(records.slice(0,shown))){
-      const section=el('section',undefined,'capture-group'),grid=el('div',undefined,'capture-grid');section.append(el('h3',destinationLabel(state,group.scanId),'capture-group-title'),grid);fragment.append(section);
+      const section=el('section',undefined,'capture-group'),grid=el('div',undefined,'capture-grid'),groupName=destinationLabel(state,group.scanId);
+      section.setAttribute('aria-label',groupName);
+      if(showGroupTitles)section.append(el('h3',groupName,'capture-group-title'));
+      section.append(grid);fragment.append(section);
       for(const record of group.records){
         const card=el('article',undefined,'capture-card');card.dataset.captureId=record.id;card.dataset.focusKey=record.id;const open=button('',()=>openCapture(record.id));open.className='capture-open';open.setAttribute('aria-label','Open capture '+(record.source.title||captureHost(record)));const figure=el('div',undefined,'capture-image'),info=el('div',undefined,'capture-card-info');
         info.append(el('span',record.mode==='source-image'?'Source image':'Screenshot','capture-type'),el('h3',record.source.title||captureHost(record)),el('p',captureHost(record)+' · '+new Date(record.startedAt).toLocaleString()),el('p',historySubjects.get(record.subjectId)?.name||record.context.subjectName||'Unassigned','capture-subject'),el('span',record.review==='reviewed'?'Reviewed':record.review==='excluded'?'Excluded':record.review==='follow-up'?'Needs follow-up':'Unreviewed','capture-review'));open.append(figure,info);

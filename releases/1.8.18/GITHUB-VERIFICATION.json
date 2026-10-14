@@ -1,0 +1,34 @@
+{
+  "checked_at_utc": "2026-10-14T19:48:07.332361+00:00",
+  "release_url": "https://github.com/roedoeroe/Gather/releases/tag/1.8.18-rc.1",
+  "tag": "1.8.18-rc.1",
+  "release_target_commit": "afc2d4d07511013237b984b2c886ad563069ec69",
+  "prerelease": true,
+  "draft": false,
+  "only_asset": "Gather-1.8.18-extension.zip",
+  "download_url": "https://github.com/roedoeroe/Gather/releases/download/1.8.18-rc.1/Gather-1.8.18-extension.zip",
+  "anonymous_download_http": 200,
+  "bytes": 245618,
+  "sha256": "9d8524907c54363a38c42511a96dfb7b5bc12bce5d0aa5fb75714d1eaa7e64f6",
+  "zip_crc": "passed",
+  "manifest_version": "1.8.18",
+  "runtime_files_matching_tested_source": 102,
+  "previous_versions_untouched": true,
+  "upload_workflow": "https://github.com/roedoeroe/Gather/actions/runs/38626654015",
+  "upload_workflow_status": "success",
+  "upload_prerequisite_correction": "Created the immutable version tag before retrying upload; the draft-only missing-tag lookup returned HTTP422 in the first attempt. No asset was overwritten.",
+  "source_commit_checks": [
+    {
+      "name": "deterministic",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/roedoeroe/Gather/actions/runs/38626307669/job/116066223204"
+    },
+    {
+      "name": "deterministic",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/roedoeroe/Gather/actions/runs/38626285014/job/116066152124"
+    }
+  ]
+}

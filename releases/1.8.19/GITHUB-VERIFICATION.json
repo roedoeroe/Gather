@@ -1,0 +1,17 @@
+{
+  "checked_at_utc": "2026-10-15T19:06:21.449940+00:00",
+  "release_url": "https://github.com/roedoeroe/Gather/releases/tag/1.8.19-rc.1",
+  "tag": "1.8.19-rc.1",
+  "release_target_commit": "8a26b9357783a4d7a7b2c91d6118404648cb96d4",
+  "prerelease": true,
+  "draft": false,
+  "only_asset": "Gather-1.8.19-extension.zip",
+  "download_url": "https://github.com/roedoeroe/Gather/releases/download/1.8.19-rc.1/Gather-1.8.19-extension.zip",
+  "anonymous_download_http": 200,
+  "bytes": 254263,
+  "sha256": "6498544fcfef557ad70eb177ffa58cf36242c9b9a4ce6f5f88a59e98c52eb5d0",
+  "zip_crc": "passed",
+  "manifest_version": "1.8.19",
+  "runtime_files_matching_tested_source": 105,
+  "previous_versions_untouched": true
+}

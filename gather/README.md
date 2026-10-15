@@ -1,14 +1,16 @@
-# Gather 1.8.18 RC
+# Gather 1.8.19 RC
 
 A local Edge extension for exact account IDs, screenshots and deliberate research. **Open a page → Gather → inspect or copy.** A case is optional. Blue/white controls keep routine work in the toolbar; the full workspace has Research, Captures, Case, Reference and Settings.
 
-## What changed in 1.8.18
+## What changed in 1.8.19
 
-Successful current-page lookups now say **Find again**, while unsuccessful results keep **Retry this page**. Secondary toolbar text is larger and darker, with screenshot actions still anchored below lookup results. Capture History removes the repeated scan heading in a single-scan view and preserves headings in broader views. Current guidance now accurately describes the shipped Reference tools.
+**Get real post date** reads a publication timestamp tied to the current post. It shows UTC and your local time, labels date-only/minute precision, and offers **Copy date**. It does not estimate timestamps from relative labels, use edit times, or save a new date history.
+
+Post-author lookup now recognizes ordinary Facebook post/photo links, TikTok photo posts and X/Twitter status links. X is read only after invoking Gather on the current page; no background host permission was added. Exact IDs remain strings. A post ID, commenter or quoted author cannot substitute for the post author. Missing or conflicting information remains unresolved.
 
 ## Available tools
 
-- Supported video/post URLs can resolve their explicitly bound author. TikTok videos, Instagram posts/reels, Threads posts, YouTube videos/Shorts and supported Facebook videos/reels return a clean canonical owner profile. Exact IDs remain strings; ambiguous/missing author structures fail visibly.
+- Supported video/post URLs can resolve their explicitly bound author. TikTok videos, Instagram posts/reels, Threads posts, YouTube videos/Shorts and Facebook posts/photos/videos/reels and current X posts can return a clean canonical owner profile. Exact IDs remain strings; ambiguous/missing author structures fail visibly.
 - **Save source image to Gather** is available by right-clicking an image. It preserves the exact returned PNG/JPEG/WebP/AVIF/GIF bytes, source URL, dimensions and hash under the frozen Case/SOC. No guessed CDN rewrites or screenshot fallback. Auto-copy source images is a separate option.
 - **Reverse image** starts with a selected local file or stored capture. Preview, change/remove, then Copy & open the chosen provider. The image is not uploaded automatically. Manual upload options remain when clipboard/provider support differs.
 - **Reference** imports a local Markdown folder or transparent versioned JSON pack, searches titles/sections/paths/text/aliases with conservative typo matching, and copies exact source wording. No proprietary content, remote AI, email composition or live OneNote dependency.
@@ -18,9 +20,9 @@ The existing two-second conditional Instagram readiness check, exact selection p
 
 ## Install, update and rollback
 
-You need only **Gather-1.8.18-extension.zip**. Extract it to a permanent folder; in `edge://extensions`, enable Developer mode and Load unpacked → **account-id-tool**. Your organization must allow unpacked extensions. Pin Gather and open Help for workflow guidance.
+You need only **Gather-1.8.19-extension.zip**. Extract it to a permanent folder; in `edge://extensions`, enable Developer mode and Load unpacked → **account-id-tool**. Your organization must allow unpacked extensions. Pin Gather and open Help for workflow guidance.
 
-To update, finish captures and close Gather windows. Preserve a private backup as appropriate. Replace all files at the **same installed account-id-tool path**, then Reload; confirm **1.8.18**. Do not uninstall or clear browser storage. Keep the immutable 1.8.17 ZIP and a matching pre-update backup. Test rollback in a separate profile: much older builds may not understand newer source-image formats or Reference features. Reference has its own collection export, separate from case backups.
+To update, finish captures and close Gather windows. Preserve a private backup as appropriate. Replace all files at the **same installed account-id-tool path**, then Reload; confirm **1.8.19**. Do not uninstall or clear browser storage. Keep the immutable 1.8.18 ZIP and a matching pre-update backup. Test rollback in a separate profile: much older builds may not understand newer source-image formats or Reference features. Reference has its own collection export, separate from case backups.
 
 ## Local work and deliberate external actions
 
@@ -32,13 +34,13 @@ Red deletion controls remove local records and image blobs in the selected scope
 
 ## Limits and verification
 
-This is a controlled release candidate. Supported URL recognition does not guarantee a platform exposes a reliable author/ID. Opaque short links, ambiguous content and login/security challenges do not produce guessed identities. X remains search-only. Full-page capture is bounded to 24 tiles, 48 million pixels, 24,000 CSS pixels and 60 seconds; changing feeds/sticky content can cause partial output. Check completion status.
+This is a controlled release candidate. Supported URL recognition does not guarantee a platform exposes a reliable author/ID. Opaque short links, ambiguous content and login/security challenges do not produce guessed identities. X requires current-page toolbar invocation; pasted-only background lookup explains this limit. Full-page capture is bounded to 24 tiles, 48 million pixels, 24,000 CSS pixels and 60 seconds; changing feeds/sticky content can cause partial output. Check completion status.
 
 Storage limits: 4 MiB workspace JSON; 64 MiB image asset, 192 MiB capture and 512 MiB image total. Source-image access can fail on authenticated, redirected, temporary/blob, canvas-only or CORS-blocked resources. Clipboard conversion to PNG can flatten animation to a still frame; original bytes remain unchanged. Reference: 2,000 files, 2 MiB/file, 20 MiB/collection, 100 MiB total. Imports exclude common unsafe folders/credential markers but do not replace review of approved source material.
 
 [TESTING](docs/TESTING.md) separates deterministic, rendered/mocked, native Linux Edge and external-provider checks. Windows signed-in sessions, native Windows scaling, OS dialogs and application clipboard integrations remain unverified. No universal browser/site reliability guarantee is claimed.
 
-[Product Audit](docs/PRODUCT-AUDIT-1.8.18.md) · [Future Plans](docs/FUTURE-PLANS.md) · [Quick Start](account-id-tool/COWORKER-QUICK-START.md) · [Handoff](docs/NEXT-RUN-HANDOFF.md)
+[Product Audit](docs/PRODUCT-AUDIT-1.8.19.md) · [Future Plans](docs/FUTURE-PLANS.md) · [Quick Start](account-id-tool/COWORKER-QUICK-START.md) · [Handoff](docs/NEXT-RUN-HANDOFF.md)
 
 ## Development
 

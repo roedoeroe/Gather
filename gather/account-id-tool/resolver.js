@@ -108,7 +108,7 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
       if(actual.key!==profile.key||tab.pendingUrl&&!matchesProfile(tab.pendingUrl,profile))return {error:'The current page changed. Open the profile and run it again.'};
       let snapshot=await readProfileInPage(currentTabId,profile,{includeName});
       check(signal);
-      while(profile.platform==='instagram'&&snapshot.result.error?.startsWith('No matching account ID')&&Date.now()<deadline){
+      while(profile.platform==='instagram'&&(snapshot.result.error?.startsWith('No matching account ID')||profile.content&&snapshot.result.error?.startsWith('Could not determine the owner'))&&Date.now()<deadline){
         onStage?.('Waiting briefly for profile data…');
         await pause(Math.min(SETTLE_INTERVAL_MS,deadline-Date.now()),signal);
         if(!await sameCurrentProfile(currentTabId,profile))return {error:'The page changed during lookup. Open the intended profile and retry.'};
@@ -160,6 +160,7 @@ export async function resolveProfile(profile, {signal, browserFallback = true, o
     // This explicit operation reads source in the same authorized tab/document.
     // The existing user tab is never tracked as temporary or closed by Gather.
   }
+  if(profile.platform==='x')return {error:'Open this X post or profile, then use Gather’s toolbar to read its author ID. No background X access is requested.'};
   onStage?.('Fetching profile…');
   const direct = await fetchSource(profile, signal);
   check(signal);

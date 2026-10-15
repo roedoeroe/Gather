@@ -1,0 +1,34 @@
+{
+  "version": "1.8.19",
+  "version_name": "1.8.19 RC",
+  "prepared_at_utc": "2026-10-15T16:24:12.421196+00:00",
+  "permissions_unchanged_from_1_8_18": true,
+  "runtime_files": 105,
+  "generated_reader_check": "passed",
+  "privacy_pattern_gate": "passed; not general PII/legal certification",
+  "packages": [
+    {
+      "file": "Gather-1.8.19-development.zip",
+      "sha256": "37a72400cb85496c32a0d4e11e57b40b4e553ebdd227ebafdf07544943e5281c",
+      "bytes": 16704822,
+      "zip_crc": "passed",
+      "zip_entries": 852,
+      "runtime_files_matching_tested_source": 105
+    },
+    {
+      "file": "Gather-1.8.19-extension.zip",
+      "sha256": "6498544fcfef557ad70eb177ffa58cf36242c9b9a4ce6f5f88a59e98c52eb5d0",
+      "bytes": 254263,
+      "zip_crc": "passed",
+      "zip_entries": 105,
+      "runtime_files_matching_tested_source": 105
+    }
+  ],
+  "extracted_extension_native_post_groups": 12,
+  "extracted_development_node_tests": {
+    "passed": 243,
+    "failed": 0,
+    "skipped": 0
+  },
+  "extracted_development_reader_check": "passed"
+}

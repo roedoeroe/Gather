@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "groups": 12,
+  "passed": [
+    "instagram: real toolbar resolves bound author; native Copy IDs and Copy date round-trip through the system clipboard.",
+    "tiktok: real toolbar resolves bound author; native Copy IDs and Copy date round-trip through the system clipboard.",
+    "facebook: real toolbar resolves bound author; native Copy IDs and Copy date round-trip through the system clipboard.",
+    "threads: real toolbar resolves bound author; native Copy IDs and Copy date round-trip through the system clipboard.",
+    "x: real toolbar resolves bound author; native Copy IDs and Copy date round-trip through the system clipboard.",
+    "youtube: real toolbar resolves bound author; native Copy IDs and Copy date round-trip through the system clipboard.",
+    "Delayed Instagram post owner resolves within the existing two-second buffer without a second user action or source fetch.",
+    "X date source fallback uses one GET of the same authorized post with real activeTab; no X host permission.",
+    "Generated isolated reader reads exact permalink time and ignores a comment timestamp.",
+    "Conflicting dates show an explanation with no copyable guessed value.",
+    "SPA navigation during date acquisition discards stale results and hides Copy date.",
+    "Profile pages explain that post dates require an individual post."
+  ],
+  "errors": [],
+  "scope": "Native sandboxed Linux Edge, real toolbar and clipboard, fictional HTTPS responses; not signed-in live-platform coverage."
+}

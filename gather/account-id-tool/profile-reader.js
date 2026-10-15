@@ -167,8 +167,8 @@ return {cleanProfileStatus,detectProfileStatus,currentProfileStatus,parseNotes,n
 modules.push((() => {
 const {confirmedGone,accountState,orderAccounts,ADAPTER_VERSION} = modules[0];
 const {detectProfileStatus, cleanProfileStatus, notesInfo} = modules[1];
-const PLATFORMS = ['instagram', 'facebook', 'threads', 'tiktok', 'youtube'];
-const LABELS = {instagram: 'Instagram', facebook: 'Facebook', threads: 'Threads', tiktok: 'TikTok', youtube: 'YouTube'};
+const PLATFORMS = ['instagram', 'facebook', 'threads', 'tiktok', 'youtube', 'x'];
+const LABELS = {instagram: 'Instagram', facebook: 'Facebook', threads: 'Threads', tiktok: 'TikTok', youtube: 'YouTube', x: 'X / Twitter'};
 const numeric = value => typeof value === 'string' && /^[1-9]\d{0,29}$/.test(value);
 const channel = value => typeof value === 'string' && /^UC[\w-]{22}$/.test(value);
 const clean = value => value.replace(/^[<(["']+|[>\])"'.!?]+$/g, '');
@@ -216,8 +216,12 @@ function normalizeProfile(value) {
     } else if (/^(c|user)$/.test(first) && second && (parts.length === 2 || parts.length === 3 && tab.test(third))) {
       handle = second; path = '/' + first + '/' + encodeURIComponent(second);
     } else throw new Error('Use a YouTube channel link, not a video');
-  } else throw new Error('Use an Instagram, Facebook, Threads, TikTok or YouTube profile URL');
-  const canonical = 'https://www.' + platform + '.com' + path;
+  } else if (host === 'x.com' || host === 'twitter.com') {
+    platform = 'x';
+    if(parts.length!==1||! /^[A-Za-z0-9_]{1,15}$/.test(first)||/^(home|explore|search|i|intent|settings|messages|notifications|compose|login|logout|signup)$/i.test(first))throw new Error('Use an X profile or post link');
+    handle=first;path='/'+handle;
+  } else throw new Error('Use an Instagram, Facebook, Threads, TikTok, YouTube or X profile or post URL');
+  const canonical = (platform==='x'?'https://x.com':'https://www.'+platform+'.com') + path;
   return {platform, handle, directId, url: canonical, key: platform === 'youtube' && directId ? canonical : canonical.toLowerCase()};
 }
 
@@ -394,7 +398,7 @@ function jsonObjects(html) {
     if (/^[{[]/.test(body)) { try { roots.push(parseJson(body)); } catch {} }
     // Known data assignments contain JSON, not executable extraction logic.
     // Read their balanced JSON value without evaluating the surrounding script.
-    const marker = /(?:\b(?:var\s+)?(?:ytInitialData|ytInitialPlayerResponse)\s*=|\bwindow\._sharedData\s*=|\bwindow\.__additionalDataLoaded\s*\(\s*["'][^"']+["']\s*,)\s*/g;
+    const marker = /(?:\b(?:var\s+)?(?:ytInitialData|ytInitialPlayerResponse)\s*=|\bwindow\.(?:_sharedData|__INITIAL_STATE__)\s*=|\bwindow\.__additionalDataLoaded\s*\(\s*["'][^"']+["']\s*,)\s*/g;
     let start;
     while ((start = marker.exec(body))) {
       const tail = body.slice(start.index + start[0].length);
@@ -514,6 +518,12 @@ function extractId(html, profile, pageUrl = profile.url) {
       if (/^(profile_owner|profileOwner)$/.test(key)) {
         if (matching(obj.username) || sameUrl(obj.url) || (!obj.username && !obj.url && ogMatches)) add(obj.id || obj.profile_id, 'Profile owner data', obj.name);
       }
+    } else if (profile.platform === 'x') {
+      const user=obj.legacy||obj;
+      if(matching(user.screen_name||obj.core?.screen_name)){
+        for(const field of ['rest_id','id_str'])if(obj[field])add(obj[field],'Matched X account data · '+field,user.name||obj.core?.name);
+        if(user.id_str)add(user.id_str,'Matched X account data · id_str',user.name);
+      }
     } else if (profile.platform === 'youtube' && key === 'channelMetadataRenderer') {
       const addresses = [obj.vanityChannelUrl, ...(Array.isArray(obj.ownerUrls) ? obj.ownerUrls : [])].filter(Boolean);
       // An explicit different handle is never accepted. Legacy /c and /user URLs can redirect.
@@ -610,15 +620,28 @@ function normalizeLookup(value) {
     const host=url.hostname.replace(/^(www|m|mobile|web)\./,''),path=url.pathname;
     let platform,contentId,kind,owner='';
     let match;
-    if(host==='tiktok.com'&&(match=path.match(/^\/@([\w.]{1,30})\/video\/([1-9]\d{0,29})\/?$/))){platform='tiktok';owner=match[1];contentId=match[2];kind='video';}
-    else if(host==='instagram.com'&&(match=path.match(/^\/(p|reel)\/([\w-]{1,64})\/?$/))){platform='instagram';kind=match[1];contentId=match[2];}
+    if(host==='tiktok.com'&&(match=path.match(/^\/@([\w.]{1,30})\/(?:video|photo)\/([1-9]\d{0,29})\/?$/))){platform='tiktok';owner=match[1];contentId=match[2];kind='video';}
+    else if(host==='instagram.com'&&(match=path.match(/^\/(p|reel|reels)\/([\w-]{1,64})\/?$/))){platform='instagram';kind=match[1];contentId=match[2];}
     else if(['threads.com','threads.net'].includes(host)&&(match=path.match(/^\/@([\w.]{1,30})\/post\/([\w-]{1,64})\/?$/))){platform='threads';owner=match[1];kind='post';contentId=match[2];}
     else if(host==='youtube.com'&&((match=path.match(/^\/shorts\/([\w-]{11})\/?$/))||(path==='/watch'&&/^[\w-]{11}$/.test(url.searchParams.get('v')||'')))){platform='youtube';kind=match?'shorts':'watch';contentId=match?.[1]||url.searchParams.get('v');}
     else if(host==='facebook.com'&&((match=path.match(/^\/(reel|videos)\/([1-9]\d{0,29})\/?$/))||(/^\/watch\/?$/.test(path)&&numeric(url.searchParams.get('v'))))){platform='facebook';kind=match?.[1]||'watch';contentId=match?.[2]||url.searchParams.get('v');}
+    else if(host==='facebook.com'&&(match=path.match(/^\/(?:[\w.-]+\/posts|groups\/[^/]+\/posts)\/([\w-]{1,100})\/?$/))){platform='facebook';kind='post';contentId=match[1];}
+    else if(host==='facebook.com'&&/^\/(?:story|permalink)\.php$/.test(path)&&/^[\w-]{1,100}$/.test(url.searchParams.get('story_fbid')||'')){platform='facebook';kind='story';contentId=url.searchParams.get('story_fbid');}
+    else if(host==='facebook.com'&&/^\/photo(?:\.php|\/)?$/.test(path)&&numeric(url.searchParams.get('fbid'))){platform='facebook';kind='photo';contentId=url.searchParams.get('fbid');}
+    else if(['x.com','twitter.com'].includes(host)&&(match=path.match(/^\/(?:([A-Za-z0-9_]{1,15})\/status|i\/web\/status)\/([1-9]\d{0,29})(?:\/(?:photo|video)\/[1-9]\d*)?\/?$/))){platform='x';kind='status';owner=match[1]||'';contentId=match[2];}
     else throw profileError;
-    const cleanUrl=platform==='youtube'?`https://www.youtube.com/watch?v=${contentId}`:platform==='facebook'&&kind==='watch'?`https://www.facebook.com/watch/?v=${contentId}`:`https://www.${platform}.com${path.replace(/\/$/,'')}`;
-    return {platform,handle:owner,directId:'',url:cleanUrl,key:'content:'+platform+':'+owner.toLowerCase()+':'+contentId,content:{kind,id:contentId,owner},...(owner?{ownerProfileUrl:normalizeProfile(`https://www.${platform}.com/@${owner}`).url}:{})};
+    const cleanUrl=platform==='x'?`https://x.com/${owner||'i/web'}/status/${contentId}`:platform==='facebook'&&kind==='story'?`https://www.facebook.com/permalink.php?story_fbid=${contentId}`+(numeric(url.searchParams.get('id'))?'&id='+url.searchParams.get('id'):''):platform==='facebook'&&kind==='photo'?`https://www.facebook.com/photo.php?fbid=${contentId}`:platform==='youtube'?`https://www.youtube.com/watch?v=${contentId}`:platform==='facebook'&&kind==='watch'?`https://www.facebook.com/watch/?v=${contentId}`:`https://www.${platform}.com${path.replace(/\/$/,'')}`;
+    return {platform,handle:owner,directId:'',url:cleanUrl,key:'content:'+platform+':'+owner.toLowerCase()+':'+contentId,content:{kind,id:contentId,owner},...(owner?{ownerProfileUrl:normalizeProfile(platform==='x'?`https://x.com/${owner}`:`https://www.${platform}.com/@${owner}`).url}:{})};
   }
+}
+
+// A parent post_id on a comment is a reference, not the comment's identity.
+function isFacebookContentRecord(obj,id) {
+  if(/comment|reply/i.test(obj.__typename||'')||obj.comment_id!==undefined||obj.reply_id!==undefined)return false;
+  const typed=/^(Story|Post|Video|Photo)$/.test(obj.__typename||'');
+  if(asId(obj.post_id)===id)return typed||Array.isArray(obj.actors)&&obj.actors.length>0;
+  if(['video_id','legacy_fbid'].some(k=>asId(obj[k])===id))return typed||/^(User|Page)$/.test(obj.owner?.__typename||'');
+  return false;
 }
 
 function extractLookup(html, lookup, pageUrl=lookup.url) {
@@ -646,8 +669,12 @@ function extractLookup(html, lookup, pageUrl=lookup.url) {
       const profile=normalizeProfile('https://www.youtube.com/channel/'+obj.channelId);
       candidates.set(profile.key+':'+obj.channelId,{id:obj.channelId,displayName:cleanName(obj.author),canonicalProfileUrl:profile.url,method:'Content owner · videoDetails',verifiedAt:Date.now()});
     }
-    if(lookup.platform==='facebook'&&['post_id','video_id','legacy_fbid'].some(k=>asId(obj[k])===lookup.content.id)){
-      for(const owner of [obj.author,obj.owner])if(owner&&/^(User|Page)$/.test(owner.__typename)&&numeric(asId(owner.id)))add(owner,'https://www.facebook.com/profile.php?id='+asId(owner.id));
+    if(lookup.platform==='x'&&(asId(obj.rest_id||obj.id_str)===lookup.content.id||asId(obj.legacy?.id_str)===lookup.content.id)){
+      const user=obj.core?.user_results?.result||obj.user;
+      if(user?.legacy?.screen_name||user?.core?.screen_name||user?.screen_name)add(user,'https://x.com/'+(user.legacy?.screen_name||user.core?.screen_name||user.screen_name));
+    }
+    if(lookup.platform==='facebook'&&isFacebookContentRecord(obj,lookup.content.id)){
+      for(const owner of [obj.author,obj.owner,...(Array.isArray(obj.actors)?obj.actors:[])])if(owner&&/^(User|Page)$/.test(owner.__typename)&&numeric(asId(owner.id)))add(owner,'https://www.facebook.com/profile.php?id='+asId(owner.id));
     }
   });
   if(conflict||candidates.size>1)return {error:'Multiple owner accounts or conflicting IDs found. Gather did not choose an owner.'};
@@ -655,7 +682,7 @@ function extractLookup(html, lookup, pageUrl=lookup.url) {
   return {error:'Could not determine the owner account from this page. Open the owner profile and retry.'};
 }
 
-return {PLATFORMS,LABELS,normalizeProfile,parseInput,suppliedIds,idCheck,isCopyableId,applyLookup,pageAccessIssue,extractId,cleanName,accountTitle,formatDetails,formatIds,normalizeLookup,extractLookup};
+return {PLATFORMS,LABELS,normalizeProfile,parseInput,suppliedIds,idCheck,isCopyableId,applyLookup,jsonObjects,walk,pageAccessIssue,extractId,cleanName,accountTitle,formatDetails,formatIds,normalizeLookup,isFacebookContentRecord,extractLookup};
 })());
 modules.push((() => {
 // Serialized by chrome.scripting: this function must have no module closures.
@@ -679,8 +706,84 @@ async function readProfileSource(){
 
 return {readProfileSource};
 })());
+modules.push((() => {
+const {normalizeLookup,jsonObjects,walk,pageAccessIssue,isFacebookContentRecord} = modules[2];
+
+// Dates belong to a specific post, never to the first timestamp on a page.
+function parsePostTimestamp(value) {
+  if(typeof value==='number')value=String(value);
+  if(typeof value!=='string'||value.length>120)return null;
+  const raw=value.trim();let milliseconds,precision='second';
+  if(/^\d{10}(?:\d{3})?$/.test(raw))milliseconds=Number(raw)*(raw.length===10?1000:1);
+  else if(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})?)?$/.test(raw)){
+    const date=raw.slice(0,10),[y,m,d]=date.split('-').map(Number);
+    if(y<2000||y>new Date().getUTCFullYear()+1||m<1||m>12||d<1||d>new Date(Date.UTC(y,m,0)).getUTCDate())return null;
+    const clock=raw.slice(11).match(/^(\d{2}):(\d{2})(?::(\d{2}))?/);
+    if(clock&&(Number(clock[1])>23||Number(clock[2])>59||Number(clock[3]||0)>59))return null;
+    if(raw.length===10)return {value:raw,precision:'date',timezone:'not supplied',raw};
+    // A wall-clock time without an offset is not an absolute instant.
+    if(!/(Z|[+-]\d{2}:\d{2})$/.test(raw))return null;
+    if(!/:\d{2}:\d{2}/.test(raw))precision='minute';
+    milliseconds=Date.parse(raw);
+  }else if(/^[A-Z][a-z]{2} [A-Z][a-z]{2} \d{2} \d{2}:\d{2}:\d{2} [+-]\d{4} \d{4}$/.test(raw))milliseconds=Date.parse(raw);
+  else return null;
+  if(!Number.isFinite(milliseconds)||milliseconds<Date.UTC(2000,0,1)||milliseconds>Date.now()+86400000)return null;
+  return {value:new Date(milliseconds).toISOString(),precision,timezone:'UTC',raw};
+}
+function extractPostDate(html,lookup,pageUrl=lookup.url,times=[]) {
+  if(typeof html!=='string'||html.length>15000000)return {error:'This page exceeds Gather’s reading limit.'};
+  let current;try{current=normalizeLookup(pageUrl);}catch{return {error:'Open an individual supported post to get its date.'};}
+  if(!lookup.content||current.key!==lookup.key)return {error:'The post changed. Open the intended post and try again.'};
+  const roots=jsonObjects(html),access=pageAccessIssue(html,pageUrl,roots);if(access)return {error:access};
+  const candidates=[];
+  const matches=url=>{try{const link=new URL(url,pageUrl);if(['comment_id','reply_comment_id','reply_id','lc'].some(k=>link.searchParams.has(k)))return false;return normalizeLookup(link.href).key===lookup.key;}catch{return false;}};
+  const add=(value,method)=>{const date=parsePostTimestamp(value);if(date)candidates.push({...date,method});};
+  const id=lookup.content.id,platform=lookup.platform;
+  walk(roots,obj=>{
+    if(platform==='instagram'&&(obj.shortcode===id||obj.code===id))for(const k of ['taken_at_timestamp','taken_at'])add(obj[k],'Instagram · '+k);
+    if(platform==='threads'&&(obj.code===id||obj.shortcode===id))add(obj.taken_at,'Threads · taken_at');
+    if(platform==='tiktok'&&String(obj.id)===id&&obj.author)for(const k of ['createTime','create_time'])add(obj[k],'TikTok · '+k);
+    if(platform==='facebook'&&isFacebookContentRecord(obj,id))for(const k of ['creation_time','created_time','publish_time'])add(obj[k],'Facebook · '+k);
+    if(platform==='x'&&(String(obj.rest_id||obj.id_str)===id||String(obj.legacy?.id_str)===id)&&(obj.core?.user_results||obj.user))add(obj.legacy?.created_at||obj.created_at,'X · created_at');
+    if(platform==='youtube'&&obj.videoDetails?.videoId===id){const data=obj.microformat?.playerMicroformatRenderer;if(data)add(data.publishDate,'YouTube · publishDate');}
+    const type=Array.isArray(obj['@type'])?obj['@type']:[obj['@type']];
+    if(type.some(t=>['SocialMediaPosting','BlogPosting','VideoObject','Article'].includes(t))&&[obj.url,obj['@id'],typeof obj.mainEntityOfPage==='string'?obj.mainEntityOfPage:obj.mainEntityOfPage?.['@id']].some(v=>typeof v==='string'&&matches(v)))add(obj.datePublished,'Post-linked structured data · datePublished');
+  });
+  for(const time of times.slice(0,100))if(typeof time?.url==='string'&&matches(time.url))add(time.value,'Post permalink · '+(time.kind==='epoch'?'timestamp':'time datetime'));
+  if(!candidates.length)return {error:'No exact publication date was exposed for this post. Relative labels such as “1w” are not precise enough.'};
+  const exact=candidates.filter(c=>c.precision!=='date'),chosen=exact[0]||candidates[0];
+  // Minute values may corroborate seconds without inventing seconds themselves.
+  const conflict=candidates.some(c=>{
+    if(c.precision==='date'||chosen.precision==='date')return c.value.slice(0,10)!==chosen.value.slice(0,10);
+    const unit=c.precision==='minute'||chosen.precision==='minute'?60000:1000;
+    return Math.floor(Date.parse(c.value)/unit)!==Math.floor(Date.parse(chosen.value)/unit);
+  });
+  if(conflict)return {error:'Conflicting publication dates were found for this post. Gather did not choose one.'};
+  const best=exact.find(c=>c.precision==='second')||chosen;
+  return {...best,postUrl:lookup.url,platform,checkedAt:Date.now()};
+}
+
+return {parsePostTimestamp,extractPostDate};
+})());
 const {extractLookup, normalizeLookup} = modules[2];
 const {readProfileSource} = modules[3];
+const {extractPostDate} = modules[4];
+Object.defineProperty(globalThis, '__gatherPostDateReader', {configurable: true, value: async url => {
+  let post;try {post=normalizeLookup(url);}catch{return {error:'Open an individual supported post first.'};}
+  const before=location.href,times=[];
+  for(const node of document.querySelectorAll('time[datetime],abbr[data-utime]')){
+    const anchor=node.closest('a[href]');
+    if(anchor)times.push({url:anchor.href,value:node.getAttribute('datetime')||node.getAttribute('data-utime'),kind:node.hasAttribute('data-utime')?'epoch':'datetime'});
+    if(times.length>=100)break;
+  }
+  let result=extractPostDate(document.documentElement.outerHTML.slice(0,15000001),post,before,times);
+  if(result.error?.startsWith('No exact publication date')){
+    const source=await readProfileSource();
+    if(!source.error)result=extractPostDate(source.html,post,source.url,times);
+  }
+  if(location.href!==before)return {error:'The post changed while its date was being read. Try again.'};
+  return result;
+}});
 Object.defineProperty(globalThis, '__gatherProfileReader', {configurable: true, value: async (url, source, includeName) => {
   let profile;
   try {profile = normalizeLookup(url);} catch {return {error: 'Invalid profile link.'};}

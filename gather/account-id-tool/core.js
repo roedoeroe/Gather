@@ -1,7 +1,7 @@
 import {confirmedGone,accountState,orderAccounts,ADAPTER_VERSION} from './account-state.js';
 import {detectProfileStatus, cleanProfileStatus, notesInfo} from './profile-status.js';
-export const PLATFORMS = ['instagram', 'facebook', 'threads', 'tiktok', 'youtube'];
-export const LABELS = {instagram: 'Instagram', facebook: 'Facebook', threads: 'Threads', tiktok: 'TikTok', youtube: 'YouTube'};
+export const PLATFORMS = ['instagram', 'facebook', 'threads', 'tiktok', 'youtube', 'x'];
+export const LABELS = {instagram: 'Instagram', facebook: 'Facebook', threads: 'Threads', tiktok: 'TikTok', youtube: 'YouTube', x: 'X / Twitter'};
 const numeric = value => typeof value === 'string' && /^[1-9]\d{0,29}$/.test(value);
 const channel = value => typeof value === 'string' && /^UC[\w-]{22}$/.test(value);
 const clean = value => value.replace(/^[<(["']+|[>\])"'.!?]+$/g, '');
@@ -49,8 +49,12 @@ export function normalizeProfile(value) {
     } else if (/^(c|user)$/.test(first) && second && (parts.length === 2 || parts.length === 3 && tab.test(third))) {
       handle = second; path = '/' + first + '/' + encodeURIComponent(second);
     } else throw new Error('Use a YouTube channel link, not a video');
-  } else throw new Error('Use an Instagram, Facebook, Threads, TikTok or YouTube profile URL');
-  const canonical = 'https://www.' + platform + '.com' + path;
+  } else if (host === 'x.com' || host === 'twitter.com') {
+    platform = 'x';
+    if(parts.length!==1||! /^[A-Za-z0-9_]{1,15}$/.test(first)||/^(home|explore|search|i|intent|settings|messages|notifications|compose|login|logout|signup)$/i.test(first))throw new Error('Use an X profile or post link');
+    handle=first;path='/'+handle;
+  } else throw new Error('Use an Instagram, Facebook, Threads, TikTok, YouTube or X profile or post URL');
+  const canonical = (platform==='x'?'https://x.com':'https://www.'+platform+'.com') + path;
   return {platform, handle, directId, url: canonical, key: platform === 'youtube' && directId ? canonical : canonical.toLowerCase()};
 }
 
@@ -218,7 +222,7 @@ function parseJson(text) {
   }
   parts.push(text.slice(start));return JSON.parse(parts.join(''));
 }
-function jsonObjects(html) {
+export function jsonObjects(html) {
   const roots = [];
   const source = html.trim();
   if (/^[{[]/.test(source)) { try { roots.push(parseJson(source)); } catch {} }
@@ -227,7 +231,7 @@ function jsonObjects(html) {
     if (/^[{[]/.test(body)) { try { roots.push(parseJson(body)); } catch {} }
     // Known data assignments contain JSON, not executable extraction logic.
     // Read their balanced JSON value without evaluating the surrounding script.
-    const marker = /(?:\b(?:var\s+)?(?:ytInitialData|ytInitialPlayerResponse)\s*=|\bwindow\._sharedData\s*=|\bwindow\.__additionalDataLoaded\s*\(\s*["'][^"']+["']\s*,)\s*/g;
+    const marker = /(?:\b(?:var\s+)?(?:ytInitialData|ytInitialPlayerResponse)\s*=|\bwindow\.(?:_sharedData|__INITIAL_STATE__)\s*=|\bwindow\.__additionalDataLoaded\s*\(\s*["'][^"']+["']\s*,)\s*/g;
     let start;
     while ((start = marker.exec(body))) {
       const tail = body.slice(start.index + start[0].length);
@@ -243,7 +247,7 @@ function jsonObjects(html) {
   }
   return roots;
 }
-function walk(roots, visit) {
+export function walk(roots, visit) {
   const stack = roots.map(value => ({value, key: ''})); let count = 0;
   while (stack.length && count++ < 150000) {
     const {value, key} = stack.pop();
@@ -347,6 +351,12 @@ export function extractId(html, profile, pageUrl = profile.url) {
       if (/^(profile_owner|profileOwner)$/.test(key)) {
         if (matching(obj.username) || sameUrl(obj.url) || (!obj.username && !obj.url && ogMatches)) add(obj.id || obj.profile_id, 'Profile owner data', obj.name);
       }
+    } else if (profile.platform === 'x') {
+      const user=obj.legacy||obj;
+      if(matching(user.screen_name||obj.core?.screen_name)){
+        for(const field of ['rest_id','id_str'])if(obj[field])add(obj[field],'Matched X account data · '+field,user.name||obj.core?.name);
+        if(user.id_str)add(user.id_str,'Matched X account data · id_str',user.name);
+      }
     } else if (profile.platform === 'youtube' && key === 'channelMetadataRenderer') {
       const addresses = [obj.vanityChannelUrl, ...(Array.isArray(obj.ownerUrls) ? obj.ownerUrls : [])].filter(Boolean);
       // An explicit different handle is never accepted. Legacy /c and /user URLs can redirect.
@@ -443,15 +453,28 @@ export function normalizeLookup(value) {
     const host=url.hostname.replace(/^(www|m|mobile|web)\./,''),path=url.pathname;
     let platform,contentId,kind,owner='';
     let match;
-    if(host==='tiktok.com'&&(match=path.match(/^\/@([\w.]{1,30})\/video\/([1-9]\d{0,29})\/?$/))){platform='tiktok';owner=match[1];contentId=match[2];kind='video';}
-    else if(host==='instagram.com'&&(match=path.match(/^\/(p|reel)\/([\w-]{1,64})\/?$/))){platform='instagram';kind=match[1];contentId=match[2];}
+    if(host==='tiktok.com'&&(match=path.match(/^\/@([\w.]{1,30})\/(?:video|photo)\/([1-9]\d{0,29})\/?$/))){platform='tiktok';owner=match[1];contentId=match[2];kind='video';}
+    else if(host==='instagram.com'&&(match=path.match(/^\/(p|reel|reels)\/([\w-]{1,64})\/?$/))){platform='instagram';kind=match[1];contentId=match[2];}
     else if(['threads.com','threads.net'].includes(host)&&(match=path.match(/^\/@([\w.]{1,30})\/post\/([\w-]{1,64})\/?$/))){platform='threads';owner=match[1];kind='post';contentId=match[2];}
     else if(host==='youtube.com'&&((match=path.match(/^\/shorts\/([\w-]{11})\/?$/))||(path==='/watch'&&/^[\w-]{11}$/.test(url.searchParams.get('v')||'')))){platform='youtube';kind=match?'shorts':'watch';contentId=match?.[1]||url.searchParams.get('v');}
     else if(host==='facebook.com'&&((match=path.match(/^\/(reel|videos)\/([1-9]\d{0,29})\/?$/))||(/^\/watch\/?$/.test(path)&&numeric(url.searchParams.get('v'))))){platform='facebook';kind=match?.[1]||'watch';contentId=match?.[2]||url.searchParams.get('v');}
+    else if(host==='facebook.com'&&(match=path.match(/^\/(?:[\w.-]+\/posts|groups\/[^/]+\/posts)\/([\w-]{1,100})\/?$/))){platform='facebook';kind='post';contentId=match[1];}
+    else if(host==='facebook.com'&&/^\/(?:story|permalink)\.php$/.test(path)&&/^[\w-]{1,100}$/.test(url.searchParams.get('story_fbid')||'')){platform='facebook';kind='story';contentId=url.searchParams.get('story_fbid');}
+    else if(host==='facebook.com'&&/^\/photo(?:\.php|\/)?$/.test(path)&&numeric(url.searchParams.get('fbid'))){platform='facebook';kind='photo';contentId=url.searchParams.get('fbid');}
+    else if(['x.com','twitter.com'].includes(host)&&(match=path.match(/^\/(?:([A-Za-z0-9_]{1,15})\/status|i\/web\/status)\/([1-9]\d{0,29})(?:\/(?:photo|video)\/[1-9]\d*)?\/?$/))){platform='x';kind='status';owner=match[1]||'';contentId=match[2];}
     else throw profileError;
-    const cleanUrl=platform==='youtube'?`https://www.youtube.com/watch?v=${contentId}`:platform==='facebook'&&kind==='watch'?`https://www.facebook.com/watch/?v=${contentId}`:`https://www.${platform}.com${path.replace(/\/$/,'')}`;
-    return {platform,handle:owner,directId:'',url:cleanUrl,key:'content:'+platform+':'+owner.toLowerCase()+':'+contentId,content:{kind,id:contentId,owner},...(owner?{ownerProfileUrl:normalizeProfile(`https://www.${platform}.com/@${owner}`).url}:{})};
+    const cleanUrl=platform==='x'?`https://x.com/${owner||'i/web'}/status/${contentId}`:platform==='facebook'&&kind==='story'?`https://www.facebook.com/permalink.php?story_fbid=${contentId}`+(numeric(url.searchParams.get('id'))?'&id='+url.searchParams.get('id'):''):platform==='facebook'&&kind==='photo'?`https://www.facebook.com/photo.php?fbid=${contentId}`:platform==='youtube'?`https://www.youtube.com/watch?v=${contentId}`:platform==='facebook'&&kind==='watch'?`https://www.facebook.com/watch/?v=${contentId}`:`https://www.${platform}.com${path.replace(/\/$/,'')}`;
+    return {platform,handle:owner,directId:'',url:cleanUrl,key:'content:'+platform+':'+owner.toLowerCase()+':'+contentId,content:{kind,id:contentId,owner},...(owner?{ownerProfileUrl:normalizeProfile(platform==='x'?`https://x.com/${owner}`:`https://www.${platform}.com/@${owner}`).url}:{})};
   }
+}
+
+// A parent post_id on a comment is a reference, not the comment's identity.
+export function isFacebookContentRecord(obj,id) {
+  if(/comment|reply/i.test(obj.__typename||'')||obj.comment_id!==undefined||obj.reply_id!==undefined)return false;
+  const typed=/^(Story|Post|Video|Photo)$/.test(obj.__typename||'');
+  if(asId(obj.post_id)===id)return typed||Array.isArray(obj.actors)&&obj.actors.length>0;
+  if(['video_id','legacy_fbid'].some(k=>asId(obj[k])===id))return typed||/^(User|Page)$/.test(obj.owner?.__typename||'');
+  return false;
 }
 
 export function extractLookup(html, lookup, pageUrl=lookup.url) {
@@ -479,8 +502,12 @@ export function extractLookup(html, lookup, pageUrl=lookup.url) {
       const profile=normalizeProfile('https://www.youtube.com/channel/'+obj.channelId);
       candidates.set(profile.key+':'+obj.channelId,{id:obj.channelId,displayName:cleanName(obj.author),canonicalProfileUrl:profile.url,method:'Content owner · videoDetails',verifiedAt:Date.now()});
     }
-    if(lookup.platform==='facebook'&&['post_id','video_id','legacy_fbid'].some(k=>asId(obj[k])===lookup.content.id)){
-      for(const owner of [obj.author,obj.owner])if(owner&&/^(User|Page)$/.test(owner.__typename)&&numeric(asId(owner.id)))add(owner,'https://www.facebook.com/profile.php?id='+asId(owner.id));
+    if(lookup.platform==='x'&&(asId(obj.rest_id||obj.id_str)===lookup.content.id||asId(obj.legacy?.id_str)===lookup.content.id)){
+      const user=obj.core?.user_results?.result||obj.user;
+      if(user?.legacy?.screen_name||user?.core?.screen_name||user?.screen_name)add(user,'https://x.com/'+(user.legacy?.screen_name||user.core?.screen_name||user.screen_name));
+    }
+    if(lookup.platform==='facebook'&&isFacebookContentRecord(obj,lookup.content.id)){
+      for(const owner of [obj.author,obj.owner,...(Array.isArray(obj.actors)?obj.actors:[])])if(owner&&/^(User|Page)$/.test(owner.__typename)&&numeric(asId(owner.id)))add(owner,'https://www.facebook.com/profile.php?id='+asId(owner.id));
     }
   });
   if(conflict||candidates.size>1)return {error:'Multiple owner accounts or conflicting IDs found. Gather did not choose an owner.'};

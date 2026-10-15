@@ -12,21 +12,23 @@ const topics = [
     'Login-Info, ARCHIVED-DONT-USE, media and duplicate export folders are excluded, as is recognizable credential content. A pattern filter cannot identify every secret: review your folder before importing. HTML, images and links are displayed as text rather than fetched or executed.',
     'Choose a collection to edit local aliases, export it, replace it with a newer version or delete it. Reference exports are separate unencrypted files. Case backups do not contain your Reference Library. Limits: 2,000 files, 2 MiB per file, 20 MiB per collection and 100 MiB total.'
   ]},
-  {id:'content-owner',title:'Look up the owner of a video or post',tags:'tiktok video instagram reel youtube shorts facebook threads canonical clean url',paragraphs:[
-    'Open Gather on a supported content page, or paste its URL. TikTok videos, Instagram posts/reels, YouTube videos/Shorts, Threads posts and supported Facebook videos/reels are recognized. A result requires content-specific author data tied to that content. Supported URL recognition does not guarantee a site exposes usable owner data.',
+  {id:'content-owner',title:'Look up the owner of a video or post',tags:'tiktok video instagram reel youtube shorts facebook threads x twitter date timestamp time publication canonical clean url',paragraphs:[
+    'Open Gather on a supported content page, or paste its URL. TikTok videos, Instagram posts/reels, YouTube videos/Shorts, Threads posts and Facebook posts/photos/videos/reels and X posts are recognized. A result requires content-specific author data tied to that content. Supported URL recognition does not guarantee a site exposes usable owner data.',
     'The four-field account result shows the owner’s clean profile URL. Tracking parameters are removed; identity-critical Facebook profile.php?id values remain. The original requested content link stays in local lookup provenance. Commenters, viewers, recommendations and conflicting owners never substitute for an author.',
+    'Get real post date reads a timestamp tied to the current post. UTC and your local time are shown when available; date-only or minute precision is labeled. Copy date copies the result. Relative labels, edit times, comments and conflicting dates are not treated as publication times. Date results are temporary and are not added to lookup history.',
+    'X requires opening Gather from its toolbar button on the post or profile. Gather does not request background access to X. Other pasted content links can use the existing lookup paths.',
     'If the site exposes no reliable author binding, open the owner’s profile and retry. Opaque short/share links are not automatically followed.'
   ]},
   {id:'start',title:'Start with the page you are viewing',tags:'quick start install beginner how to use',steps:[
-    'Open a profile on Instagram, Facebook, Threads, TikTok or YouTube, then click Gather in your browser toolbar.',
+    'Open a profile or post on Instagram, Facebook, Threads, TikTok, YouTube or X, then click Gather in your browser toolbar.',
     'Gather starts a current-page lookup automatically when there is no pasted draft. Find IDs on this page starts it manually. Find again repeats a completed lookup; Retry this page retries an unfinished check.',
     'Use Copy IDs or the Copy button beside an ID. Saving a result is a separate, deliberate action.',
     'For screenshots, choose the destination shown beside Case/SOC, then Select area, Full page or Visible area. Inbox works without creating a case.'
   ]},
   {id:'accounts',title:'What is an account ID? Which platforms work?',tags:'identifier username platform instagram facebook threads tiktok youtube x',paragraphs:[
     'An account ID is the platform’s identifier for an account or channel. It is different from a display name or username. An ID does not confirm who operates an account or whether two accounts belong to one person.',
-    'Gather extracts IDs from Instagram, Facebook, Threads, TikTok and YouTube. X is available for launching searches, but has no ID extractor.',
-    'Open Paste profile links for one link or a list. Enter runs the list; Shift+Enter adds a new line. Open account tools provides mixed batches of up to 100 accounts. IDs remain exact text, including long numbers.'
+    'Gather extracts IDs from Instagram, Facebook, Threads, TikTok, YouTube and the current X page when the site exposes a reliable account binding.',
+    'Open Paste profile or post links for one link or a list. Enter runs the list; Shift+Enter adds a new line. Open account tools provides mixed batches of up to 100 accounts. IDs remain exact text, including long numbers.'
   ]},
   {id:'copy',title:'Copy IDs, account details and annotations',tags:'clipboard auto-copy poss priv empty batch recent history names',paragraphs:[
     'IDs only copies checked identifiers. Account details includes links and available names; Display names can be switched off. Auto-copy IDs, screenshots and source images are three separate remembered choices.',

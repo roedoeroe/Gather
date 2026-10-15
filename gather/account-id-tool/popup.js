@@ -1,3 +1,4 @@
+import {mountPostTools} from './post-tools.js';
 import {recentBatches} from './batches.js';
 import {clearHistoryDialog} from './history-ui.js';
 import {formerAliasButton} from './account-state-ui.js';
@@ -9,6 +10,7 @@ import {recoverPastedLinks} from './paste.js';
 import {patchPreferences, onPreferencesChanged} from './preferences.js';
 
 const $ = id => document.getElementById(id);
+mountPostTools(document.getElementById('postTools'));
 // Viewport-relative height feeds back into Chrome's popup auto-sizing. Use the
 // screen instead, leaving space for the browser toolbar on smaller displays.
 document.documentElement.style.setProperty('--panel-limit',Math.max(360,Math.min(580,screen.availHeight-40))+'px');
@@ -27,7 +29,7 @@ function notice(message, success=false) {
 }
 function renderInput() {
   const parsed=parseInput($('quickLinks').value), count=parsed.entries.length, fromPage=useCurrentPage();
-  $('quickCount').textContent=count?count+' account'+(count===1?'':'s')+(parsed.duplicates?' · duplicates merged':'')+(parsed.invalid.length?' · '+parsed.invalid.length+' items skipped':''): $('quickLinks').value.trim()?'No supported profile links found':'Instagram, Facebook, Threads, TikTok, YouTube';
+  $('quickCount').textContent=count?count+' account'+(count===1?'':'s')+(parsed.duplicates?' · duplicates merged':'')+(parsed.invalid.length?' · '+parsed.invalid.length+' items skipped':''): $('quickLinks').value.trim()?'No supported profile or post links found':'Instagram, Facebook, Threads, TikTok, YouTube, X';
   renderSummary();
   $('getIds').disabled=!initialized||submitting||state.busy||checkingPage||(!count&&!fromPage);
   const pageResult=fromPage&&state.submittedInput===currentPage&&entries().length===1?entries()[0]:null;

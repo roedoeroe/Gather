@@ -5,7 +5,7 @@ Current direction: a fast local Edge utility for exact account IDs, Case > SOC f
 | Priority / area | Smallest useful next step | Dependency / risk | Status |
 |---|---|---|---|
 | P2 — Windows acceptance | Run the published ZIP in organization-managed Windows Edge: signed-in platform pages, native 80–200% zoom/display scaling, clipboard paste to work applications, Save/Print dialogs and side-panel invocation. | Requires that actual OS/session. Linux evidence must not be renamed Windows evidence. | External verification pending; current release is a controlled RC. |
-| P2 — Content adapters | Add narrowly bound variants only when a sanitized real structure explains a supported-platform failure. | Wrong owner/ID is worse than uncertainty; preserve 2-second IG readiness and navigation guards. | Five deterministic content bindings shipped; opaque short URLs/unsupported structures fail visibly. |
+| P2 — Content adapters | Add narrowly bound variants only when a sanitized real structure explains a supported-platform failure. | Wrong owner/ID is worse than uncertainty; preserve 2-second IG readiness and navigation guards. | Six deterministic content bindings shipped (X requires current-page toolbar invocation); opaque short URLs/unsupported structures fail visibly. |
 | P2 — Source-image access | Examine specific authenticated/redirected CDN failures with authorized fixtures; consider optional host access only when scope can remain narrow. | No broad host permissions, signed-URL rewriting or hidden screenshot fallback. | Exact clicked HTTP(S) source path shipped; blocked/temporary sources remain explicit failures. |
 | P2 — Reverse providers | Verify documented provider routes in the target region/session and add a supported direct handoff only if it needs no private API. | Provider policies/change; no hidden uploads or case metadata. | Local selection/copy + explicit provider opening shipped. Live Yandex paste and TinEye upload were verified with a fictional geometric image in1.8.17. Google challenged; other provider limitations remain. All submissions remain analyst-controlled. |
 | P2 — Reference corpus | Validate a private approved Markdown export locally: taxonomy, section labels, exclusions and ranking examples. | Real corpus not supplied to this run. Never publish organization wording; preserve exact source text. | Generic local importer/search shipped. |
@@ -16,7 +16,7 @@ Current direction: a fast local Edge utility for exact account IDs, Case > SOC f
 
 Not planned: cloud case storage, identity/relationship/threat conclusions, result scraping, coverage automation, intake/narrative parser revival, automated email sending, AI-dependent Reference or live OneNote searching. A composition feature would require a new explicit product decision; current Reference only retrieves/copies exact wording.
 
-Release blockers belong in [Product Audit](PRODUCT-AUDIT-1.8.18.md), not this backlog. Check [TESTING](TESTING.md) for evidence rather than treating historical ideas as shipped features.
+Current date/author limits are in [Post tools](POST-DATES.md); the prior stabilization audit is [Product Audit](PRODUCT-AUDIT-1.8.18.md), not this backlog. Check [TESTING](TESTING.md) for evidence rather than treating historical ideas as shipped features.
 
 ## Current-tool audit after R10
 

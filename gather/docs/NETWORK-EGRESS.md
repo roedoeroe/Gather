@@ -36,3 +36,7 @@ See [provider capabilities](REVERSE-IMAGE-PROVIDERS.md), [storage and deletion](
 ## 1.8.17 delta
 
 Add SOC and image paste create no network requests. Reverse Image still copies locally and opens the selected provider’s public page only on explicit action. The analyst performs any final paste/upload there; no Case/SOC/Reference metadata is sent. Live QA used only a generated geometric PNG. Yandex paste and TinEye upload returned results; Google’s network challenge was respected. Raw live diagnostics remain outside public inputs.
+
+## 1.8.19 post tools
+
+Get real post date is an explicit current-page read with at most one existing bounded same-origin source GET. X author/date lookup uses activeTab from toolbar invocation, without an X host permission or background platform API request. Date results are transient and do not create a new log or upload.

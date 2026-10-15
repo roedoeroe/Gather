@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "kind": "rendered-local-help",
+  "passed": [
+    "Shared Help presents the current version and focuses its search field.",
+    "Search, no-match state, Clear and Escape work without saving the search.",
+    "Topic navigation clears filters and moves keyboard focus to its answer.",
+    "Help reflows at 400px and reads no case data, creates no storage, makes no external request and throws no page error."
+  ],
+  "errors": []
+}

@@ -7,14 +7,15 @@
 <p align="center">Account lookup. Screenshots. Organized research.</p>
 
 <p align="center">
-  <strong><a href="https://github.com/roedoeroe/Gather/releases/download/1.8.18-rc.1/Gather-1.8.18-extension.zip">Download Gather 1.8.18 RC</a></strong>
+  <strong><a href="https://github.com/roedoeroe/Gather/releases/download/1.8.19-rc.1/Gather-1.8.19-extension.zip">Download Gather 1.8.19 RC</a></strong>
   · <a href="#install-or-update">Install or update</a>
-  · <a href="https://github.com/roedoeroe/Gather/releases/tag/1.8.18-rc.1">Release notes</a>
+  · <a href="https://github.com/roedoeroe/Gather/releases/tag/1.8.19-rc.1">Release notes</a>
 </p>
 
 Gather is a local browser extension that takes the repetitive work out of research. **Open a profile → Gather → inspect or copy.** Start immediately; a case is optional.
 
-- **Look up accounts.** Find and copy exact platform IDs from Instagram, Facebook, Threads, TikTok and YouTube.
+- **Look up accounts.** Find and copy exact platform IDs from supported profiles and posts, including the current X page.
+- **Read post dates.** Get the publication date/time exposed for the current post, see its timezone and copy it. No guessing from “1w”.
 - **Capture what matters.** Select an area, scroll to extend it, or capture the visible/full page. Copy the image or edit it with crop, arrows, circles and manual black redactions.
 - **Save source images.** Right-click an image to preserve its returned bytes; reverse search starts with a selected image in Gather.
 - **Find reference wording.** Import a private Markdown folder, search locally and copy exact source text.
@@ -38,13 +39,13 @@ Edits are saved separately from the original. Choose what to mark, review the re
 
 **You only need the extension ZIP.**
 
-1. [Download Gather](https://github.com/roedoeroe/Gather/releases/download/1.8.18-rc.1/Gather-1.8.18-extension.zip) and extract the ZIP into a permanent folder.
+1. [Download Gather](https://github.com/roedoeroe/Gather/releases/download/1.8.19-rc.1/Gather-1.8.19-extension.zip) and extract the ZIP into a permanent folder.
 2. In Edge, open `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select **account-id-tool**. Your organization must allow unpacked extensions.
 3. Pin Gather in the browser toolbar, open a supported profile, and click Gather. **Help** is available in the popup, side panel and workspace.
 
-**Already using Gather?** Finish captures and close Gather windows. Replace all files in the **same installed account-id-tool folder**, then click **Reload** at `edge://extensions`. Confirm **1.8.18**. Do not uninstall or clear storage to update. Keep the previous version and a matching private backup for rollback testing in a separate browser profile.
+**Already using Gather?** Finish captures and close Gather windows. Replace all files in the **same installed account-id-tool folder**, then click **Reload** at `edge://extensions`. Confirm **1.8.19**. Do not uninstall or clear storage to update. Keep the previous version and a matching private backup for rollback testing in a separate browser profile.
 
-[Quick Start — read online](https://github.com/roedoeroe/Gather/blob/1.8.18-rc.1/gather/account-id-tool/COWORKER-QUICK-START.md) · [Detailed product guide](https://github.com/roedoeroe/Gather/blob/1.8.18-rc.1/gather/README.md)
+[Quick Start — read online](https://github.com/roedoeroe/Gather/blob/1.8.19-rc.1/gather/account-id-tool/COWORKER-QUICK-START.md) · [Detailed product guide](https://github.com/roedoeroe/Gather/blob/1.8.19-rc.1/gather/README.md)
 
 ## Your work stays local
 
@@ -54,19 +55,19 @@ Copying and exporting create copies outside Gather. Red deletion controls remove
 
 ## Current release
 
-**1.8.18 is a release candidate for a small coworker pilot.** It clarifies successful lookup actions, makes toolbar text easier to read and reduces repeated headings in Capture History. Existing source images, manual editing, Reference, SOC filing and local deletion remain available. The conditional two-second Instagram readiness check is unchanged.
+**1.8.19 is a release candidate for a small coworker pilot.** It adds **Get real post date**, extends post-author lookup to ordinary Facebook posts and the current X page, and preserves the two-second Instagram readiness check for posts as well as profiles.
 
-The build passed **230 Node tests and 56 affected rendered workflow groups**, plus installed Linux Edge journeys. See the test report for native counts and package/update evidence. Signed-in Windows Edge, Windows display scaling, native side-panel opening and OS save/print dialogs still need pilot verification.
+Verification covers deterministic parsers, the rendered toolbar and installed Linux Edge with fictional platform responses. See the test report for exact counts and package/update evidence. Signed-in Windows Edge and changing live platform markup still need pilot verification. An exact date or author ID is available only when the page exposes reliably bound data.
 
-[Full test evidence](https://github.com/roedoeroe/Gather/blob/1.8.18-rc.1/gather/docs/TESTING.md) · [Known limitations](https://github.com/roedoeroe/Gather/blob/1.8.18-rc.1/gather/docs/RELEASE-CANDIDATE-1.8.18.md) · [Report a reproducible bug](https://github.com/roedoeroe/Gather/issues/new?template=bug-report.yml)
+[Full test evidence](https://github.com/roedoeroe/Gather/blob/1.8.19-rc.1/gather/docs/TESTING.md) · [Known limitations](https://github.com/roedoeroe/Gather/blob/1.8.19-rc.1/gather/docs/RELEASE-CANDIDATE-1.8.19.md) · [Report a reproducible bug](https://github.com/roedoeroe/Gather/issues/new?template=bug-report.yml)
 
 <details>
 <summary>For developers and contributors</summary>
 
-The default `main` branch contains the 1.8.18 release-candidate source. Development continues on [`develop/1.8.0-r3`](https://github.com/roedoeroe/Gather/tree/develop/1.8.0-r3); the branch name is historical. Use the immutable [`1.8.18-rc.1` tag](https://github.com/roedoeroe/Gather/tree/1.8.18-rc.1) to reproduce the published download.
+The default `main` branch contains the 1.8.19 release-candidate source. Development continues on [`develop/1.8.0-r3`](https://github.com/roedoeroe/Gather/tree/develop/1.8.0-r3); the branch name is historical. Use the immutable [`1.8.19-rc.1` tag](https://github.com/roedoeroe/Gather/tree/1.8.19-rc.1) to reproduce the published download.
 
 The runtime is in `gather/account-id-tool`, with no bundler, hosted server or runtime install step. See [Contributing](CONTRIBUTING.md) for test commands and repository layout, and [Security](SECURITY.md) for handling reports without exposing real case data.
 
-[Source/test package and integrity receipts](https://github.com/roedoeroe/Gather/tree/1.8.18-rc.1/releases/1.8.18) · [Product direction](https://github.com/roedoeroe/Gather/blob/1.8.18-rc.1/gather/docs/FUTURE-PLANS.md)
+[Source/test package and integrity receipts](https://github.com/roedoeroe/Gather/tree/1.8.19-rc.1/releases/1.8.19) · [Product direction](https://github.com/roedoeroe/Gather/blob/1.8.19-rc.1/gather/docs/FUTURE-PLANS.md)
 
 </details>
